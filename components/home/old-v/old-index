@@ -1,0 +1,185 @@
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import { getDistance } from 'geolib';
+import Geocoder from 'react-native-geocoding';
+import Navbar from '../navbar';
+import * as Location from 'expo-location';
+import { LocationAccuracy } from 'expo-location';
+import Maps from '../maps';
+import { connect } from 'react-redux';
+import { fireDb } from '../../App';
+import { firestore } from 'firebase';
+import { RootProps } from '../../services';
+import { Locations, acceptedRadius } from '../utils/variables';
+import { updateProfileLocationStateZip } from './utils'
+
+// @ts-ignore
+Geocoder.init("AIzaSyC5Lil9HNqIMl61FAhrBBnb0c6vmih7aQk");
+
+//init firestore
+// export var fireDb = firebase.firestore()
+
+export interface UsersLocationProps {
+    uid: string,
+    longitude: number,
+    latitude: number
+}
+
+export interface StateZipState {
+    state: string,
+    zip: string
+}
+
+const Home: React.FC<{ uid: string }> = ({ uid }) => {
+    const [userStateZip, setUserStateZip] = useState<StateZipState>()
+    const [location, setLocation] = useState<Location.LocationObject>();
+    const [errorMsg, setErrorMsg] = useState<string>();
+    const [users, setUsers] = useState<Array<UsersLocationProps> | null>(null);
+
+    const listenToLocationsUpdate = (location: Location.LocationObject, stateZip: StateZipState) => {
+        fireDb
+            .collection(Locations)
+            .doc(stateZip.state)
+            .collection(stateZip.zip)
+            .where(firestore.FieldPath.documentId(), "!=", uid)
+            .onSnapshot(function (querySnapshot) {
+
+                var usersArr: Array<UsersLocationProps> = [];
+
+                querySnapshot.docs.forEach(doc => {
+                    // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+                    const { longitude, latitude } = doc.data()
+
+                    //distance is in meters
+                    var distanceBetweenPoints = getDistance(
+                        { latitude: location.coords.latitude, longitude: location.coords.longitude },
+                        { latitude, longitude }
+                    )
+
+                    //set meters to 800 (1/2 mile)
+                    if (distanceBetweenPoints < acceptedRadius) {
+                        usersArr.push({
+                            uid: doc.id,
+                            longitude,
+                            latitude
+                        })
+                    }
+                })
+                setUsers(usersArr)
+            })
+    }
+
+    const getUserStateZip = async (location: Location.LocationObject) => {
+
+        var stateZip: StateZipState = {
+            state: '',
+            zip: ''
+        }
+
+        try {
+            // @ts-ignore
+            const res = await Geocoder.from({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            })
+
+            var address: string = res.results[0].formatted_address
+
+            //the second index should be the state and zip
+            var geoStateZip = address.split(',')[2].split(' ');
+
+            stateZip = {
+                state: geoStateZip[1],
+                zip: geoStateZip[2]
+            }
+
+        } catch (e) {
+            console.log(e)
+            return;
+        }
+
+        if (stateZip.zip && stateZip.state) {
+            setUserStateZip(stateZip)
+            return stateZip
+        } else {
+            //set a fallback action to have user manually enter state and zip?
+        }
+
+
+    }
+
+    const setUserLocation = async (location: Location.LocationObject) => {
+        if (!userStateZip) {
+            var stateZip: StateZipState | undefined = await getUserStateZip(location);
+        }
+
+        console.log(stateZip);
+
+        if (!stateZip) {
+            return;
+        }
+
+        //function checks stored location in profile and compares current location
+        //if different ? remove previous location in Location collection : nothing
+        await updateProfileLocationStateZip(uid, stateZip)
+
+        await fireDb.collection(Locations).doc(stateZip.state).collection(stateZip.zip).doc(uid).set({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        })
+            .then(() => {
+                if (stateZip) {
+                    listenToLocationsUpdate(location, stateZip)
+                }
+            })
+            .catch((err) => console.log(err))
+    }
+
+    useEffect(() => {
+        //only allow american users
+        (async () => {
+            try {
+                let { status } = await Location.requestPermissionsAsync();
+                if (status !== 'granted') {
+                    setErrorMsg('Permission to access location was denied');
+                }
+
+                let location = await Location.getCurrentPositionAsync({ accuracy: LocationAccuracy.Highest });
+
+                if (location) {
+                    setUserLocation(location);
+                    setLocation(location)
+                }
+            } catch (e) {
+                console.log(e)
+            }
+        })();
+
+        return () => {
+
+        }
+    }, []);
+
+    return (
+        <View style={styles.container}>
+            {errorMsg && <Text>{errorMsg}</Text>}
+            {location ? <Maps location={location} users={users} /> : <Text>Loading...</Text>}
+            <Navbar />
+        </View >
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+})
+
+const mapStateToProps = (state: RootProps) => ({
+    uid: state.user.uid
+})
+
+
+export default connect(mapStateToProps, {})(Home);
