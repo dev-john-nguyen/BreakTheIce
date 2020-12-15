@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import Maps from '../maps';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { set_user_location } from '../../services/user/actions';
+import { set_and_listen_user_location } from '../../services/user/actions';
 import { set_and_listen_near_users } from '../../services/near_users/actions';
+import { set_and_listen_invitations } from '../../services/invitations/actions';
+import { set_and_listen_friends } from '../../services/friends/actions';
 import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/tsTypes';
-import { NearUsersProps, NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
+import { NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
+import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
+import { FriendDispatchActionProps } from '../../services/friends/tsTypes';
+import { HomeStackNavigationProp } from '../navigation/utils';
 import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
 // @ts-ignore
@@ -16,9 +21,12 @@ import { GEOCODER_KEY } from '@env'
 Geocoder.init(GEOCODER_KEY);
 
 interface HomeProps {
+    navigation: HomeStackNavigationProp;
     user: UserRootStateProps;
-    set_user_location: UserDispatchActionsProps['set_user_location'];
+    set_and_listen_user_location: UserDispatchActionsProps['set_and_listen_user_location'];
     set_and_listen_near_users: NearUsersDispatchActionProps['set_and_listen_near_users'];
+    set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
+    set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends']
 }
 
 interface CurrentLocationProps {
@@ -105,16 +113,23 @@ const Home = (props: HomeProps) => {
     }, [])
 
     useEffect(() => {
+        //initate and set all the listeners
         if (currentLocation && currentLocation.location && currentLocation.stateCity) {
-            props.set_user_location(props.user.uid, currentLocation.stateCity, currentLocation.location)
-            props.set_and_listen_near_users(props.user.uid, currentLocation.stateCity, currentLocation.location)
+            props.set_and_listen_user_location(currentLocation.stateCity, currentLocation.location);
+            props.set_and_listen_near_users(props.user.uid, currentLocation.stateCity, currentLocation.location);
+            props.set_and_listen_invitations(props.user.uid)
+            props.set_and_listen_friends(props.user.uid)
         }
     }, [currentLocation])
 
+    const handleOnListViewPress = () => props.navigation.push('NearByList')
 
     return (
         <View style={styles.container}>
-            {props.user.location && props.user.stateCity ? <Maps /> : <ActivityIndicator />}
+            {props.user.location && props.user.stateCity ?
+                <Maps navigation={props.navigation} />
+                :
+                <ActivityIndicator />}
         </View>
     )
 }
@@ -124,17 +139,17 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    }
+    },
+
 })
 
 const mapStateToProps = (state: RootProps) => ({
     user: state.user,
 })
 
-Home.propType = {
-    user: PropTypes.object.isRequired,
-    set_user_location: PropTypes.func.isRequired,
-    set_and_listen_near_users: PropTypes.func.isRequired
-}
+// Home.propType = {
+//     user: PropTypes.object.isRequired,
+//     set_and_listen_near_users: PropTypes.func.isRequired
+// }
 
-export default connect(mapStateToProps, { set_user_location, set_and_listen_near_users })(Home);
+export default connect(mapStateToProps, { set_and_listen_user_location, set_and_listen_near_users, set_and_listen_invitations, set_and_listen_friends })(Home);

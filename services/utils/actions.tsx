@@ -6,9 +6,9 @@ export const set_error = (message: String) => ({
     payload: message
 })
 
-export const remove_error = {
+export const remove_error = () => ({
     type: REMOVE_ERROR
-}
+})
 
 export const set_loading = {
     type: SET_LOADING

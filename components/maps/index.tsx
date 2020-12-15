@@ -1,16 +1,13 @@
 import React from 'react';
-import MapView, { Marker, EventUserLocation } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Pressable, ActivityIndicator } from 'react-native';
-import { getDistance } from 'geolib';
-import { locationDistanceIntervalToUpdate, locationSpeedToUpdate } from '../../utils/variables';
+import { ProfilePage, NearByListPage } from '../../utils/variables';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { update_user_location } from '../../services/user/actions';
 import { validate_near_users } from '../../services/near_users/actions';
-import { NearUsersLocationProps, NearUsersProps, NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
+import { NearUsersRootProps, NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/tsTypes';
-import { LocationObject } from 'expo-location';
-import * as Location from 'expo-location';
+import { HomeStackNavigationProp } from '../navigation/utils';
 import { userDefaultSvg } from '../../utils/svgs'
 import { SvgXml } from 'react-native-svg';
 
@@ -23,22 +20,22 @@ interface RegionProps {
 
 interface MapStateProps {
     region: RegionProps;
-    userLocation: LocationObject;
+    selectedNearUser: UserRootStateProps | null;
 }
 
 interface MapsProps {
-    nearUsers: NearUsersProps['nearBy'];
-    nearUsersFetched: NearUsersProps['fetched'];
-    allUsers: NearUsersProps['all'];
+    navigation: HomeStackNavigationProp;
+    nearUsers: NearUsersRootProps['nearBy'];
+    nearUsersFetched: NearUsersRootProps['fetched'];
+    allUsers: NearUsersRootProps['all'];
     user: UserRootStateProps;
-    update_user_location: UserDispatchActionsProps['update_user_location'];
     validate_near_users: NearUsersDispatchActionProps['validate_near_users'];
 }
 
 //location and stateCity are checked are parent element so this won't render unless those are checked
 class Maps extends React.Component<MapsProps, MapStateProps> {
-    _isMounted: boolean;
-    _initLocation: boolean;
+    // _isMounted: boolean;
+    // _initLocation: boolean;
 
     constructor(props: MapsProps) {
         super(props);
@@ -56,105 +53,55 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         }
 
         //handle clean up async actions
-        this._isMounted = false;
-        this._initLocation = false;
+        // this._isMounted = false;
+        // this._initLocation = false;
         this.state = {
             region: initRegion,
-            userLocation: { ...props.user.location }
+            selectedNearUser: null
         }
     }
 
     // static propTypes: {
-    //     nearUsers: Requireable<NearUsersProps['nearBy']>,
-    //     allUsers: Requireable<NearUsersProps['all']>,
-    //     nearUsersFetched: Requireable<NearUsersProps['fetched']>,
+    //     nearUsers: Requireable<NearUsersRootProps['nearBy']>,
+    //     allUsers: Requireable<NearUsersRootProps['all']>,
+    //     nearUsersFetched: Requireable<NearUsersRootProps['fetched']>,
     //     user: Requireable<UserRootStateProps>,
     //     update_user_location: Requireable<UserDispatchActionsProps['update_user_location']>,
     //     validate_near_users: Requireable<NearUsersDispatchActionProps['validate_near_users']>
     // }
 
-    componentWillUnmount() {
-
-    }
-
     componentDidMount() {
         //start watching position
-        this._isMounted = true
-        this.handleWatchPosition();
+        // this._isMounted = true
+        // this.handleWatchPosition();
     }
 
     onRegionChange = (region: RegionProps) => {
         this.setState({ region })
     }
 
-    handleOnUserLocationChange = (e: EventUserLocation) => {
-        var currentCoords = e.nativeEvent.coordinate
-        const { location } = this.props.user
-
-        if (!currentCoords) return console.log('failed to capture cur location')
-
-        //compare distance travel since last known distance
-        var distanceTraveled: number | undefined = getDistance(
-            { latitude: currentCoords.latitude, longitude: currentCoords.longitude },
-            { latitude: location.coords.latitude, longitude: location.coords.longitude }
-        )
-
-        console.log(distanceTraveled)
-
-        if (!distanceTraveled) return console.log('empty' + distanceTraveled)
-
-        //less than 10 meters than don't update
-        if (distanceTraveled < 50) return console.log("Didn't travel far enough to save...");
-        //check speed of the user
-
-        if (currentCoords.speed! < 0 && currentCoords.speed > 2) return console.log(currentCoords.speed + " travling too fast to save");
-        //then save to server
-
-        console.log('saving....', currentCoords.speed, 'distance ' + distanceTraveled)
-        //how to determine if the user is in a different city code now?
-
-        var newLocation: LocationObject = {
-            coords: {
-                latitude: currentCoords.latitude,
-                longitude: currentCoords.longitude,
-                altitude: null,
-                accuracy: currentCoords.accuracy,
-                altitudeAccuracy: null,
-                heading: currentCoords.heading,
-                speed: currentCoords.speed
-            },
-            timestamp: + new Date()
-        }
-
-        this.props.set_user_location(this.props.user.uid, this.props.user.stateCity, newLocation)
+    handleNearUsersOnPress = (nearUsers: UserRootStateProps) => {
+        this.props.navigation.push(ProfilePage, {
+            profileUid: nearUsers.uid
+        })
     }
 
-    handleWatchPosition = () => {
-        Location.watchPositionAsync({ distanceInterval: locationDistanceIntervalToUpdate }, (newLocation) => {
-            //to allow user to go back to location region
-            this.setState({ userLocation: newLocation })
+    handleOnListViewPress = () => {
+        this.props.navigation.push(NearByListPage)
+    }
 
-            const { user, nearUsers, allUsers } = this.props
-
-            if (newLocation.coords) {
-
-                if (!this._initLocation) {
-                    this._initLocation = true;
-                } else {
-                    //check to see how fast the user is traveling to prevent too many calls
-                    if ((newLocation.coords.speed && newLocation.coords.speed < locationSpeedToUpdate) || !newLocation.coords.speed) {
-                        //update user location in the server
-                        this._isMounted && this.props.update_user_location(user.uid, user.stateCity, newLocation);
-
-                        if (allUsers.length > 0) {
-                            //validate all the users within the city and see if they are within range
-                            this._isMounted && this.props.validate_near_users(newLocation, nearUsers, allUsers);
-                        }
+    handleOnMyLocationPress = () => {
+        if (this.props.user.location) {
+            this.setState(
+                {
+                    region: {
+                        ...this.state.region,
+                        latitude: this.props.user.location.coords.latitude,
+                        longitude: this.props.user.location.coords.longitude
                     }
                 }
-
-            }
-        })
+            )
+        }
     }
 
     render() {
@@ -166,12 +113,12 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                 onPress={(e) => console.log(e.nativeEvent)}
             >
                 {
-                    this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((newUser: NearUsersLocationProps) => (
+                    this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: UserRootStateProps) => (
                         <Marker
-                            key={newUser.uid}
-                            coordinate={{ latitude: newUser.latitude, longitude: newUser.longitude }}
+                            key={nearUser.uid}
+                            coordinate={{ latitude: nearUser.location.coords.latitude, longitude: nearUser.location.coords.longitude }}
                             style={{ width: 'auto', height: 'auto' }}
-                            onPress={(e) => console.log(e.nativeEvent)}
+                            onPress={(e) => this.handleNearUsersOnPress(nearUser)}
                         >
                             <SvgXml xml={userDefaultSvg} width='20' height='20' fill={'#00FFFF'} />
                         </Marker>
@@ -179,11 +126,15 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                 }
             </MapView >
         )
+
         return (
             <View style={styles.container}>
                 {this.props.nearUsersFetched && this.props.user.location ? renderMapView : <ActivityIndicator />}
-                <Pressable onPress={() => this.state.userLocation && this.setState({ region: { ...this.state.region, latitude: this.state.userLocation.coords.latitude, longitude: this.state.userLocation.coords.longitude } })} >
+                <Pressable onPress={this.handleOnMyLocationPress} >
                     <Text>My Location</Text>
+                </Pressable>
+                <Pressable onPress={this.handleOnListViewPress}>
+                    <Text>List View</Text>
                 </Pressable>
             </View>
         )
@@ -200,6 +151,27 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: '80%',
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    ModalContainer: {
+        margin: 20,
+        backgroundColor: 'green',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+    }
 });
 
 const mapStateToProps = (state: RootProps) => ({
@@ -236,4 +208,4 @@ const mapStateToProps = (state: RootProps) => ({
 //     validate_near_users: PropTypes.func
 // }
 
-export default connect(mapStateToProps, { update_user_location, validate_near_users })(Maps);
+export default connect(mapStateToProps, { validate_near_users })(Maps);

@@ -1,24 +1,48 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION } from './actionTypes';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED } from './actionTypes';
 import { set_error, set_loading, remove_loading } from '../utils/actions';
 // import firebase from 'firebase/app';
 import { firebase } from '../firebase';
 import { fireDb } from '../../App';
-import { RootState, AppDispatch } from '../../App';
-import { StateCityProps } from './tsTypes';
+import { AppDispatch } from '../../App';
+import { StateCityProps, UserRootStateProps } from './tsTypes';
 import { LocationObject } from 'expo-location';
-import { updateProfileLocationStateCity, updateUserLocationCoords } from './utils';
+import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location } from './utils';
+import { validate_near_users } from '../near_users/actions';
+import * as Location from 'expo-location';
+import { RootProps } from '..';
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, ProfileDb } from '../../utils/variables'
+import { SET_ERROR } from '../utils/actionTypes';
 // const baseUrl = 'http://localhost:5050';
 
-
-
 export const verifyAuth = (): any => (dispatch: AppDispatch) => {
-    firebase.auth().onAuthStateChanged((user) => {
+    firebase.auth().onAuthStateChanged(async (user) => {
         dispatch(set_loading)
         if (user) {
-            dispatch({
-                type: SET_USER,
-                payload: { uid: user.uid }
-            });
+
+            //get the user profile information
+            var profileData: UserRootStateProps | undefined | void;
+            try {
+                profileData = await fetch_profile(user.uid)
+            } catch (err) {
+                console.log(err);
+                dispatch({
+                    type: USER_FETCHED_FAILED,
+                    payload: "Something went wrong trying to get your profile"
+                })
+            } finally {
+                if (profileData) {
+                    dispatch({
+                        type: SET_USER,
+                        payload: profileData
+                    });
+                } else {
+                    dispatch({
+                        type: USER_FETCHED_FAILED,
+                        payload: "Looks like we couldn't get your profile"
+                    })
+                }
+            }
+
         } else {
             dispatch({ type: REMOVE_USER })
         }
@@ -26,34 +50,59 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
     });
 }
 
-
-export const update_user_location = (uid: string, stateCity: StateCityProps, location: LocationObject) => async (dispatch: AppDispatch) => {
-    if (!location.coords) return;
+export const set_and_listen_user_location = (stateCity: StateCityProps, location: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
     try {
-        await updateUserLocationCoords(uid, location, stateCity);
+        //batch operation to init user location and perform the nesscary updates
+        await fireDb_init_user_location(getState().user, stateCity, location);
     } catch (e) {
         console.log(e)
+        return dispatch({
+            type: SET_ERROR,
+            payload: 'Something went wrong initializing your location'
+        })
     }
 
-    dispatch({
-        type: UPDATE_LOCATION,
-        payload: { location }
+    Location.watchPositionAsync({ distanceInterval: locationDistanceIntervalToUpdate }, async (newLocation) => {
+        //to allow user to go back to location region
+        // this.setState({ userLocation: newLocation })
+
+        // const { user, nearUsers, allUsers } = this.props
+
+        const { user, nearUsers } = getState()
+
+        //check if newLocation coords are available
+        if (!newLocation.coords) return;
+
+        //nothing updated in the coords so don't update
+        if (user.location.coords.latitude == newLocation.coords.latitude &&
+            user.location.coords.longitude == newLocation.coords.longitude
+        ) return;
+
+        //check to see how fast the user is traveling to prevent too many calls
+        if ((newLocation.coords.speed && newLocation.coords.speed > locationSpeedToUpdate)) return;
+
+        //update user location in the server
+        try {
+            await fireDb_update_user_location(getState().user, newLocation);
+        } catch (e) {
+            console.log(e)
+            dispatch({
+                type: SET_ERROR,
+                payload: 'Oops! Failed to update your location'
+            })
+        }
+
+        dispatch({
+            type: UPDATE_LOCATION,
+            payload: {
+                location: newLocation
+            }
+        })
+
+        if (nearUsers.all.length > 0) validate_near_users(newLocation, nearUsers.nearBy, nearUsers.all);
+
     })
-}
-
-export const set_user_location = (uid: string, stateCity: StateCityProps, location: LocationObject) => async (dispatch: AppDispatch) => {
-
-    try {
-        //update server user location and remove coords from Location collection if need be
-        await updateProfileLocationStateCity(uid, stateCity);
-
-        //update Location collection with the users current zip
-        await updateUserLocationCoords(uid, location, stateCity);
-
-    } catch (e) {
-        console.log(e)
-    }
 
     dispatch({
         type: SET_LOCATION,
@@ -63,6 +112,46 @@ export const set_user_location = (uid: string, stateCity: StateCityProps, locati
         }
     })
 }
+
+
+// export const update_user_location = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+//     if (!newLocation.coords) return;
+
+//     try {
+//         await fireDb_update_user_location(getState().user, newLocation);
+//     } catch (e) {
+//         console.log(e)
+//         return
+//     }
+
+//     return dispatch({
+//         type: UPDATE_LOCATION,
+//         payload: { location }
+//     })
+// }
+
+// export const set_user_location = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+//     if (!newLocation.coords) return;
+
+//     try {
+//         //update server user location and remove coords from Location collection if need be
+//         await fireDb_update_state_city(uid, stateCity);
+
+//         //update Location collection with the users current zip
+//         await fireDb_update_user_location(getState().user, newLocation);
+
+//     } catch (e) {
+//         console.log(e)
+//     }
+
+//     return dispatch({
+//         type: SET_LOCATION,
+//         payload: {
+//             stateCity: stateCity,
+//             location: location
+//         }
+//     })
+// }
 
 // export const sign_up = (email: string, password: string) => async (dispatch: AppDispatch) => {
 

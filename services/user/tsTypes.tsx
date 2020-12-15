@@ -7,7 +7,7 @@ export interface UserActionProps {
         uid?: string,
         location?: LocationObject,
         stateCity?: StateCityProps
-    }
+    } | UserRootStateProps
 }
 export interface StateCityProps {
     state: string;
@@ -17,10 +17,26 @@ export interface StateCityProps {
 export interface UserRootStateProps {
     uid: string;
     location: LocationObject;
-    stateCity: StateCityProps
+    stateCity: StateCityProps;
+    name: string;
+    age: number;
+    bioLong: string;
+    bioShort: string;
+    gender: string;
+    isPrivate: boolean;
+    fetchFail?: boolean;
 }
 
 export interface UserDispatchActionsProps {
-    set_user_location: (uid: string, userstateCity: StateCityProps, location: LocationObject) => void;
-    update_user_location: (uid: string, userstateCity: StateCityProps, location: LocationObject) => void;
+    set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => void;
 }
+
+// export interface UserProfileProps {
+//     uid: string;
+//     name: string;
+//     age: number;
+//     bioLong: string;
+//     bioShort: string;
+//     gender: string;
+//     stateCity: StateCityProps;
+// }

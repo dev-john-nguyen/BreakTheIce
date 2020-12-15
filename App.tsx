@@ -1,6 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Base from './components';
 import reducers from './services';
 import { createStore, applyMiddleware } from 'redux';
@@ -10,7 +8,6 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 // import { initFirebase } from './services/firebase/initFirebase';
 import { verifyAuth } from './services/user/actions';
 import { firebase } from './services/firebase';
-import { Action, AnyAction } from 'redux'
 
 //init FireStore Db
 export const fireDb = firebase.firestore()
