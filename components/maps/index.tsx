@@ -2,11 +2,12 @@ import React from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Pressable, ActivityIndicator } from 'react-native';
 import { ProfilePage, NearByListPage } from '../../utils/variables';
+import { buttonsStyles, colors } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { validate_near_users } from '../../services/near_users/actions';
-import { NearUsersRootProps, NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
-import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/tsTypes';
+import { NearUsersRootProps, NearUsersDispatchActionProps, NearByUsersProps } from '../../services/near_users/tsTypes';
+import { UserRootStateProps } from '../../services/user/tsTypes';
 import { HomeStackNavigationProp } from '../navigation/utils';
 import { userDefaultSvg } from '../../utils/svgs'
 import { SvgXml } from 'react-native-svg';
@@ -20,7 +21,7 @@ interface RegionProps {
 
 interface MapStateProps {
     region: RegionProps;
-    selectedNearUser: UserRootStateProps | null;
+    selectedNearUser: NearByUsersProps | null;
 }
 
 interface MapsProps {
@@ -29,7 +30,6 @@ interface MapsProps {
     nearUsersFetched: NearUsersRootProps['fetched'];
     allUsers: NearUsersRootProps['all'];
     user: UserRootStateProps;
-    validate_near_users: NearUsersDispatchActionProps['validate_near_users'];
 }
 
 //location and stateCity are checked are parent element so this won't render unless those are checked
@@ -80,9 +80,10 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         this.setState({ region })
     }
 
-    handleNearUsersOnPress = (nearUsers: UserRootStateProps) => {
+    handleNearUsersOnPress = (nearUsers: NearByUsersProps) => {
         this.props.navigation.push(ProfilePage, {
-            profileUid: nearUsers.uid
+            profileUid: nearUsers.uid,
+            title: nearUsers.name
         })
     }
 
@@ -107,20 +108,20 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     render() {
         const renderMapView = (
             <MapView
-                style={styles.mapStyle}
+                style={styles.map}
                 region={this.state.region}
                 showsUserLocation={true}
                 onPress={(e) => console.log(e.nativeEvent)}
             >
                 {
-                    this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: UserRootStateProps) => (
+                    this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: NearByUsersProps) => (
                         <Marker
                             key={nearUser.uid}
                             coordinate={{ latitude: nearUser.location.coords.latitude, longitude: nearUser.location.coords.longitude }}
                             style={{ width: 'auto', height: 'auto' }}
                             onPress={(e) => this.handleNearUsersOnPress(nearUser)}
                         >
-                            <SvgXml xml={userDefaultSvg} width='20' height='20' fill={'#00FFFF'} />
+                            <SvgXml xml={userDefaultSvg} width='25' height='25' fill={colors.primary} />
                         </Marker>
                     ))
                 }
@@ -130,11 +131,17 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         return (
             <View style={styles.container}>
                 {this.props.nearUsersFetched && this.props.user.location ? renderMapView : <ActivityIndicator />}
-                <Pressable onPress={this.handleOnMyLocationPress} >
-                    <Text>My Location</Text>
+                <Pressable onPress={this.handleOnMyLocationPress}
+                    style={({ pressed }) => pressed ? { ...styles.myLocation, ...buttonsStyles.button_secondary_pressed } : { ...styles.myLocation, ...buttonsStyles.button_secondary }}>
+                    {({ pressed }) => (
+                        <Text
+                            style={pressed ? buttonsStyles.button_secondary_text_pressed : buttonsStyles.button_secondary_text}
+                        >My Location</Text>
+                    )}
                 </Pressable>
-                <Pressable onPress={this.handleOnListViewPress}>
-                    <Text>List View</Text>
+                <Pressable onPress={this.handleOnListViewPress}
+                    style={({ pressed }) => pressed ? { ...styles.listView, ...buttonsStyles.button_primary_pressed } : { ...styles.listView, ...buttonsStyles.button_primary }}>
+                    <Text style={buttonsStyles.button_primary_text}>List View</Text>
                 </Pressable>
             </View>
         )
@@ -146,31 +153,21 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'stretch',
         justifyContent: 'center',
+        position: 'relative'
     },
-    mapStyle: {
+    map: {
         width: Dimensions.get('window').width,
-        height: '80%',
+        flex: 1
     },
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
+    myLocation: {
+        position: 'absolute',
+        top: 10,
+        left: '30%'
     },
-    ModalContainer: {
-        margin: 20,
-        backgroundColor: 'green',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
+    listView: {
+        position: 'absolute',
+        bottom: 10,
+        right: 10
     }
 });
 

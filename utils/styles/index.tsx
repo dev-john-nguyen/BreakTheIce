@@ -9,20 +9,21 @@ export const colors = {
     white: '#ffffff'
 }
 
-
+//buttons
 const buttonBase = {
     borderRadius: 20,
     paddingLeft: 50,
     paddingRight: 50,
     paddingTop: 10,
-    paddingBottom: 10
+    paddingBottom: 10,
+    borderWidth: 2
 }
 
-//buttons
 export const buttonsStyles = StyleSheet.create({
     button_primary: {
         ...buttonBase,
-        backgroundColor: colors.primary
+        backgroundColor: colors.primary,
+        borderColor: colors.primary
     },
     button_primary_text: {
         color: colors.white,
@@ -30,14 +31,162 @@ export const buttonsStyles = StyleSheet.create({
     },
     button_primary_pressed: {
         ...buttonBase,
-        backgroundColor: colors.secondary
+        backgroundColor: colors.secondary,
+        borderColor: colors.secondary
     },
     button_secondary: {
         ...buttonBase,
-        backgroundColor: colors.white
+        borderColor: colors.primary
+    },
+    button_secondary_pressed: {
+        ...buttonBase,
+        borderColor: colors.primary,
+        backgroundColor: colors.primary
     },
     button_secondary_text: {
+        fontSize: 12,
         color: colors.primary
+    },
+    button_secondary_text_pressed: {
+        fontSize: 12,
+        color: colors.white,
+        borderColor: colors.white
+    },
+    button_white_outline: {
+        ...buttonBase,
+        borderColor: colors.white
+    },
+    button_white_outline_pressed: {
+        ...buttonBase,
+        borderColor: colors.white,
+        backgroundColor: colors.white
+    },
+    button_white_outline_text: {
+        fontSize: 12,
+        color: colors.white
+    },
+    button_white_outline_text_pressed: {
+        fontSize: 12,
+        color: colors.primary
+    },
+    button_inactive: {
+        ...buttonBase,
+        borderColor: colors.secondary,
+        backgroundColor: colors.secondary
+    },
+    button_inactive_text: {
+        fontSize: 12,
+        color: colors.white
+    }
+})
+
+const ListContainerButtonBase = {
+    borderRadius: 20,
+    paddingLeft: 40,
+    paddingRight: 40,
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderWidth: 2
+}
+
+//list containers
+export const ListContainerStyle = StyleSheet.create({
+    container: {
+        borderBottomWidth: 2,
+        borderTopWidth: 2,
+        borderBottomColor: colors.primary,
+        borderTopColor: colors.primary,
+        marginBottom: 10,
+        marginTop: 10,
+        position: 'relative'
+    },
+    content: {
+        flexDirection: 'row',
+        paddingLeft: 20,
+        paddingRight: 10,
+        paddingTop: 20
+    },
+    topLeft: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+    },
+    profile_section: {
+        flexBasis: "30%",
+        marginRight: 10,
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        height: 130,
+        paddingBottom: 10
+    },
+    topLeft_text: {
+        fontSize: 8,
+        color: colors.primary
+    },
+    username: {
+        fontSize: 16,
+        color: colors.primary,
+        textAlign: 'center'
+    },
+    age: {
+        fontSize: 12,
+        color: colors.primary,
+        textAlign: 'center'
+    },
+    content_section: {
+        height: 130,
+        flex: 1,
+        justifyContent: 'space-evenly',
+        paddingTop: 20,
+        paddingBottom: 20,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    content_section_text: {
+        height: '70%',
+        fontSize: 12,
+        color: colors.primary,
+        display: 'flex',
+        justifyContent: 'center',
+        textAlign: 'center'
+    },
+    content_section_buttons: {
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    content_section_button_primary: {
+        ...ListContainerButtonBase,
+        backgroundColor: colors.primary,
+        borderColor: colors.primary
+    },
+    content_section_button_primary_pressed: {
+        ...ListContainerButtonBase,
+        backgroundColor: colors.secondary,
+        borderColor: colors.secondary
+    },
+    content_section_button_primary_text: {
+        color: colors.white,
+        fontSize: 10
+    },
+    content_section_button_secondary: {
+        ...ListContainerButtonBase,
+        borderColor: colors.primary,
+        marginLeft: 10
+    },
+    content_section_button_secondary_pressed: {
+        ...ListContainerButtonBase,
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+        marginLeft: 10
+    },
+    content_section_button_secondary_text: {
+        color: colors.primary,
+        fontSize: 10
+    },
+    content_section_button_secondary_text_pressed: {
+        color: colors.white,
+        fontSize: 10
     },
 })
 

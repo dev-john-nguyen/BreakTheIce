@@ -1,12 +1,42 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { BottomTabBarProps, } from '@react-navigation/bottom-tabs';
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { colors } from '../../utils/styles';
+import { SvgXml } from 'react-native-svg';
+import { profileSvg, searchSvg, invitationSvg, messageSvg } from '../../utils/svgs';
+import { bottomTabInvitations, bottomTabMessages, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
 
 const Navigation: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const focusedOptions = descriptors[state.routes[state.index].key].options;
 
     if (focusedOptions.tabBarVisible === false) {
         return null;
+    }
+
+    const renderSvgs = (name: string, isFocused: boolean) => {
+        const widthHeight = '30';
+        switch (name) {
+            case bottomTabsHome:
+                return (
+                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                )
+            case bottomTabInvitations:
+                return (
+                    <SvgXml xml={invitationSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                )
+            case bottomTabMessages:
+                return (
+                    <SvgXml xml={messageSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                )
+            case bottomTabsProfile:
+                return (
+                    <SvgXml xml={profileSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                )
+            default:
+                return (
+                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                )
+        }
     }
 
 
@@ -53,9 +83,7 @@ const Navigation: React.FC<BottomTabBarProps> = ({ state, descriptors, navigatio
                         onLongPress={onLongPress}
                         style={{ flex: 1 }}
                     >
-                        <Text style={{ color: isFocused ? '#673ab7' : '#222' }}>
-                            {label}
-                        </Text>
+                        {renderSvgs(route.name, isFocused)}
                     </TouchableOpacity>
                 );
             })}
@@ -65,11 +93,23 @@ const Navigation: React.FC<BottomTabBarProps> = ({ state, descriptors, navigatio
 
 const styles = StyleSheet.create({
     container: {
-        position: 'absolute',
-        bottom: 50,
+        flexBasis: '10%',
+        position: 'relative',
         display: 'flex',
         flexDirection: 'row',
-        backgroundColor: 'green'
+        backgroundColor: colors.primary,
+        alignItems: 'center'
+    },
+    svg: {
+        alignSelf: 'center',
+        position: "relative",
+        bottom: 10
+    },
+    text_style: {
+        color: colors.white
+    },
+    text_style_focused: {
+        color: colors.secondary
     }
 })
 

@@ -1,5 +1,6 @@
 import { SET_FRIENDS } from './actionTypes';
-import { AppDispatch, fireDb } from '../../App';
+import { AppDispatch } from '../../App';
+import { fireDb } from '../firebase';
 import { FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { FriendObjProps } from './tsTypes';
 

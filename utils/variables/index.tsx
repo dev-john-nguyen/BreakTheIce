@@ -15,11 +15,20 @@ export const InvitationsDb_Outbound = 'outbound';
 export const InvitationsDb_Inbound = 'inbound';
 export const FriendsDb = 'Friends';
 export const FriendsUsersDb = 'Users';
+export const ChatDb = 'Chat';
+export const ChatMessageDb = 'Messages'
+export const MessagesUsersDb = 'Users';
 
-//pages
+//stack screens pages
 export const NearByListPage = 'NearByList';
 export const HomePage = 'Home';
 export const MapPage = 'Map';
 export const InvitationsPage = 'Invitations';
 export const SettingsPage = 'Settings';
-export const ProfilePage = 'Profile'
+export const ProfilePage = 'Profile';
+
+//bottomTabs
+export const bottomTabsHome = 'Home';
+export const bottomTabInvitations = 'Invitations';
+export const bottomTabMessages = 'Messages';
+export const bottomTabsProfile = 'Profile'

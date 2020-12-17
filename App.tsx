@@ -7,10 +7,10 @@ import reduxThunk, { ThunkAction } from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 // import { initFirebase } from './services/firebase/initFirebase';
 import { verifyAuth } from './services/user/actions';
-import { firebase } from './services/firebase';
+// import { firebase } from './services/firebase';
 
-//init FireStore Db
-export const fireDb = firebase.firestore()
+// //init FireStore Db
+// export const fireDb = firebase.firestore()
 
 const composeEnhancers = composeWithDevTools(applyMiddleware(reduxThunk))
 const store = createStore(

@@ -2,7 +2,6 @@ import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAIL
 import { set_error, set_loading, remove_loading } from '../utils/actions';
 // import firebase from 'firebase/app';
 import { firebase } from '../firebase';
-import { fireDb } from '../../App';
 import { AppDispatch } from '../../App';
 import { StateCityProps, UserRootStateProps } from './tsTypes';
 import { LocationObject } from 'expo-location';
@@ -10,35 +9,64 @@ import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location }
 import { validate_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
-import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, ProfileDb } from '../../utils/variables'
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate } from '../../utils/variables'
+import { SET_MESSAGES } from '../chat/actionTypes';
 import { SET_ERROR } from '../utils/actionTypes';
 // const baseUrl = 'http://localhost:5050';
+
+interface FetchUserProps {
+    profile: UserRootStateProps;
+    chatIds: Array<any>;
+}
 
 export const verifyAuth = (): any => (dispatch: AppDispatch) => {
     firebase.auth().onAuthStateChanged(async (user) => {
         dispatch(set_loading)
         if (user) {
 
-            //get the user profile information
-            var profileData: UserRootStateProps | undefined | void;
+            //get the user profile and chatIds
+            var fetchUserRes: FetchUserProps | undefined;
+
             try {
-                profileData = await fetch_profile(user.uid)
+                fetchUserRes = await fetch_profile(user.uid)
             } catch (err) {
                 console.log(err);
                 dispatch({
                     type: USER_FETCHED_FAILED,
-                    payload: "Something went wrong trying to get your profile"
+                    payload: "Oops! Something went wrong getting your profile."
                 })
             } finally {
-                if (profileData) {
-                    dispatch({
-                        type: SET_USER,
-                        payload: profileData
-                    });
+                if (fetchUserRes) {
+
+                    //check if profile data exists
+                    if (fetchUserRes.profile) {
+                        dispatch({
+                            type: SET_USER,
+                            payload: fetchUserRes.profile
+                        });
+                    } else {
+                        dispatch({
+                            type: USER_FETCHED_FAILED,
+                            payload: "Looks like we couldn't get your profile"
+                        })
+                    }
+
+                    //check if there are any chatIds
+                    if (fetchUserRes.chatIds) {
+                        dispatch({
+                            type: SET_MESSAGES,
+                            payload: fetchUserRes.chatIds
+                        })
+                    } else {
+                        dispatch({
+                            type: SET_ERROR,
+                            payload: "Couldn't retrieve your messages"
+                        })
+                    }
                 } else {
                     dispatch({
                         type: USER_FETCHED_FAILED,
-                        payload: "Looks like we couldn't get your profile"
+                        payload: "Oops! Something went wrong getting your profile."
                     })
                 }
             }

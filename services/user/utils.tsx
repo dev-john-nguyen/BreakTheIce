@@ -1,5 +1,5 @@
-import { fireDb } from '../../App';
-import { LocationsDb, ProfileDb } from '../../utils/variables';
+import { fireDb } from '../firebase';
+import { LocationsDb, UsersDb } from '../../utils/variables';
 import { StateCityProps, UserRootStateProps } from './tsTypes';
 import { LocationObject } from 'expo-location';
 
@@ -15,7 +15,7 @@ export const fireDb_init_user_location = async (rxProfileObj: UserRootStateProps
     var batch = fireDb.batch();
 
     //fireDb Profile Path
-    const ProfileRef = fireDb.collection(ProfileDb).doc(rxProfileObj.uid);
+    const ProfileRef = fireDb.collection(UsersDb).doc(rxProfileObj.uid);
 
     if (rxProfileObj.stateCity && rxProfileObj.stateCity.city && rxProfileObj.stateCity.state) {
         //check if the dbStatZip different than currentStateZip
@@ -45,7 +45,7 @@ export const fireDb_update_user_location = async (rxProfileObj: UserRootStatePro
 }
 
 export const fetch_profile = async (uid: string) => {
-    return await fireDb.collection(ProfileDb).doc(uid).get()
+    return await fireDb.collection(UsersDb).doc(uid).get()
         .then((doc) => {
             if (doc.exists) {
                 const data = doc.data();
@@ -53,6 +53,7 @@ export const fetch_profile = async (uid: string) => {
 
                 //reminder that location can undefined and will be updated based on
                 //what the location listener will update it with
+                //also getting chatIds so the messages are avaiable
 
                 const profileObj: UserRootStateProps = {
                     uid: doc.id,
@@ -69,7 +70,10 @@ export const fetch_profile = async (uid: string) => {
                     location: data.location ? data.location : null
                 }
 
-                return profileObj;
+                return {
+                    profile: profileObj,
+                    chatIds: data.chatIds ? data.chatIds : []
+                };
             } else {
                 return;
             }

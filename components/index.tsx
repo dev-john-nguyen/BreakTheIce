@@ -1,17 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import PropTypes from 'prop-types'
+import React from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import { remove_error } from '../services/utils/actions';
 import Login from './login';
 import Navigation from './navigation';
 import { RootProps } from '../services';
-import { UtilsRootStateProps } from '../services/utils/tsTypes';
-import { UserRootStateProps } from '../services/user/tsTypes';
 import { NavigationContainer } from '@react-navigation/native';
-import { HomeStackScreen, InvitationsStackScreen, FriendsStackScreen } from './navigation/utils'
+import { HomeStackScreen, InvitationsStackScreen, ProfileStackScreen, ChatStackScreen } from './navigation/utils'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { bottomTabInvitations, bottomTabMessages, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -31,9 +29,10 @@ const Base = (props: Base) => {
             return (
                 <NavigationContainer>
                     <BottomTabs.Navigator backBehavior='history' tabBar={props => <Navigation {...props} />}>
-                        <BottomTabs.Screen name='Home' component={HomeStackScreen} />
-                        <BottomTabs.Screen name='Invitations' component={InvitationsStackScreen} />
-                        <BottomTabs.Screen name='Friends' component={FriendsStackScreen} />
+                        <BottomTabs.Screen name={bottomTabsHome} component={HomeStackScreen} />
+                        <BottomTabs.Screen name={bottomTabInvitations} component={InvitationsStackScreen} />
+                        <BottomTabs.Screen name={bottomTabMessages} component={ChatStackScreen} />
+                        <BottomTabs.Screen name={bottomTabsProfile} component={ProfileStackScreen} />
                     </BottomTabs.Navigator>
                 </NavigationContainer>
             )

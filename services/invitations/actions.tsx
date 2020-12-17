@@ -3,10 +3,10 @@ import { SET_ERROR } from '../utils/actionTypes';
 import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './tsTypes';
 import { UserRootStateProps } from '../user/tsTypes';
-import { fireDb } from '../../App';
+import { fireDb } from '../firebase';
 import { InvitationsDb, InvitationsDb_Inbound, InvitationsDb_Outbound, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
-
+``
 //@ts-ignore
 import { firestore } from 'firebase';
 import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
@@ -14,21 +14,31 @@ import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/fi
 //define the structure of the invitation
 
 export const send_invitation = (uid: UserRootStateProps['uid'], invitationContent: InvitationObject) => async (dispatch: AppDispatch) => {
-    var batch = fireDb.batch();
-    const InvitationInboundRef = fireDb.collection(InvitationsDb).doc(invitationContent.uid).collection(InvitationsDb_Inbound).doc(uid);
-    batch.set(InvitationInboundRef, invitationContent)
-    const InvitationOutboundRef = fireDb.collection(InvitationsDb).doc(uid).collection(InvitationsDb_Outbound).doc(invitationContent.uid);
-    batch.set(InvitationOutboundRef, invitationContent)
+    // var batch = fireDb.batch();
+    // const InvitationInboundRef = fireDb.collection(InvitationsDb).doc(invitationContent.uid).collection(InvitationsDb_Inbound).doc(uid);
+    // batch.set(InvitationInboundRef, invitationContent)
+    // const InvitationOutboundRef = fireDb.collection(InvitationsDb).doc(uid).collection(InvitationsDb_Outbound).doc(invitationContent.uid);
+    // batch.set(InvitationOutboundRef, invitationContent)
+
+    // try {
+    //     await batch.commit()
+    // } catch (e) {
+    //     console.log(e)
+    //     dispatch({
+    //         type: SET_ERROR,
+    //         payload: 'Something went wrong sending the invitation'
+    //     })
+    //     throw new Error('Failed')
+    // }
 
     try {
-        await batch.commit()
+        await fireDb.collection(InvitationsDb).add(invitationContent)
     } catch (e) {
         console.log(e)
-        dispatch({
+        return dispatch({
             type: SET_ERROR,
-            payload: 'Something went wrong sending the invitation'
+            payload: "Oops! Something went wrong sending your invitation."
         })
-        throw new Error('Failed')
     }
 
     return dispatch({
@@ -40,8 +50,9 @@ export const send_invitation = (uid: UserRootStateProps['uid'], invitationConten
 export const set_and_listen_invitations = (uid: UserRootStateProps['uid']) => (dispatch: AppDispatch) => {
     //only listening on inbound invitations and not outbound...
 
-    fireDb.collection(InvitationsDb).doc(uid).collection(InvitationsDb_Outbound)
-        .where(firestore.FieldPath.documentId(), "!=", uid)
+    //get all invitations that were sent
+    fireDb.collection(InvitationsDb)
+        .where("sentBy", "==", uid)
         .get()
         .then((querySnapshot) => {
             dispatch({
@@ -53,17 +64,15 @@ export const set_and_listen_invitations = (uid: UserRootStateProps['uid']) => (d
             console.log(err);
             dispatch({
                 type: SET_ERROR,
-                payload: 'Something went wrong trying to get outbound invitations'
+                payload: "Oops! Couldn't get invitations that you sent"
             })
         })
 
-    fireDb.collection(InvitationsDb).doc(uid).collection(InvitationsDb_Inbound)
-        .where(firestore.FieldPath.documentId(), "!=", uid)
+    //get and listen to inbound invitations
+    fireDb.collection(InvitationsDb)
+        .where("sentTo", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
         .onSnapshot((querySnapshot) => {
-            querySnapshot.forEach(doc => {
-
-            })
             dispatch({
                 type: SET_INVITATIONS_INBOUND,
                 payload: handleInvitations(querySnapshot)
@@ -73,7 +82,7 @@ export const set_and_listen_invitations = (uid: UserRootStateProps['uid']) => (d
                 console.log(err)
                 dispatch({
                     type: SET_ERROR,
-                    payload: 'Something went wrong trying to get your invitations'
+                    payload: "Oops! Couldn't get your invitations"
                 })
             }
         )
@@ -90,12 +99,14 @@ function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
             const invitationDoc = doc.data()
 
             if (invitationDoc) {
-                const { message, date, status } = invitationDoc;
+                const { message, createdAt, updatedAt, status, sentBy, sentTo } = invitationDoc;
 
                 var invitationObj: InvitationObject = {
-                    uid: doc.id,
+                    sentBy,
+                    sentTo,
+                    createdAt: createdAt.toDate(),
+                    updatedAt: updatedAt.toDate(),
                     message,
-                    date,
                     status
                 }
                 invitations.push(invitationObj)
@@ -106,7 +117,7 @@ function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
     return invitations;
 }
 
-export const update_inviter_invitation = (inviterUid: InvitationObject['uid'], status: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const update_inviter_invitation = (inviterUid: InvitationObject['sentBy'], status: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
     const uid = getState().user.uid;
 
     if (!uid) {

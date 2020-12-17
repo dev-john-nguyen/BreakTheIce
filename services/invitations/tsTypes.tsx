@@ -19,14 +19,16 @@ export enum InvitationStatusOptions {
 }
 
 export interface InvitationObject {
-    uid: string,
+    sentBy: string,
+    sentTo: string,
+    createdAt: Date,
+    updatedAt: Date,
     message: string,
-    date: Date,
     status: InvitationStatusOptions
 }
 
 export interface InvitationsDispatchActionProps {
-    send_invitation: (uid: UserRootStateProps['uid'], invitationContent: InvitationObject) => Promise<undefined>;
+    send_invitation: (uid: UserRootStateProps['uid'], invitationContent: InvitationObject) => Promise<any>;
     set_and_listen_invitations: (uid: UserRootStateProps['uid']) => void;
-    update_inviter_invitation: (inviterUid: InvitationObject['uid'], status: InvitationObject['status']) => void;
+    update_inviter_invitation: (inviterUid: InvitationObject['sentBy'], status: InvitationObject['status']) => void;
 }

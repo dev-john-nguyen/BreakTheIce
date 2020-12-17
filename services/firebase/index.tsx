@@ -13,8 +13,9 @@ const firebaseConfig = {
     measurementId: FIREBASE_MEASUREMENTID
 };
 
-export const firebase = !fb.apps.length ? fb.initializeApp(firebaseConfig) : fb.app()
+export const firebase = !fb.apps.length ? fb.initializeApp(firebaseConfig) : fb.app();
 
+export const fireDb = firebase.firestore();
 // Initialize Firebase
 // export const firebase = () => {
 //     firebase.apps.length === 0 && firebase.initializeApp(firebaseConfig)

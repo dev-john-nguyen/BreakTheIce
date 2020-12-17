@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, TextInput, StyleSheet, ActivityIndicator, Modal, StyleProp } from 'react-native';
-import { ProfileScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
-import { messageMaxLen, messagePlaceholder, ProfileDb } from '../../utils/variables';
+import { HomeScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
+import { messageMaxLen, messagePlaceholder, UsersDb } from '../../utils/variables';
 import { colors, buttonsStyles, modalStyle } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';
@@ -11,13 +11,13 @@ import { UserRootStateProps } from '../../services/user/tsTypes';
 import { NearUsersRootProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
-import { fireDb } from '../../App';
+import { fireDb } from '../../services/firebase';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg, closeSvg } from '../../utils/svgs';
 
 interface ProfileProps {
     navigation: HomeStackNavigationProp;
-    route: ProfileScreenRouteProp;
+    route: HomeScreenRouteProp;
     send_invitation: InvitationsDispatchActionProps['send_invitation'];
     set_error: (message: string) => void;
     user: UserRootStateProps;
@@ -28,7 +28,6 @@ interface ProfileProps {
 
 interface ProfileUserProps extends UserRootStateProps {
     friend: boolean;
-    sentInvite: boolean;
 }
 
 //Summary
@@ -38,19 +37,18 @@ const Profile = (props: ProfileProps) => {
     const [profileUser, setProfileUser] = useState<ProfileUserProps | undefined>();
     const [sentInvite, setSentInvite] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string>('');
-    const [warningMsg, setWarningMsg] = useState<string>('');
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
     const [sendStatus, setSendStatus] = useState<string>('Send');
 
     useEffect(() => {
-        if (!props.route.params.profileUid) {
-            props.set_error('User id not found!')
-            props.navigation.goBack()
-            return;
-        }
-
-        //fetch the profile of the user using profileUid that is passed in params
+        //fetch the profile of the useßr using profileUid that is passed in params
         (async () => {
+            if (!props.route.params || !props.route.params.profileUid) {
+                props.set_error('User id not found!')
+                props.navigation.goBack()
+                return;
+            }
+
             const { profileUid } = props.route.params;
 
             //check if user is friends profile user (friends should be up to date in redux state)
@@ -70,14 +68,14 @@ const Profile = (props: ProfileProps) => {
 
             for (let i = 0; i < props.nearUsers.length; i++) {
                 if (props.nearUsers[i].uid === profileUid) {
-                    profileUserObj = { ...props.nearUsers[i], friend, sentInvite }
+                    profileUserObj = { ...props.nearUsers[i], friend }
                     break;
                 }
             }
 
             //check to see if the profileObj is empty... if it is fetch it from server
             if (!profileUserObj) {
-                profileUserObj = await fireDb.collection(ProfileDb).doc(profileUid).get()
+                profileUserObj = await fireDb.collection(UsersDb).doc(profileUid).get()
                     .then((doc) => {
                         if (doc.exists) {
                             const docData = doc.data();
@@ -96,8 +94,7 @@ const Profile = (props: ProfileProps) => {
                                 gender,
                                 age,
                                 isPrivate,
-                                friend,
-                                sentInvite
+                                friend
                             }
 
                         } else {
@@ -112,7 +109,6 @@ const Profile = (props: ProfileProps) => {
 
             //if the profileUserObj is still empty it meant that we weren't able to find the profile
             //and so set error or not found
-            console.log(profileUserObj)
             if (!profileUserObj) {
                 setErrorMsg("Oops! User not found.")
             } else {
@@ -127,33 +123,40 @@ const Profile = (props: ProfileProps) => {
         //if friends is false then see if an invitation was already sent to this user
         //maybe have invitation request implementation so a user can send multiple invitations request
         //on separate days
+
+        if (!props.route.params || !props.route.params.profileUid) {
+            props.set_error('User id not found!')
+            props.navigation.goBack()
+            return;
+        }
+        const { profileUid } = props.route.params;
+
         for (let i = 0; i < props.outboundInvitations.length; i++) {
-            if (props.outboundInvitations[i].uid === profileUid) {
+            if (props.outboundInvitations[i].sentTo === profileUid) {
                 setSentInvite(true)
                 break;
             }
         }
-    }, [props.outboundInvitations])
+    }, [props.outboundInvitations, props.route])
 
     if (errorMsg) return (<View><Text>{errorMsg}</Text></View>)
 
     if (!profileUser) return (<View><ActivityIndicator /></View>)
 
-    const { profileUid } = props.route.params;
-
-
     const handleRequestToLink = async () => {
         if (message.length < 10) return console.log('not long enough bitch')
-        if (!profileUid || !props.user.uid) return console.log('not able to get uid');
+        if (!profileUser.uid || !props.user.uid) return console.log('not able to get uid');
         //init invitation object
 
         setSendStatus('Sending...')
 
         const invitationContent: InvitationObject = {
-            uid: profileUid,
+            sentBy: props.user.uid,
+            sentTo: profileUser.uid,
             message: message,
             status: InvitationStatusOptions.pending,
-            date: new Date()
+            createdAt: new Date(),
+            updatedAt: new Date(),
         }
 
         await props.send_invitation(props.user.uid, invitationContent)
@@ -191,8 +194,8 @@ const Profile = (props: ProfileProps) => {
                         style={modalStyle.text_area}
                         placeholderTextColor={colors.secondary}
                     />
-                    <Pressable onPress={handleRequestToLink} style={buttonsStyles.button_secondary}>
-                        <Text style={buttonsStyles.button_secondary_text}>
+                    <Pressable onPress={handleRequestToLink} style={buttonsStyles.button_white_outline}>
+                        <Text style={buttonsStyles.button_white_outline_text}>
                             {sendStatus}
                         </Text>
                     </Pressable>
@@ -218,8 +221,12 @@ const Profile = (props: ProfileProps) => {
             </Pressable>
         )
 
-        //if sentInvite is false it means an invite was already sent
-        if (!profileUser.sentInvite) return (
+        if (sentInvite) return (
+            <Pressable style={buttonsStyles.button_inactive}>
+                <Text style={buttonsStyles.button_inactive_text}>Pending</Text>
+            </Pressable>
+        )
+        return (
             <Pressable onPress={() => setShowModalInvite(true)}
                 style={({ pressed }) => (
                     pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
@@ -261,7 +268,8 @@ const styles = StyleSheet.create({
         padding: 10
     },
     base_text: {
-        color: colors.primary
+        color: colors.primary,
+        fontWeight: '400'
     },
     header_section: {
         flexBasis: 'auto',

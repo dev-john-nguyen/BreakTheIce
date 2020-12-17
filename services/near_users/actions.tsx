@@ -1,8 +1,10 @@
 import { SET_NEAR_USERS, UPDATE_NEAR_USERS } from './actionTypes';
-import { AppDispatch, fireDb } from '../../App';
+import { AppDispatch } from '../../App';
+import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
 import { LocationsDb, acceptedRadius } from '../../utils/variables';
-import { StateCityProps, UserRootStateProps } from '../user/tsTypes';
+import { StateCityProps } from '../user/tsTypes';
+import { NearByUsersProps } from './tsTypes';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
 
@@ -19,14 +21,16 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
         .where(firestore.FieldPath.documentId(), "!=", uid)
         .onSnapshot(function (querySnapshot) {
 
-            var nearByUsers: Array<UserRootStateProps> = [];
-            var allUsers: Array<UserRootStateProps> = [];
+            console.log(getState().friends.users)
+
+            var nearByUsers: Array<NearByUsersProps> = [];
+            var allUsers: Array<NearByUsersProps> = [];
 
             querySnapshot.docs.forEach(doc => {
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
                 const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate } = doc.data()
 
-                var userData: UserRootStateProps = {
+                var userData: NearByUsersProps = {
                     uid: doc.id,
                     location,
                     name,
@@ -35,7 +39,9 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                     stateCity,
                     gender,
                     age,
-                    isPrivate
+                    isPrivate,
+                    friend: false,
+                    distance: 0
                 }
 
                 //check if the coords are missing
@@ -51,6 +57,8 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                     { latitude: newLocation.coords.latitude, longitude: newLocation.coords.longitude },
                     { latitude, longitude }
                 )
+
+                userData.distance = distanceBetweenPoints;
 
                 if (distanceBetweenPoints < acceptedRadius) {
                     nearByUsers.push(userData)
@@ -69,7 +77,7 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
         })
 }
 
-export const validate_near_users = (location: LocationObject, nearByUsers: Array<UserRootStateProps>, allUsers: Array<UserRootStateProps>) => (dispatch: AppDispatch) => {
+export const validate_near_users = (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<NearByUsersProps>) => (dispatch: AppDispatch) => {
     //update nearByUsers directly to prevent full reload of the component on rerender
 
     const { longitude, latitude } = location.coords
