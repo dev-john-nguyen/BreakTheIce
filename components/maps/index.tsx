@@ -83,7 +83,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     handleNearUsersOnPress = (nearUsers: NearByUsersProps) => {
         this.props.navigation.push(ProfilePage, {
             profileUid: nearUsers.uid,
-            title: nearUsers.name
+            title: nearUsers.username
         })
     }
 

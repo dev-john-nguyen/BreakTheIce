@@ -2,7 +2,7 @@ import React from 'react';
 import { View, FlatList, TouchableHighlight, Text, StyleSheet, Pressable } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { HomeStackNavigationProp } from '../navigation/utils';
+import { InvitationsStackNavigationProp } from '../navigation/utils';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
 import { update_inviter_invitation } from '../../services/invitations/actions';
 import { ListContainerStyle, colors, buttonsStyles } from '../../utils/styles';
@@ -10,7 +10,7 @@ import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg, linkSvg } from '../../utils/svgs';
 
 interface Invitations {
-    navigation: any;
+    navigation: InvitationsStackNavigationProp;
     invitation: InvitationsRootProps;
     update_inviter_invitation: InvitationsDispatchActionProps['update_inviter_invitation']
 }
@@ -18,27 +18,21 @@ interface Invitations {
 class Invitations extends React.Component<Invitations> {
     constructor(props: Invitations) {
         super(props)
-
-
     }
 
     handleInvitationOnPress = (inviterObj: InvitationObject) => {
-        // this.props.navigation.navigate('Home', {
-        //     screen: 'Profile',
-        //     params: {
-        //         profileUid: inviterObj.uid
-        //     }
-        // })
-        this.props.navigation.push('Profile', { profileUid: inviterObj.uid })
+        this.props.navigation.push('Profile', {
+            profileUid: inviterObj.sentTo,
+            title: inviterObj.sentByUsername
+        })
     }
 
-    handleOnStatusUpdatePress = (inviterObj: InvitationObject, status: InvitationObject['status']) => {
-        this.props.update_inviter_invitation(inviterObj.uid, status);
+    handleOnStatusUpdatePress = (inviterObj: InvitationObject, updatedStatus: InvitationObject['status']) => {
+        this.props.update_inviter_invitation(inviterObj, updatedStatus);
     }
 
     render() {
         const renderDate = (date: Date) => {
-            console.log(date)
             return date.getMonth() + '/' + date.getDay() + '/' + date.getFullYear()
         }
 
@@ -49,20 +43,19 @@ class Invitations extends React.Component<Invitations> {
                 data={this.props.invitation.inbound}
                 renderItem={({ item, index, separators }) => (
                     <TouchableHighlight
-                        key={item.uid}
                         onPress={() => this.handleInvitationOnPress(item)}
                         underlayColor={colors.secondary}
                         style={ListContainerStyle.container}
                     >
                         <View style={ListContainerStyle.content}>
                             <View style={ListContainerStyle.topLeft}>
-                                <Text style={ListContainerStyle.topLeft_text}>{item.date ? renderDate(item.date) : '99/99/9999'}</Text>
+                                <Text style={ListContainerStyle.topLeft_text}>{item.createdAt ? renderDate(item.createdAt) : '99/99/9999'}</Text>
                             </View>
                             <View style={ListContainerStyle.profile_section}>
                                 <SvgXml xml={userDefaultSvg} width='50' height='50' fill={colors.primary} />
-                                <View>
-                                    <Text style={ListContainerStyle.username}>RandomUser</Text>
-                                    <Text style={ListContainerStyle.age}>26 years old</Text>
+                                <View style={ListContainerStyle.profile_section_text}>
+                                    <Text style={ListContainerStyle.username}>{item.sentByUsername ? item.sentByUsername : 'UnknownUser'}</Text>
+                                    <Text style={ListContainerStyle.age}>{item.sentByAge ? item.sentByAge : 0} years old</Text>
                                 </View>
                             </View>
                             <View style={ListContainerStyle.content_section}>
@@ -86,7 +79,7 @@ class Invitations extends React.Component<Invitations> {
                         </View>
                     </TouchableHighlight>
                 )}
-                keyExtractor={(item) => item.uid}
+                keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
             />
 
         }

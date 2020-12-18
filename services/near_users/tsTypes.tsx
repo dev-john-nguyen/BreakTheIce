@@ -3,12 +3,13 @@ import { StateCityProps, UserRootStateProps } from '../user/tsTypes';
 
 export interface NearUsersActionProps {
     type: string;
-    payload?: NearByUsersProps
+    payload?: NearUsersRootProps | UserRootStateProps['uid']
 }
 
 export interface NearByUsersProps extends UserRootStateProps {
     friend: boolean;
     distance: number;
+    sentInvite: boolean;
 }
 
 export interface NearUsersRootProps {

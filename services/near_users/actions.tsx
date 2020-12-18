@@ -21,17 +21,16 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
         .where(firestore.FieldPath.documentId(), "!=", uid)
         .onSnapshot(function (querySnapshot) {
 
-            console.log(getState().friends.users)
-
             var nearByUsers: Array<NearByUsersProps> = [];
             var allUsers: Array<NearByUsersProps> = [];
 
             querySnapshot.docs.forEach(doc => {
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate } = doc.data()
+                const { username, location, name, bioShort, bioLong, stateCity, gender, age, isPrivate } = doc.data()
 
                 var userData: NearByUsersProps = {
                     uid: doc.id,
+                    username,
                     location,
                     name,
                     bioShort,
@@ -41,7 +40,8 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                     age,
                     isPrivate,
                     friend: false,
-                    distance: 0
+                    distance: 0,
+                    sentInvite: false
                 }
 
                 //check if the coords are missing
@@ -58,7 +58,32 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                     { latitude, longitude }
                 )
 
+                //update distance key
                 userData.distance = distanceBetweenPoints;
+
+                //check if the nearUser is a friend
+                var friends = getState().friends.users;
+                if (friends.length > 0) {
+                    //loop through and see if uid match then update friend bool
+                    for (let i = 0; i < friends.length; i++) {
+                        if (friends[i].uid === userData.uid) {
+                            userData.friend = true;
+                            break
+                        }
+                    }
+                }
+
+                //check if an invitation was sent to the user already
+                var invitationsOutbound = getState().invitations.outbound;
+                if (invitationsOutbound.length > 0) {
+                    for (let i = 0; i < invitationsOutbound.length; i++) {
+                        if (invitationsOutbound[i].sentTo === userData.uid) {
+                            userData.sentInvite = true;
+                            break
+                        }
+                    }
+                }
+
 
                 if (distanceBetweenPoints < acceptedRadius) {
                     nearByUsers.push(userData)

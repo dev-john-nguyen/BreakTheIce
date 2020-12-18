@@ -1,19 +1,19 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS } from './actionTypes'
-import { NearUsersActionProps } from './tsTypes';
-
+import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITATION_UPDATE_USER } from './actionTypes'
+import { NearUsersActionProps, NearUsersRootProps } from './tsTypes';
+import { UserRootStateProps } from '../user/tsTypes';
 const INITIAL_STATE = {
     nearBy: [],
     all: [],
     fetched: false
 }
 
-export default (state = INITIAL_STATE, action: NearUsersActionProps) => {
+export default (state: NearUsersRootProps = INITIAL_STATE, action: NearUsersActionProps) => {
     switch (action.type) {
         case SET_NEAR_USERS:
-            if (!action.payload) return state;
+            let payloadSet = action.payload as NearUsersRootProps
             return {
-                nearBy: action.payload.nearBy,
-                all: action.payload.all,
+                nearBy: payloadSet.nearBy,
+                all: payloadSet.all,
                 fetched: true
             }
         case REMOVE_NEAR_USERS:
@@ -22,11 +22,21 @@ export default (state = INITIAL_STATE, action: NearUsersActionProps) => {
                 fetched: false
             }
         case UPDATE_NEAR_USERS:
-            if (!action.payload) return state;
+            let payloadUpdate = action.payload as NearUsersRootProps
             return {
                 ...state,
-                nearBy: action.payload.nearBy
+                nearBy: payloadUpdate.nearBy
             }
+        case SENT_INVITATION_UPDATE_USER:
+            let uid = action.payload as UserRootStateProps['uid'];
+            //find the nearUser in nearBy and update sentInvite to true
+            for (let i = 0; i < state.nearBy.length; i++) {
+                if (uid === state.nearBy[i].uid) {
+                    state.nearBy[i].sentInvite = true
+                    break;
+                }
+            }
+            return state;
         default:
             return state
     }

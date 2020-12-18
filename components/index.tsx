@@ -4,10 +4,10 @@ import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions } from
 import { connect } from 'react-redux';
 import { remove_error } from '../services/utils/actions';
 import Login from './login';
-import Navigation from './navigation';
+import BottomNav from './navigation/BottomNav';
 import { RootProps } from '../services';
 import { NavigationContainer } from '@react-navigation/native';
-import { HomeStackScreen, InvitationsStackScreen, ProfileStackScreen, ChatStackScreen } from './navigation/utils'
+import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation/utils'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { bottomTabInvitations, bottomTabMessages, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
 
@@ -16,23 +16,22 @@ const BottomTabs = createBottomTabNavigator();
 interface Base {
     error: string;
     loading: boolean;
-    uid: string;
-    fetchFail: boolean | undefined;
     remove_error: () => void;
+    user: RootProps['user']
 }
 
 const Base = (props: Base) => {
     const handleRender = () => {
         if (props.loading) return <ActivityIndicator />
-        if (props.fetchFail) return <Text>Oops! We couldn't retrieve your profile.</Text>
-        if (props.uid) {
+        if (props.user.fetchFail) return <Text>Oops! We couldn't retrieve your profile.</Text>
+        if (props.user.uid) {
             return (
                 <NavigationContainer>
-                    <BottomTabs.Navigator backBehavior='history' tabBar={props => <Navigation {...props} />}>
+                    <BottomTabs.Navigator backBehavior='history' tabBar={props => <BottomNav {...props} />}>
                         <BottomTabs.Screen name={bottomTabsHome} component={HomeStackScreen} />
                         <BottomTabs.Screen name={bottomTabInvitations} component={InvitationsStackScreen} />
                         <BottomTabs.Screen name={bottomTabMessages} component={ChatStackScreen} />
-                        <BottomTabs.Screen name={bottomTabsProfile} component={ProfileStackScreen} />
+                        <BottomTabs.Screen name={bottomTabsProfile} component={MeStackScreen} initialParams={{ title: props.user.username }} />
                     </BottomTabs.Navigator>
                 </NavigationContainer>
             )
@@ -84,8 +83,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: RootProps) => ({
     error: state.utils.error,
     loading: state.utils.loading,
-    uid: state.user.uid,
-    fetchFail: state.user.fetchFail
+    user: state.user
 })
 
 // Base.propTypes = {

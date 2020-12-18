@@ -16,6 +16,7 @@ export interface StateCityProps {
 
 export interface UserRootStateProps {
     uid: string;
+    username: string;
     location: LocationObject;
     stateCity: StateCityProps;
     name: string;

@@ -4,6 +4,7 @@ import { UserActionProps, UserRootStateProps } from './tsTypes';
 
 const INITIAL_STATE = {
     uid: null,
+    username: null,
     location: {
         coords: null,
         timestamp: null

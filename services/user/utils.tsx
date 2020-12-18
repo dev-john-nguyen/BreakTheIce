@@ -57,6 +57,7 @@ export const fetch_profile = async (uid: string) => {
 
                 const profileObj: UserRootStateProps = {
                     uid: doc.id,
+                    username: data.username ? data.username : '',
                     stateCity: data.stateCity ? data.stateCity : {
                         state: '',
                         city: ''

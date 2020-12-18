@@ -6,7 +6,7 @@ import { SvgXml } from 'react-native-svg';
 import { profileSvg, searchSvg, invitationSvg, messageSvg } from '../../utils/svgs';
 import { bottomTabInvitations, bottomTabMessages, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
 
-const Navigation: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const focusedOptions = descriptors[state.routes[state.index].key].options;
 
     if (focusedOptions.tabBarVisible === false) {
@@ -113,4 +113,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Navigation;
+export default BottomNav;

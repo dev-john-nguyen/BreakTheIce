@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, Pressable, Text } from 'react-native';
-import { baseStyles } from '../../utils/styles';
+import { baseStyles, colors } from '../../utils/styles';
 import firebase from 'firebase';
 
 const Login = () => {
@@ -31,42 +31,51 @@ const Login = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={{ textAlign: 'center' }}>Welcome To LetsLink</Text>
-            <TextInput
-                style={baseStyles.input}
-                placeholder="email"
-                textContentType="emailAddress"
-                onChangeText={(text) => setEmail(text)}
-                autoCompleteType='off'
-                autoCapitalize='none'
-            />
-            <TextInput
-                style={baseStyles.input}
-                placeholder="password"
-                onChangeText={(text) => setPassword(text)}
-                onSubmitEditing={signup ? handleSignUp : handleLogin}
-                autoCompleteType='password'
-                autoCapitalize='none'
-                secureTextEntry
-            />
-            <Pressable style={baseStyles.button} onPress={signup ? handleSignUp : handleLogin}>
-                <Text>
-                    {signup ? 'Sign Up' : 'Login'}
-                </Text>
-            </Pressable>
-            <Pressable onPress={() => setSignup(signup ? false : true)}>
-                <Text style={{ textAlign: 'center' }}>{signup ? 'Login' : 'Sign Up'}</Text>
-            </Pressable>
+            <View style={styles.content}>
+                <Text style={{ textAlign: 'center' }}>Welcome To LetsLink</Text>
+                <TextInput
+                    style={baseStyles.input}
+                    placeholder="email"
+                    textContentType="emailAddress"
+                    onChangeText={(text) => setEmail(text)}
+                    autoCompleteType='off'
+                    autoCapitalize='none'
+                />
+                <TextInput
+                    style={baseStyles.input}
+                    placeholder="password"
+                    onChangeText={(text) => setPassword(text)}
+                    onSubmitEditing={signup ? handleSignUp : handleLogin}
+                    autoCompleteType='password'
+                    autoCapitalize='none'
+                    secureTextEntry
+                />
+                <Pressable style={baseStyles.button} onPress={signup ? handleSignUp : handleLogin}>
+                    <Text>
+                        {signup ? 'Sign Up' : 'Login'}
+                    </Text>
+                </Pressable>
+                <Pressable onPress={() => setSignup(signup ? false : true)}>
+                    <Text style={{ textAlign: 'center' }}>{signup ? 'Login' : 'Sign Up'}</Text>
+                </Pressable>
+            </View>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        width: '80%',
-        margin: 10,
+        flex: 1,
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        alignSelf: 'center',
+        width: '100%',
         alignItems: 'stretch'
     },
+    content: {
+        alignSelf: 'center',
+        width: '80%',
+    }
 })
 
 export default Login;

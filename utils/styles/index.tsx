@@ -9,6 +9,19 @@ export const colors = {
     white: '#ffffff'
 }
 
+
+//profileSvg
+
+export const profileStyles = StyleSheet.create({
+    container: {
+        position: 'relative'
+    },
+    friend: {
+        position: 'absolute',
+        right: -5
+    }
+})
+
 //buttons
 const buttonBase = {
     borderRadius: 20,
@@ -96,15 +109,14 @@ export const ListContainerStyle = StyleSheet.create({
         borderTopWidth: 2,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
-        marginBottom: 10,
-        marginTop: 10,
+        marginTop: 20,
         position: 'relative'
     },
     content: {
         flexDirection: 'row',
-        paddingLeft: 20,
+        paddingLeft: 30,
         paddingRight: 10,
-        paddingTop: 20
+        paddingTop: 20,
     },
     topLeft: {
         position: 'absolute',
@@ -112,22 +124,27 @@ export const ListContainerStyle = StyleSheet.create({
         left: 10,
     },
     profile_section: {
-        flexBasis: "30%",
+        flex: .7,
         marginRight: 10,
         flexDirection: 'column',
-        justifyContent: 'space-evenly',
+        justifyContent: 'center',
         alignItems: 'center',
-        height: 130,
+        minHeight: 130,
         paddingBottom: 10
     },
     topLeft_text: {
         fontSize: 8,
         color: colors.primary
     },
+    profile_section_text: {
+        bottom: 5
+    },
     username: {
+        marginTop: 15,
         fontSize: 16,
         color: colors.primary,
-        textAlign: 'center'
+        textAlign: 'center',
+        overflow: 'visible'
     },
     age: {
         fontSize: 12,
@@ -135,16 +152,15 @@ export const ListContainerStyle = StyleSheet.create({
         textAlign: 'center'
     },
     content_section: {
-        height: 130,
         flex: 1,
         justifyContent: 'space-evenly',
         paddingTop: 20,
         paddingBottom: 20,
-        paddingLeft: 10,
-        paddingRight: 10
+        paddingLeft: 20,
+        paddingRight: 10,
+        alignSelf: 'center'
     },
     content_section_text: {
-        height: '70%',
         fontSize: 12,
         color: colors.primary,
         display: 'flex',
@@ -152,6 +168,7 @@ export const ListContainerStyle = StyleSheet.create({
         textAlign: 'center'
     },
     content_section_buttons: {
+        marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'center'
     },

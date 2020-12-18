@@ -1,14 +1,16 @@
 import React from 'react';
-import { View, FlatList, TouchableHighlight, Text } from 'react-native';
+import { View, FlatList, TouchableHighlight, Text, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { FriendsBottomTabNavProp } from '../navigation/utils';
 import { FriendsRootProps, FriendObjProps } from '../../services/friends/tsTypes';
-import { HomeScreenOptions } from '../navigation/utils'
+import { MeStackNavigationProp } from '../navigation/utils';
+import { colors, profileStyles } from '../../utils/styles';
+import { ProfileImg } from '../../utils/components';
 
 interface FriendsProps {
     friends: FriendsRootProps;
-    navigation: any
+    navigation: MeStackNavigationProp
 }
 
 const Friends = ({ friends, navigation }: FriendsProps) => {
@@ -22,37 +24,55 @@ const Friends = ({ friends, navigation }: FriendsProps) => {
     }
 
     const handleOnFriendPress = (friend: FriendObjProps) => {
-        // navigation.navigate('Home',
-        //     {
-        //         screen: HomeScreenOptions.Profile,
-        //         params: { profileUid: friend.uid }
-        //     })
-        navigation.push("Profile", { profileUid: friend.uid })
+        navigation.push("Profile", {
+            profileUid: friend.uid,
+            title: friend.username
+        })
     }
 
     return (
-        <View>
-            <FlatList data={friends.users} renderItem={({ item, index, separators }) => (
-                <TouchableHighlight
-                    key={item.uid}
-                    onPress={() => handleOnFriendPress(item)}
-                    onShowUnderlay={separators.highlight}
-                    onHideUnderlay={separators.unhighlight}
-                >
-                    <View>
-                        <Text>{item.dateCreated.toString()}</Text>
-                        <Text>{item.active}</Text>
-                    </View>
-                </TouchableHighlight>
-            )}
-                keyExtractor={(item) => item.uid}
-            />
-        </View>
+        <FlatList data={friends.users} renderItem={({ item, index, separators }) => (
+            <TouchableHighlight
+                key={item.uid ? item.uid : index.toString()}
+                onPress={() => handleOnFriendPress(item)}
+                onShowUnderlay={separators.highlight}
+                onHideUnderlay={separators.unhighlight}
+            >
+                <View style={styles.container}>
+                    <ProfileImg friend={true} />
+                    <Text style={styles.username}>{item.username}</Text>
+                </View>
+            </TouchableHighlight>
+        )}
+            keyExtractor={(item, index) => item.uid ? item.uid : index.toString()}
+        />
     )
 }
 
 const mapStateToProps = (state: RootProps) => ({
     friends: state.friends
+})
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        paddingLeft: 110,
+        borderBottomWidth: 2,
+        borderTopWidth: 2,
+        borderBottomColor: colors.primary,
+        borderTopColor: colors.primary,
+        marginTop: 20,
+        position: 'relative'
+    },
+    username: {
+        marginLeft: 20,
+        fontSize: 16,
+        color: colors.primary,
+        textAlign: 'center'
+    }
+
 })
 
 

@@ -6,33 +6,16 @@ import { UserRootStateProps } from '../user/tsTypes';
 import { fireDb } from '../firebase';
 import { InvitationsDb, InvitationsDb_Inbound, InvitationsDb_Outbound, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
-``
+import { SENT_INVITATION_UPDATE_USER } from '../near_users/actionTypes';
 //@ts-ignore
 import { firestore } from 'firebase';
 import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
 
 //define the structure of the invitation
 
-export const send_invitation = (uid: UserRootStateProps['uid'], invitationContent: InvitationObject) => async (dispatch: AppDispatch) => {
-    // var batch = fireDb.batch();
-    // const InvitationInboundRef = fireDb.collection(InvitationsDb).doc(invitationContent.uid).collection(InvitationsDb_Inbound).doc(uid);
-    // batch.set(InvitationInboundRef, invitationContent)
-    // const InvitationOutboundRef = fireDb.collection(InvitationsDb).doc(uid).collection(InvitationsDb_Outbound).doc(invitationContent.uid);
-    // batch.set(InvitationOutboundRef, invitationContent)
-
-    // try {
-    //     await batch.commit()
-    // } catch (e) {
-    //     console.log(e)
-    //     dispatch({
-    //         type: SET_ERROR,
-    //         payload: 'Something went wrong sending the invitation'
-    //     })
-    //     throw new Error('Failed')
-    // }
-
+export const send_invitation = (invitationObj: InvitationObject) => async (dispatch: AppDispatch) => {
     try {
-        await fireDb.collection(InvitationsDb).add(invitationContent)
+        await fireDb.collection(InvitationsDb).add(invitationObj)
     } catch (e) {
         console.log(e)
         return dispatch({
@@ -41,9 +24,14 @@ export const send_invitation = (uid: UserRootStateProps['uid'], invitationConten
         })
     }
 
-    return dispatch({
+    //will need to update the near user of which the invitation was sent
+    dispatch({
+        type: SENT_INVITATION_UPDATE_USER,
+        payload: invitationObj.sentTo
+    })
+    dispatch({
         type: SEND_INVITATION,
-        payload: invitationContent
+        payload: invitationObj
     })
 }
 
@@ -99,9 +87,12 @@ function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
             const invitationDoc = doc.data()
 
             if (invitationDoc) {
-                const { message, createdAt, updatedAt, status, sentBy, sentTo } = invitationDoc;
+                const { message, createdAt, updatedAt, status, sentBy, sentTo, sentByAge, sentByUsername } = invitationDoc;
 
                 var invitationObj: InvitationObject = {
+                    docId: doc.id,
+                    sentByAge,
+                    sentByUsername,
                     sentBy,
                     sentTo,
                     createdAt: createdAt.toDate(),
@@ -117,26 +108,27 @@ function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
     return invitations;
 }
 
-export const update_inviter_invitation = (inviterUid: InvitationObject['sentBy'], status: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-    const uid = getState().user.uid;
-
-    if (!uid) {
-        return dispatch({
-            type: SET_ERROR,
-            payload: "Couldn't find your user id"
-        })
-    }
+export const update_inviter_invitation = (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    const user = getState().user;
 
     var batch = fireDb.batch();
-    const InboundRef = fireDb.collection(InvitationsDb).doc(uid).collection(InvitationsDb_Inbound).doc(inviterUid);
-    batch.set(InboundRef, { status }, { merge: true })
-    const OutboundRef = fireDb.collection(InvitationsDb).doc(inviterUid).collection(InvitationsDb_Outbound).doc(uid);
-    batch.set(OutboundRef, { status }, { merge: true })
+
+    const InvitationRef = fireDb.collection(InvitationsDb).doc(invitationObj.docId);
+    batch.set(InvitationRef, { status: updatedStatus }, { merge: true })
 
     //if accepted then create new friend
-    if (status === InvitationStatusOptions.accepted) {
-        const FriendRef = fireDb.collection(FriendsDb).doc(uid).collection(FriendsUsersDb).doc(inviterUid);
-        batch.set(FriendRef, {
+    if (updatedStatus === InvitationStatusOptions.accepted) {
+        const InviteeRef = fireDb.collection(FriendsDb).doc(invitationObj.sentBy).collection(FriendsUsersDb).doc(user.uid);
+        batch.set(InviteeRef, {
+            username: user.username,
+            dateUpdated: new Date(),
+            dateCreated: new Date(),
+            active: true
+        })
+        const InviterRef = fireDb.collection(FriendsDb).doc(user.uid).collection(FriendsUsersDb).doc(invitationObj.sentBy);
+        batch.set(InviterRef, {
+            username: invitationObj.sentByUsername,
+            dateUpdated: new Date(),
             dateCreated: new Date(),
             active: true
         })
@@ -149,9 +141,9 @@ export const update_inviter_invitation = (inviterUid: InvitationObject['sentBy']
         console.log(err)
         return dispatch({
             type: SET_ERROR,
-            payload: "Something went wrong when updating your denied invitation request"
+            payload: "Oops! Something went wrong updated your request"
         })
     }
 
-    //Don't need to dipatch because the inbound listener will catch it
+    //Don't need to dipatch because the inbound listener will catch it ... hopefully
 }

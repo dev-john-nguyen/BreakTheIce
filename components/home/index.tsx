@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { colors } from '../../utils/styles'
 import Maps from '../maps';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
@@ -116,9 +117,9 @@ const Home = (props: HomeProps) => {
         //initate and set all the listeners
         if (currentLocation && currentLocation.location && currentLocation.stateCity) {
             props.set_and_listen_user_location(currentLocation.stateCity, currentLocation.location);
+            props.set_and_listen_friends(props.user.uid);
+            props.set_and_listen_invitations(props.user.uid);
             props.set_and_listen_near_users(props.user.uid, currentLocation.stateCity, currentLocation.location);
-            props.set_and_listen_invitations(props.user.uid)
-            props.set_and_listen_friends(props.user.uid)
         }
     }, [currentLocation])
 
@@ -129,7 +130,7 @@ const Home = (props: HomeProps) => {
             {props.user.location && props.user.stateCity ?
                 <Maps navigation={props.navigation} />
                 :
-                <ActivityIndicator />}
+                <ActivityIndicator size='large' color={colors.primary} />}
         </View>
     )
 }

@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, TextInput, StyleSheet, ActivityIndicator, Modal, StyleProp } from 'react-native';
 import { HomeScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
-import { messageMaxLen, messagePlaceholder, UsersDb } from '../../utils/variables';
+import { UsersDb } from '../../utils/variables';
 import { colors, buttonsStyles, modalStyle } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';
 import { set_error } from '../../services/utils/actions';
-import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationsRootProps } from '../../services/invitations/tsTypes';
+import { InvitationsRootProps } from '../../services/invitations/tsTypes';
 import { UserRootStateProps } from '../../services/user/tsTypes';
-import { NearUsersRootProps } from '../../services/near_users/tsTypes';
+import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
 import { fireDb } from '../../services/firebase';
 import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg, closeSvg } from '../../utils/svgs';
+import { userDefaultSvg } from '../../utils/svgs';
+import InvitationModal from '../modal/InvitationModal';
 
 interface ProfileProps {
     navigation: HomeStackNavigationProp;
     route: HomeScreenRouteProp;
-    send_invitation: InvitationsDispatchActionProps['send_invitation'];
     set_error: (message: string) => void;
     user: UserRootStateProps;
     nearUsers: NearUsersRootProps['all'];
@@ -33,12 +33,9 @@ interface ProfileUserProps extends UserRootStateProps {
 //Summary
 ///Profile shows the whole profile of the user depending on if the user is PRIVATE or not
 const Profile = (props: ProfileProps) => {
-    const [message, setMessage] = useState<string>('');
-    const [profileUser, setProfileUser] = useState<ProfileUserProps | undefined>();
-    const [sentInvite, setSentInvite] = useState<boolean>(false);
+    const [profileUser, setProfileUser] = useState<NearByUsersProps | undefined>();
     const [errorMsg, setErrorMsg] = useState<string>('');
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
-    const [sendStatus, setSendStatus] = useState<string>('Send');
 
     useEffect(() => {
         //fetch the profile of the useßr using profileUid that is passed in params
@@ -51,24 +48,14 @@ const Profile = (props: ProfileProps) => {
 
             const { profileUid } = props.route.params;
 
-            //check if user is friends profile user (friends should be up to date in redux state)
-            var friend: boolean = false;
-
-            for (let i = 0; i < props.friends.length; i++) {
-                if (props.friends[i].uid === profileUid) {
-                    friend = true;
-                    break;
-                }
-            }
-
             //first search in all users to get the profile
             //reason I can't get from friends is because if the friends updates profile
             //the friendsObj will not update, but rather near_users and profile will only update
-            var profileUserObj: ProfileUserProps | undefined;
+            var profileUserObj: NearByUsersProps | undefined;
 
             for (let i = 0; i < props.nearUsers.length; i++) {
                 if (props.nearUsers[i].uid === profileUid) {
-                    profileUserObj = { ...props.nearUsers[i], friend }
+                    profileUserObj = { ...props.nearUsers[i] }
                     break;
                 }
             }
@@ -82,10 +69,11 @@ const Profile = (props: ProfileProps) => {
 
                             if (!docData) return undefined;
 
-                            const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate } = docData
+                            const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate, username } = docData
 
                             return {
                                 uid: doc.id,
+                                username,
                                 location,
                                 name,
                                 bioShort,
@@ -94,7 +82,9 @@ const Profile = (props: ProfileProps) => {
                                 gender,
                                 age,
                                 isPrivate,
-                                friend
+                                friend: false,
+                                distance: 0,
+                                sentInvite: false
                             }
 
                         } else {
@@ -117,92 +107,34 @@ const Profile = (props: ProfileProps) => {
 
         })()
 
-    }, [props.route])
+    }, [props.route, props.outboundInvitations])
 
-    useEffect(() => {
-        //if friends is false then see if an invitation was already sent to this user
-        //maybe have invitation request implementation so a user can send multiple invitations request
-        //on separate days
+    // useEffect(() => {
+    //     //if friends is false then see if an invitation was already sent to this user
+    //     //maybe have invitation request implementation so a user can send multiple invitations request
+    //     //on separate days
 
-        if (!props.route.params || !props.route.params.profileUid) {
-            props.set_error('User id not found!')
-            props.navigation.goBack()
-            return;
-        }
-        const { profileUid } = props.route.params;
+    //     if (!props.route.params || !props.route.params.profileUid) {
+    //         props.set_error('User id not found!')
+    //         props.navigation.goBack()
+    //         return;
+    //     }
+    //     const { profileUid } = props.route.params;
 
-        for (let i = 0; i < props.outboundInvitations.length; i++) {
-            if (props.outboundInvitations[i].sentTo === profileUid) {
-                setSentInvite(true)
-                break;
-            }
-        }
-    }, [props.outboundInvitations, props.route])
+    //     for (let i = 0; i < props.outboundInvitations.length; i++) {
+    //         if (props.outboundInvitations[i].sentTo === profileUid) {
+    //             if (profileUser) {
+    //                 const updatedProfile: NearByUsersProps = { ...profileUser, sentInvite: true }
+    //                 setProfileUser(updatedProfile)
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }, [props.outboundInvitations, props.route])
 
     if (errorMsg) return (<View><Text>{errorMsg}</Text></View>)
 
     if (!profileUser) return (<View><ActivityIndicator /></View>)
-
-    const handleRequestToLink = async () => {
-        if (message.length < 10) return console.log('not long enough bitch')
-        if (!profileUser.uid || !props.user.uid) return console.log('not able to get uid');
-        //init invitation object
-
-        setSendStatus('Sending...')
-
-        const invitationContent: InvitationObject = {
-            sentBy: props.user.uid,
-            sentTo: profileUser.uid,
-            message: message,
-            status: InvitationStatusOptions.pending,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        }
-
-        await props.send_invitation(props.user.uid, invitationContent)
-            .then((obj) => {
-                console.log(obj)
-                setSendStatus('Sent')
-            })
-            .catch((err) => {
-                console.log(err)
-                setSendStatus('Failed')
-            })
-    }
-
-    const modal = (
-        <Modal
-            visible={showModalInvite}
-            animationType='fade'
-            transparent={true}
-            onRequestClose={() => setShowModalInvite(false)}
-        >
-            <View style={modalStyle.center_view}>
-                <View style={modalStyle.modal_view}>
-                    <Pressable style={modalStyle.close_button} onPress={() => setShowModalInvite(false)}>
-                        <SvgXml xml={closeSvg} width='20' height='20' fill={colors.white} />
-                    </Pressable>
-                    <Text style={modalStyle.header_text}>Invite</Text>
-                    <TextInput
-                        multiline
-                        placeholder={'100 character limit'}
-                        numberOfLines={4}
-                        onChangeText={text => setMessage(text)}
-                        value={message}
-                        autoCompleteType='off'
-                        maxLength={messageMaxLen}
-                        style={modalStyle.text_area}
-                        placeholderTextColor={colors.secondary}
-                    />
-                    <Pressable onPress={handleRequestToLink} style={buttonsStyles.button_white_outline}>
-                        <Text style={buttonsStyles.button_white_outline_text}>
-                            {sendStatus}
-                        </Text>
-                    </Pressable>
-                </View>
-            </View>
-        </Modal>
-    )
 
     const baseText = (text: string | number, additionalStyle: Object) => (
         <Text style={[styles.base_text, additionalStyle]}>
@@ -221,7 +153,7 @@ const Profile = (props: ProfileProps) => {
             </Pressable>
         )
 
-        if (sentInvite) return (
+        if (profileUser.sentInvite) return (
             <Pressable style={buttonsStyles.button_inactive}>
                 <Text style={buttonsStyles.button_inactive_text}>Pending</Text>
             </Pressable>
@@ -239,7 +171,12 @@ const Profile = (props: ProfileProps) => {
 
     return (
         <View style={styles.container}>
-            {modal}
+            <InvitationModal
+                visible={showModalInvite && !profileUser.sentInvite && !profileUser.friend}
+                user={props.user}
+                targetUser={profileUser}
+                handleClose={() => setShowModalInvite(false)}
+            />
             <View style={styles.header_section}>
                 <SvgXml xml={userDefaultSvg} width='100' height='100' fill={colors.primary} />
                 <View style={styles.header_content}>

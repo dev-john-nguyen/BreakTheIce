@@ -12,8 +12,9 @@ export interface FriendObjProps {
     dateCreated: Date;
     active: boolean;
     uid: string;
+    username: string;
 }
 
 export interface FriendDispatchActionProps {
-    set_and_listen_friends: (uid: string) => void
+    set_and_listen_friends: (uid: string) => Promise<any>
 }

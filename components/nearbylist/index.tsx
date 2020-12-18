@@ -6,8 +6,7 @@ import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/
 import { HomeStackNavigationProp } from '../navigation/utils';
 import { ProfilePage } from '../../utils/variables';
 import { ListContainerStyle, colors } from '../../utils/styles';
-import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg, linkSvg } from '../../utils/svgs';
+import { ProfileImg } from '../../utils/components';
 
 interface NearByListProps {
     navigation: HomeStackNavigationProp;
@@ -32,7 +31,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
     handleNearUsersOnPress = (nearUser: NearByUsersProps) => {
         this.props.navigation.push(ProfilePage, {
             profileUid: nearUser.uid,
-            title: nearUser.name
+            title: nearUser.username
         })
     }
 
@@ -47,19 +46,19 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
             renderItem={({ item, index, separators }) => (
                 <TouchableHighlight
                     key={item.uid}
-                    // onPress={() => this.handleInvitationOnPress(item)}
+                    onPress={() => this.handleNearUsersOnPress(item)}
                     underlayColor={colors.secondary}
                     style={ListContainerStyle.container}
                 >
                     <View style={ListContainerStyle.content}>
                         <View style={ListContainerStyle.topLeft}>
-                            <Text style={ListContainerStyle.topLeft_text}>25 meters away</Text>
+                            <Text style={ListContainerStyle.topLeft_text}>{item.distance ? item.distance : 0} meters away</Text>
                         </View>
                         <View style={ListContainerStyle.profile_section}>
-                            <SvgXml xml={userDefaultSvg} width='50' height='50' fill={colors.primary} />
-                            <View>
-                                <Text style={ListContainerStyle.username}>RandomUser</Text>
-                                <Text style={ListContainerStyle.age}>26 years old</Text>
+                            <ProfileImg friend={item.friend} />
+                            <View style={ListContainerStyle.profile_section_text}>
+                                <Text style={ListContainerStyle.username}>{item.username ? item.username : 'RandomUser'}</Text>
+                                <Text style={ListContainerStyle.age}>{item.age ? item.age : 0} years old</Text>
                             </View>
                         </View>
                         <View style={ListContainerStyle.content_section}>
@@ -67,7 +66,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                             <View style={ListContainerStyle.content_section_buttons}>
                                 <Pressable style={({ pressed }) => pressed ? ListContainerStyle.content_section_button_primary_pressed : ListContainerStyle.content_section_button_primary} >
                                     {({ pressed }) => (
-                                        <Text style={ListContainerStyle.content_section_button_primary_text}>Invite</Text>
+                                        <Text style={ListContainerStyle.content_section_button_primary_text}>{item.friend ? 'Message' : item.sentInvite ? 'Pending' : 'Invite'}</Text>
                                     )}
                                 </Pressable>
                             </View>
