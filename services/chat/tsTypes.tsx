@@ -15,7 +15,22 @@ export interface ChatObjectProps {
     messages: Array<MessageProps>;
 }
 
+export type ChatPreviewProps = {
+    docId: string;
+    usersInfo: Array<{ uid: string, username: string }>;
+    uids: Array<string>;
+    recentMsg: string;
+    recentUsername: string;
+    dateSent: Date;
+}
+
 export interface ChatRootProps {
+    fetched: boolean;
     ids: Array<string>;
-    rooms: Array<ChatObjectProps>
+    rooms: Array<ChatObjectProps>;
+    previews: Array<ChatPreviewProps>
+}
+
+export interface ChatDispatchActionsProps {
+    set_and_listen_messages: (uid: string) => void;
 }

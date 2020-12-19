@@ -57,7 +57,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                         <View style={ListContainerStyle.profile_section}>
                             <ProfileImg friend={item.friend} />
                             <View style={ListContainerStyle.profile_section_text}>
-                                <Text style={ListContainerStyle.username}>{item.username ? item.username : 'RandomUser'}</Text>
+                                <Text style={ListContainerStyle.username} numberOfLines={1}>{item.username ? item.username : 'RandomUser'}</Text>
                                 <Text style={ListContainerStyle.age}>{item.age ? item.age : 0} years old</Text>
                             </View>
                         </View>

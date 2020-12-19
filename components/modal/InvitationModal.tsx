@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Modal, Pressable } from 'react-native';
+import { View, Text, TextInput, Modal, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { colors, buttonsStyles, modalStyle } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { closeSvg } from '../../utils/svgs';
@@ -57,30 +57,34 @@ const InviteModal = (props: MyModalProps) => {
             transparent={true}
             onRequestClose={() => props.handleClose(false)}
         >
-            <View style={modalStyle.center_view}>
-                <View style={modalStyle.modal_view}>
-                    <Pressable style={modalStyle.close_button} onPress={() => props.handleClose(false)}>
-                        <SvgXml xml={closeSvg} width='20' height='20' fill={colors.white} />
-                    </Pressable>
-                    <Text style={modalStyle.header_text}>Invite</Text>
-                    <TextInput
-                        multiline
-                        placeholder={'100 character limit'}
-                        numberOfLines={4}
-                        onChangeText={text => setMessage(text)}
-                        value={message}
-                        autoCompleteType='off'
-                        maxLength={messageMaxLen}
-                        style={modalStyle.text_area}
-                        placeholderTextColor={colors.secondary}
-                    />
-                    <Pressable onPress={handleSendInvitation} style={buttonsStyles.button_white_outline}>
-                        <Text style={buttonsStyles.button_white_outline_text}>
-                            {btnStatus}
-                        </Text>
-                    </Pressable>
-                </View>
-            </View>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={modalStyle.center_view}>
+                        <View style={modalStyle.modal_view}>
+                            <Pressable style={modalStyle.close_button} onPress={() => props.handleClose(false)}>
+                                <SvgXml xml={closeSvg} width='20' height='20' fill={colors.white} />
+                            </Pressable>
+                            <Text style={modalStyle.header_text}>Invite</Text>
+                            <TextInput
+                                multiline
+                                placeholder={'100 character limit'}
+                                numberOfLines={4}
+                                onChangeText={text => setMessage(text)}
+                                value={message}
+                                autoCompleteType='off'
+                                maxLength={messageMaxLen}
+                                style={modalStyle.text_area}
+                                placeholderTextColor={colors.secondary}
+                            />
+                            <Pressable onPress={handleSendInvitation} style={buttonsStyles.button_white_outline}>
+                                <Text style={buttonsStyles.button_white_outline_text}>
+                                    {btnStatus}
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
         </Modal>
     )
 }

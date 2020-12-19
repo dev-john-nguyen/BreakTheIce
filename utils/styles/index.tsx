@@ -25,11 +25,12 @@ export const profileStyles = StyleSheet.create({
 //buttons
 const buttonBase = {
     borderRadius: 20,
-    paddingLeft: 50,
-    paddingRight: 50,
+    paddingLeft: 40,
+    paddingRight: 40,
     paddingTop: 10,
     paddingBottom: 10,
-    borderWidth: 2
+    borderWidth: 2,
+    maxHeight: 40
 }
 
 export const buttonsStyles = StyleSheet.create({
@@ -124,7 +125,7 @@ export const ListContainerStyle = StyleSheet.create({
         left: 10,
     },
     profile_section: {
-        flex: .7,
+        flex: .5,
         marginRight: 10,
         flexDirection: 'column',
         justifyContent: 'center',
@@ -233,7 +234,7 @@ export const modalStyle = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
         width: '70%',
-        height: '30%',
+        minHeight: 300,
         justifyContent: 'space-between'
     },
     text_area: {

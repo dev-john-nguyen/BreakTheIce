@@ -1,1 +1,3 @@
 export const SET_MESSAGES = 'SET_MESSAGES';
+export const SET_CHAT_PREVIEWS = 'SET_CHAT_PREVIEWS';
+export const SET_FETCHED = 'SET_FETCHED';

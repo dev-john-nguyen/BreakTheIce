@@ -27,14 +27,16 @@ export const screenOptions = (props: { navigation: any, route: RouteProps['props
     headerTitle: () => {
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>{renderTitle(props.route, props.navigation)}</Text>
+                <Text style={styles.text}>{renderTitle(props.route)}</Text>
                 <View style={styles.underline} />
             </View>
         )
     },
+
     headerStyle: styles.header_style,
     headerTintColor: colors.white,
-    headerTitleStyle: styles.header_tint_style
+    headerTitleStyle: styles.header_tint_style,
+    headerBackTitleVisible: false
 }
 )
 

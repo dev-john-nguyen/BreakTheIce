@@ -9,9 +9,11 @@ import { set_and_listen_user_location } from '../../services/user/actions';
 import { set_and_listen_near_users } from '../../services/near_users/actions';
 import { set_and_listen_invitations } from '../../services/invitations/actions';
 import { set_and_listen_friends } from '../../services/friends/actions';
+import { set_and_listen_messages } from '../../services/chat/actions';
 import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/tsTypes';
 import { NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
 import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
+import { ChatDispatchActionsProps } from '../../services/chat/tsTypes';
 import { FriendDispatchActionProps } from '../../services/friends/tsTypes';
 import { HomeStackNavigationProp } from '../navigation/utils';
 import * as Location from 'expo-location';
@@ -27,7 +29,8 @@ interface HomeProps {
     set_and_listen_user_location: UserDispatchActionsProps['set_and_listen_user_location'];
     set_and_listen_near_users: NearUsersDispatchActionProps['set_and_listen_near_users'];
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
-    set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends']
+    set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
+    set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
 }
 
 interface CurrentLocationProps {
@@ -120,6 +123,7 @@ const Home = (props: HomeProps) => {
             props.set_and_listen_friends(props.user.uid);
             props.set_and_listen_invitations(props.user.uid);
             props.set_and_listen_near_users(props.user.uid, currentLocation.stateCity, currentLocation.location);
+            props.set_and_listen_messages(props.user.uid);
         }
     }, [currentLocation])
 
@@ -153,4 +157,7 @@ const mapStateToProps = (state: RootProps) => ({
 //     set_and_listen_near_users: PropTypes.func.isRequired
 // }
 
-export default connect(mapStateToProps, { set_and_listen_user_location, set_and_listen_near_users, set_and_listen_invitations, set_and_listen_friends })(Home);
+export default connect(mapStateToProps, {
+    set_and_listen_user_location, set_and_listen_near_users, set_and_listen_invitations, set_and_listen_friends,
+    set_and_listen_messages
+})(Home);

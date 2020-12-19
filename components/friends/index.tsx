@@ -35,10 +35,10 @@ const Friends = ({ friends, navigation }: FriendsProps) => {
             <TouchableHighlight
                 key={item.uid ? item.uid : index.toString()}
                 onPress={() => handleOnFriendPress(item)}
-                onShowUnderlay={separators.highlight}
-                onHideUnderlay={separators.unhighlight}
+                underlayColor={colors.secondary}
+                style={styles.container}
             >
-                <View style={styles.container}>
+                <View style={styles.content}>
                     <ProfileImg friend={true} />
                     <Text style={styles.username}>{item.username}</Text>
                 </View>
@@ -55,16 +55,18 @@ const mapStateToProps = (state: RootProps) => ({
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
-        alignItems: 'center',
         padding: 10,
         paddingLeft: 110,
         borderBottomWidth: 2,
         borderTopWidth: 2,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
-        marginTop: 20,
-        position: 'relative'
+        marginTop: 20
+    },
+    content: {
+        position: 'relative',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     username: {
         marginLeft: 20,

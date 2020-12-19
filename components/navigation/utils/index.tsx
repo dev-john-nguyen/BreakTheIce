@@ -6,11 +6,12 @@ import NearByList from '../../nearbylist';
 import Invitations from '../../invitations';
 import Profile from '../../profile';
 import Friends from '../../friends';
-import Messages from '../../messages';
-import Message from '../../messages/components/Message';
+import Chat from '../../chat';
+import Message from '../../chat/components/Message';
 import Me from '../../me';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
 import { screenOptions } from '../header';
+import { ChatPreviewProps } from '../../../services/chat/tsTypes';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -66,8 +67,10 @@ type InvitationsStackParams = {
 }
 
 type ChatStackParams = {
-    Chat: undefined;
-    Message: undefined;
+    Chat: undefined,
+    Message: {
+        usersInfo: ChatPreviewProps['usersInfo']
+    },
     Profile: ProfileRouteParams
 }
 
@@ -86,6 +89,7 @@ export type InvitationsScreenRouteProp = RouteProp<InvitationsStackParams, "Invi
 export type InvitationsStackNavigationProp = StackNavigationProp<InvitationsStackParams>;
 
 export type ChatScreenRouteProp = RouteProp<ChatStackParams, "Chat" | "Message" | "Profile">
+export type MessageScreenRouteProp = RouteProp<ChatStackParams, "Message">
 export type ChatStackNavigationProp = StackNavigationProp<ChatStackParams>;
 
 export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings">
@@ -128,7 +132,7 @@ export const MeStackScreen = (props: any) => {
 
 export const ChatStackScreen = () => (
     <ChatStack.Navigator screenOptions={screenOptions}>
-        <ChatStack.Screen name="Chat" component={Messages} />
+        <ChatStack.Screen name="Chat" component={Chat} />
         <ChatStack.Screen name="Message" component={Message} />
         <ChatStack.Screen name="Profile" component={Profile}
             options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}
