@@ -9,8 +9,7 @@ import { validate_near_users } from '../../services/near_users/actions';
 import { NearUsersRootProps, NearUsersDispatchActionProps, NearByUsersProps } from '../../services/near_users/tsTypes';
 import { UserRootStateProps } from '../../services/user/tsTypes';
 import { HomeStackNavigationProp } from '../navigation/utils';
-import { userDefaultSvg } from '../../utils/svgs'
-import { SvgXml } from 'react-native-svg';
+import { MapProfileImg } from '../../utils/components';
 
 interface RegionProps {
     latitude: number;
@@ -121,7 +120,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             style={{ width: 'auto', height: 'auto' }}
                             onPress={(e) => this.handleNearUsersOnPress(nearUser)}
                         >
-                            <SvgXml xml={userDefaultSvg} width='25' height='25' fill={colors.primary} />
+                            <MapProfileImg friend={nearUser.friend} />
                         </Marker>
                     ))
                 }
@@ -131,14 +130,16 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         return (
             <View style={styles.container}>
                 {this.props.nearUsersFetched && this.props.user.location ? renderMapView : <ActivityIndicator />}
-                <Pressable onPress={this.handleOnMyLocationPress}
-                    style={({ pressed }) => pressed ? { ...styles.myLocation, ...buttonsStyles.button_secondary_pressed } : { ...styles.myLocation, ...buttonsStyles.button_secondary }}>
-                    {({ pressed }) => (
-                        <Text
-                            style={pressed ? buttonsStyles.button_secondary_text_pressed : buttonsStyles.button_secondary_text}
-                        >My Location</Text>
-                    )}
-                </Pressable>
+                <View style={styles.myLocation}>
+                    <Pressable onPress={this.handleOnMyLocationPress}
+                        style={({ pressed }) => pressed ? buttonsStyles.button_secondary_pressed : buttonsStyles.button_secondary}>
+                        {({ pressed }) => (
+                            <Text
+                                style={pressed ? buttonsStyles.button_secondary_text_pressed : buttonsStyles.button_secondary_text}
+                            >My Location</Text>
+                        )}
+                    </Pressable>
+                </View>
                 <Pressable onPress={this.handleOnListViewPress}
                     style={({ pressed }) => pressed ? { ...styles.listView, ...buttonsStyles.button_primary_pressed } : { ...styles.listView, ...buttonsStyles.button_primary }}>
                     <Text style={buttonsStyles.button_primary_text}>List View</Text>
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     myLocation: {
         position: 'absolute',
         top: 10,
-        left: '30%'
+        alignSelf: 'center',
     },
     listView: {
         position: 'absolute',

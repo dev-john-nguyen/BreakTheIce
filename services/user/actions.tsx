@@ -1,6 +1,5 @@
 import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED } from './actionTypes';
 import { set_error, set_loading, remove_loading } from '../utils/actions';
-// import firebase from 'firebase/app';
 import { firebase } from '../firebase';
 import { AppDispatch } from '../../App';
 import { StateCityProps, UserRootStateProps } from './tsTypes';

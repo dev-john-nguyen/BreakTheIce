@@ -5,7 +5,7 @@ import { RootProps } from '../../services';
 import { InvitationsStackNavigationProp } from '../navigation/utils';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
 import { update_inviter_invitation } from '../../services/invitations/actions';
-import { ListContainerStyle, colors, buttonsStyles } from '../../utils/styles';
+import { ListContainerStyle, colors, emptyStyles } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg, linkSvg } from '../../utils/svgs';
 
@@ -37,7 +37,7 @@ class Invitations extends React.Component<Invitations> {
         }
 
         const renderInvitationList = () => {
-            if (!this.props.invitation.inbound || this.props.invitation.inbound.length < 1) return <Text>No Invitations</Text>;
+            if (!this.props.invitation.inbound || this.props.invitation.inbound.length < 1) return <View style={emptyStyles.container}><Text style={emptyStyles.text}>No Invitations</Text></View>;
 
             return <FlatList
                 data={this.props.invitation.inbound}
@@ -45,33 +45,33 @@ class Invitations extends React.Component<Invitations> {
                     <TouchableHighlight
                         onPress={() => this.handleInvitationOnPress(item)}
                         underlayColor={colors.secondary}
-                        style={ListContainerStyle.container}
+                        style={list_style.container}
                     >
-                        <View style={ListContainerStyle.content}>
-                            <View style={ListContainerStyle.topLeft}>
-                                <Text style={ListContainerStyle.topLeft_text}>{item.createdAt ? renderDate(item.createdAt) : '99/99/9999'}</Text>
+                        <View style={list_style.content}>
+                            <View style={list_style.topLeft}>
+                                <Text style={list_style.topLeft_text}>{item.createdAt ? renderDate(item.createdAt) : '99/99/9999'}</Text>
                             </View>
-                            <View style={ListContainerStyle.profile_section}>
+                            <View style={list_style.profile_section}>
                                 <SvgXml xml={userDefaultSvg} width='50' height='50' fill={colors.primary} />
-                                <View style={ListContainerStyle.profile_section_text}>
-                                    <Text style={ListContainerStyle.username}>{item.sentByUsername ? item.sentByUsername : 'UnknownUser'}</Text>
-                                    <Text style={ListContainerStyle.age}>{item.sentByAge ? item.sentByAge : 0} years old</Text>
+                                <View style={list_style.profile_section_text}>
+                                    <Text style={list_style.username}>{item.sentByUsername ? item.sentByUsername : 'UnknownUser'}</Text>
+                                    <Text style={list_style.age}>{item.sentByAge ? item.sentByAge : 0} years old</Text>
                                 </View>
                             </View>
-                            <View style={ListContainerStyle.content_section}>
-                                <Text style={ListContainerStyle.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
-                                <View style={ListContainerStyle.content_section_buttons}>
-                                    <Pressable style={({ pressed }) => pressed ? ListContainerStyle.content_section_button_primary_pressed : ListContainerStyle.content_section_button_primary}
+                            <View style={list_style.content_section}>
+                                <Text style={list_style.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
+                                <View style={list_style.content_section_buttons}>
+                                    <Pressable style={({ pressed }) => pressed ? list_style.content_section_button_primary_pressed : list_style.content_section_button_primary}
                                         onPress={() => this.handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)} >
                                         {({ pressed }) => (
-                                            <Text style={ListContainerStyle.content_section_button_primary_text}>{pressed ? 'Accepted' : 'Accept'}</Text>
+                                            <Text style={list_style.content_section_button_primary_text}>{pressed ? 'Accepted' : 'Accept'}</Text>
                                         )}
                                     </Pressable>
-                                    <Pressable style={({ pressed }) => pressed ? ListContainerStyle.content_section_button_secondary_pressed : ListContainerStyle.content_section_button_secondary}
+                                    <Pressable style={({ pressed }) => pressed ? list_style.content_section_button_secondary_pressed : list_style.content_section_button_secondary}
                                         onPress={() => this.handleOnStatusUpdatePress(item, InvitationStatusOptions.denied)}>
                                         {({ pressed }) => (
-                                            pressed ? <Text style={ListContainerStyle.content_section_button_secondary_text_pressed}>Denied</Text> :
-                                                <Text style={ListContainerStyle.content_section_button_secondary_text}>Deny</Text>
+                                            pressed ? <Text style={list_style.content_section_button_secondary_text_pressed}>Denied</Text> :
+                                                <Text style={list_style.content_section_button_secondary_text}>Deny</Text>
                                         )}
                                     </Pressable>
                                 </View>
@@ -86,18 +86,13 @@ class Invitations extends React.Component<Invitations> {
 
 
         return (
-            <View style={style.container}>
+            <View style={{ flex: 1 }}>
                 {renderInvitationList()}
             </View>
         )
     }
 }
-
-const style = StyleSheet.create({
-    container: {
-        flex: 1,
-    }
-})
+const list_style = ListContainerStyle(colors.primary);
 
 const mapStateToProps = (state: RootProps) => ({
     invitation: state.invitations

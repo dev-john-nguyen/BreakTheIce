@@ -109,28 +109,6 @@ const Profile = (props: ProfileProps) => {
 
     }, [props.route, props.outboundInvitations])
 
-    // useEffect(() => {
-    //     //if friends is false then see if an invitation was already sent to this user
-    //     //maybe have invitation request implementation so a user can send multiple invitations request
-    //     //on separate days
-
-    //     if (!props.route.params || !props.route.params.profileUid) {
-    //         props.set_error('User id not found!')
-    //         props.navigation.goBack()
-    //         return;
-    //     }
-    //     const { profileUid } = props.route.params;
-
-    //     for (let i = 0; i < props.outboundInvitations.length; i++) {
-    //         if (props.outboundInvitations[i].sentTo === profileUid) {
-    //             if (profileUser) {
-    //                 const updatedProfile: NearByUsersProps = { ...profileUser, sentInvite: true }
-    //                 setProfileUser(updatedProfile)
-    //                 break;
-    //             }
-    //         }
-    //     }
-    // }, [props.outboundInvitations, props.route])
 
     if (errorMsg) return (<View><Text>{errorMsg}</Text></View>)
 
@@ -173,7 +151,6 @@ const Profile = (props: ProfileProps) => {
         <View style={styles.container}>
             <InvitationModal
                 visible={showModalInvite && !profileUser.sentInvite && !profileUser.friend}
-                user={props.user}
                 targetUser={profileUser}
                 handleClose={() => setShowModalInvite(false)}
             />

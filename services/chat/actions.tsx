@@ -2,12 +2,9 @@ import { SET_CHAT_PREVIEWS, SET_FETCHED } from './actionTypes';
 import { fireDb } from '../firebase';
 import { AppDispatch } from '../../App';
 import { RootProps } from '../';
-import { ChatDb, ChatMessageDb } from '../../utils/variables';
+import { ChatDb } from '../../utils/variables';
 import { SET_ERROR } from '../utils/actionTypes';
 import { ChatPreviewProps } from './tsTypes';
-
-//@ts-ignore
-import { firestore } from 'firebase';
 
 export const set_and_listen_messages = (uid: string) => (dispatch: AppDispatch, getState: () => RootProps) => {
 
@@ -20,19 +17,20 @@ export const set_and_listen_messages = (uid: string) => (dispatch: AppDispatch, 
     //check if there are any messages
     if (chatIds.length < 1) return;
 
-    fireDb.collection(ChatDb).where('uids', 'array-contains', uid).onSnapshot(querySnapshot => {
+    var fireDbChatListner = fireDb.collection(ChatDb).where('uids', 'array-contains', uid).onSnapshot(querySnapshot => {
         var chatPreviews: ChatPreviewProps[] = [];
 
         querySnapshot.docs.forEach(doc => {
             if (doc.exists) {
-                const { uids, recentUsername, recentMsg, dateSent, usersInfo } = doc.data()
+                const { unread, recentUid, recentMsg, dateSent, usersInfo, dateCreated } = doc.data()
                 chatPreviews.push({
                     docId: doc.id,
-                    uids,
-                    recentUsername,
                     recentMsg,
                     dateSent: dateSent.toDate(),
-                    usersInfo
+                    dateCreated: dateCreated.toDate(),
+                    usersInfo,
+                    unread,
+                    recentUid
                 })
             }
         })
@@ -41,7 +39,17 @@ export const set_and_listen_messages = (uid: string) => (dispatch: AppDispatch, 
             type: SET_CHAT_PREVIEWS,
             payload: chatPreviews
         })
-    })
+    },
+        err => {
+            console.log(err);
+            dispatch({
+                type: SET_ERROR,
+                payload: 'Oops! We had trouble retrieving your messages.'
+            })
+
+            return false;
+        }
+    )
 
 
     dispatch({ type: SET_FETCHED })

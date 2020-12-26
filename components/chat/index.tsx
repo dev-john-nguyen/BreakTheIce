@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableHighlight, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableHighlight, ActivityIndicator } from 'react-native';
 import { ListContainerStyle, colors } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { ProfileImg } from '../../utils/components';
@@ -14,16 +14,16 @@ interface ChatProps {
 }
 
 const Chat = (props: ChatProps) => {
-    const testData = [{
-        username: 'nguyening20',
-        age: 26,
-        date: '12/31/2020',
-        msgId: '34af23dsf',
-        recentMsg: "The short film to You Rock My World, the Top 10 hit single from Michael Jackson's Invincible, features guest appearances from Chris Tucker, Michael Madsen and Marlon Brando, in one of his final film appearances."
-    }]
+    const [chatPreviews, setChatPreviews] = useState<ChatPreviewProps[]>()
+    useEffect(() => {
+        //sort by time;
+        props.chat.previews.sort((chat1: ChatPreviewProps, chat2: ChatPreviewProps) => (new Date(chat2.dateSent) as any) - (new Date(chat1.dateSent) as any))
 
-    const handleRedirectToMessage = (preview: ChatPreviewProps) => {
-        props.navigation.push('Message', { usersInfo: preview.usersInfo });
+        setChatPreviews([...props.chat.previews])
+    }, [props.chat.previews])
+
+    const handleRedirectToMessage = (preview: ChatPreviewProps, unread: boolean) => {
+        props.navigation.push('Message', { msgDocId: preview.docId, unread });
     }
 
     const renderFriendUsername = (userInfo: ChatPreviewProps['usersInfo']) => {
@@ -36,41 +36,66 @@ const Chat = (props: ChatProps) => {
     }
 
     const renderDate = (date: Date) => {
+        if (!date) return
         return date.getMonth() + '/' + date.getDay() + '/' + date.getFullYear()
     }
 
+    const renderDateDiff = (date: any) => {
+        if (!date) return;
+
+        const date1: any = new Date();
+        const diffTime = Math.abs(date1 - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 1) return diffDays + " days ago"
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        if (diffHours < 24 && diffHours > 1) return diffHours + " hours ago"
+        const diffMins = Math.ceil(diffTime / (1000 * 60));
+        if (diffMins < 60 && diffMins > 1) return diffMins + " mins ago"
+        const diffSec = Math.ceil(diffTime / (1000));
+        return diffSec + " secs ago";
+    }
+
+    if (!chatPreviews) return <View style={{ flex: 1, alignContent: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+    </View>
+
     return (
         <FlatList
-            data={props.chat.previews}
-            renderItem={({ item, index, separators }) => (
-                <TouchableHighlight
-                    key={item.docId ? item.docId : index.toString()}
-                    onPress={() => handleRedirectToMessage(item)}
-                    underlayColor={colors.secondary}
-                    style={ListContainerStyle.container}
-                >
-                    <View style={ListContainerStyle.content}>
-                        <View style={ListContainerStyle.topLeft}>
-                            <Text style={ListContainerStyle.topLeft_text}>{renderDate(item.dateSent)}</Text>
-                        </View>
-                        <View style={ListContainerStyle.profile_section}>
-                            <ProfileImg friend={true} />
-                            <View style={ListContainerStyle.profile_section_text}>
-                                <Text style={ListContainerStyle.username}>{renderFriendUsername(item.usersInfo)}</Text>
-                                {/* <Text style={ListContainerStyle.age}>{item.age ? item.age : 0} years old</Text> */}
-                            </View>
-                        </View>
-                        <View style={ListContainerStyle.content_section}>
-                            <Text style={ListContainerStyle.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
-                            <View>
-                                <Text>{item.recentUsername ? item.recentUsername : ''}</Text>
-                                <Text>{renderDate(item.dateSent)}</Text>
-                            </View>
+            data={chatPreviews}
+            renderItem={({ item, index, separators }) => {
 
+                var unread = item.unread && item.recentUid !== props.user.uid;
+
+                const list_style = ListContainerStyle(unread ? colors.white : colors.primary, unread ? colors.secondary : undefined)
+
+                return (
+                    <TouchableHighlight
+                        key={item.docId ? item.docId : index.toString()}
+                        onPress={() => handleRedirectToMessage(item, unread)}
+                        underlayColor={colors.secondary}
+                        style={list_style.container}
+                    >
+                        <View style={list_style.content}>
+                            <View style={list_style.topLeft}>
+                                <Text style={list_style.topLeft_text}>{renderDate(item.dateCreated)}</Text>
+                            </View>
+                            <View style={list_style.profile_section}>
+                                <ProfileImg friend={true} fillColor={unread ? colors.white : colors.primary} />
+                                <View style={list_style.profile_section_text}>
+                                    <Text style={list_style.username}>{renderFriendUsername(item.usersInfo)}</Text>
+                                </View>
+                            </View>
+                            <View style={list_style.content_section}>
+                                <Text style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
+                                <View style={list_style.content_section_small}>
+                                    <Text style={list_style.content_section_small_text}>{renderDateDiff(item.dateSent)}</Text>
+                                </View>
+
+                            </View>
                         </View>
-                    </View>
-                </TouchableHighlight>
-            )}
+                    </TouchableHighlight>
+                )
+            }}
             keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
         />
     )

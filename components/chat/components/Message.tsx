@@ -1,84 +1,170 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { connect } from 'react-redux';
+import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { ProfileImg } from '../../../utils/components';
 import { colors, buttonsStyles } from '../../../utils/styles';
-import { MessageScreenRouteProp, ChatStackNavigationProp } from '../../navigation/utils';
+import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils';
+import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
-import { ChatDb } from '../../../utils/variables';
+import { ChatDb, ChatMessageDb } from '../../../utils/variables';
+import { MessageProps } from '../../../services/chat/tsTypes';
+import { RootProps } from '../../../services';
+import { set_error } from '../../../services/utils/actions';
 
-interface MessageProps {
-    route: MessageScreenRouteProp;
+interface ComMessageProps {
+    route: RouteProp<ChatStackParams, "Message">;
     navigation: ChatStackNavigationProp;
+    user: RootProps['user'];
+    set_error: (msg: string) => void;
 }
-const Message = (props: MessageProps) => {
-    const [userIds, setUsersIds] = useState<string[]>();
 
-    const textMsg = [
-        {
-            uid: '1',
-            username: 'nguyening20',
-            message: "Hey! What's up? Its been a minute"
+const Message = (props: ComMessageProps) => {
+    const { msgDocId } = props.route.params;
+    const [messages, setMessages] = useState<MessageProps[] | 'empty'>();
+    const [messageTxt, setMessageTxt] = useState<string>('');
+    const [targetChatDocId, setTargetChatDocId] = useState<string | undefined>(msgDocId)
+
+
+    const dbListener = (msgDocId: string) => {
+        return fireDb.collection(ChatDb).doc(msgDocId).collection(ChatMessageDb).onSnapshot((querySnapshot) => {
+            var messages: MessageProps[] = [];
+
+            querySnapshot.docs.forEach((doc) => {
+                if (doc.exists) {
+                    const { message, sentAt, sentBy, sentTo } = doc.data();
+                    messages.push({ message, sentAt: sentAt.toDate(), sentBy, docId: doc.id })
+                }
+            })
+
+            //sort by time;
+            messages.sort((msg1: MessageProps, msg2: MessageProps) => (new Date(msg2.sentAt) as any) - (new Date(msg1.sentAt) as any))
+
+            setMessages(messages)
         },
-        {
-            uid: '2',
-            username: 'Amber123',
-            message: "Nothing much! Miss you. Lets freak soon."
-        },
-        {
-            uid: '2',
-            username: 'Amber123',
-            message: "I'll blow you. We freak in that hot tub that one time. Man the way you put your dick inside me in that hot tub. It was crazy. I've never done anything like that before. Hopefully we can do it again soon..."
-        },
-        {
-            uid: '1',
-            username: 'nguyening20',
-            message: "Oh yeah I remeber that. That was fun. Lets do it again."
-        }
-    ]
-
-    //get users to differ between which message belows to who
-    useEffect(() => {
-        //check if params exists
-        if (props.route.params) {
-            console.log(props.route.params.usersInfo)
-        }
-        // //on mount fetch all the messages via firestore
-        // fireDb.collection(ChatDb).doc()
-
-
-
-        var usersIds: string[] = [];
-
-        for (let i = 0; i < textMsg.length; i++) {
-            usersIds.push(textMsg[i].uid);
-        }
-
-        var uniqueUserIds = usersIds.sort().filter(function (item: string, pos: number, ary: string[]) {
-            return !pos || item != ary[pos - 1];
-        });
-
-        setUsersIds(uniqueUserIds)
-
-    }, [])
-
-    var renderTextMsgs;
-
-    if (userIds) {
-        renderTextMsgs = textMsg.map((text, index) => {
-            if (text.uid === userIds[0]) {
-                return (
-                    <View key={index} style={styles.message_left}>
-                        <Text style={styles.message_left_text}>{text.message}</Text>
-                    </View>
-                )
-            } else {
-                return (
-                    <View key={index} style={styles.message_right}>
-                        <Text style={styles.message_right_text}>{text.message}</Text>
-                    </View>
-                )
+            err => {
+                props.set_error('Oops! Failed to get messages')
+                setMessages('empty');
             }
-        })
+        )
+    }
+
+
+    useEffect(() => {
+        //route.params change remove listener and
+        // const { msgDocId, targetUser } = props.route.params;
+        var unsubscribeMessages: () => void;
+
+        if (targetChatDocId) {
+            const { unread } = props.route.params;
+
+            if (unread) {
+                //set message read
+                fireDb.collection(ChatDb).doc(targetChatDocId).set({ unread: false }, { merge: true })
+            }
+            //check if docId can be found if not set error
+            unsubscribeMessages = dbListener(targetChatDocId)
+        } else {
+            setMessages('empty')
+            props.navigation.setParams
+        }
+
+        return () => unsubscribeMessages && unsubscribeMessages();
+    }, [props.route.params, targetChatDocId])
+
+    const handleSentMessage = () => {
+
+        if (messageTxt.length < 1) return props.set_error('empty')
+
+        Keyboard.dismiss();
+
+        //there should be only two users in the chat so the sentTo uid
+        //can be one or the other
+        var batch = fireDb.batch();
+
+        //initate vars
+        var chatRef;
+        var chatObj: any = {
+            recentMsg: messageTxt,
+            dateSent: new Date(),
+            unread: true,
+            recentUid: props.user.uid
+        }
+        var newChatId: string;
+
+        if (targetChatDocId) {
+            //listener was set so targetChatDocId
+            chatRef = fireDb.collection(ChatDb).doc(targetChatDocId);
+        } else if (props.route.params.targetUser) {
+            //listener or targetChatDocId 
+            chatRef = fireDb.collection(ChatDb).doc();
+
+            const { targetUser } = props.route.params;
+
+            chatObj.dateCreated = new Date();
+            chatObj.usersInfo = [{ username: targetUser.username, uid: targetUser.uid }, { username: props.user.username, uid: props.user.uid }]
+
+            //set new targetChatDocId and this will eventually set the listener
+            newChatId = chatRef.id;
+        } else {
+            //fail
+            return props.set_error("Oops! Wasn't able to find user information");
+        }
+
+        batch.set(chatRef, chatObj, { merge: true })
+
+        var newMsgRef = chatRef.collection(ChatMessageDb).doc();
+
+        batch.set(newMsgRef, {
+            sentBy: props.user.uid,
+            sentAt: new Date(),
+            message: messageTxt
+        }
+        )
+
+        batch.commit()
+            .then(() => {
+                //if chatId is not undefined then a new Chat was created
+                newChatId && setTargetChatDocId(newChatId);
+                setMessageTxt('');
+            })
+            .catch((err) => {
+                console.log(err)
+                props.set_error("Sorry, wasn't able to send your message, please try again.")
+            })
+    }
+
+
+    const renderTextMsgs = () => {
+        if (!messages) return <ActivityIndicator />
+
+        if (messages === 'empty') {
+            return <View style={styles.empty}>
+                <Text>No Messages</Text>
+            </View>
+        }
+
+        return <FlatList
+            style={styles.messages}
+            data={messages}
+            inverted
+            initialNumToRender={10}
+            renderItem={({ item, index, separators }) => {
+                if (item.sentBy === props.user.uid) {
+                    return (
+                        <View key={item.docId} style={styles.message_right}>
+                            <Text style={styles.message_right_text}>{item.message}</Text>
+                        </View>
+                    )
+                } else {
+                    return (
+                        <View key={item.docId} style={styles.message_left}>
+                            <Text style={styles.message_left_text}>{item.message}</Text>
+                        </View>
+                    )
+                }
+            }}
+            keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
+        />
     }
 
 
@@ -88,17 +174,20 @@ const Message = (props: MessageProps) => {
                 <ProfileImg friend={true} />
                 <Text style={styles.username}>Amber123</Text>
             </View>
-            <ScrollView style={styles.messages}>
-                {userIds ? renderTextMsgs : <ActivityIndicator />}
-            </ScrollView>
+            {renderTextMsgs()}
             <KeyboardAvoidingView keyboardVerticalOffset={120} behavior={'padding'} style={styles.message_form}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.message_form_content}>
                         <ScrollView style={styles.message_form_input}>
-                            <TextInput style={styles.message_form_input_text} multiline />
+                            <TextInput
+                                style={styles.message_form_input_text}
+                                onChangeText={text => setMessageTxt(text)}
+                                value={messageTxt}
+                                multiline />
                         </ScrollView>
-                        <Pressable style={buttonsStyles.button_white_outline}>
-                            <Text style={buttonsStyles.button_white_outline_text}>Send</Text>
+                        <Pressable style={({ pressed }) => pressed ? buttonsStyles.button_white_outline_pressed : buttonsStyles.button_white_outline} onPress={handleSentMessage}
+                        >
+                            {({ pressed }) => <Text style={pressed ? buttonsStyles.button_white_outline_text_pressed : buttonsStyles.button_white_outline_text}>Send</Text>}
                         </Pressable>
                     </View>
                 </ TouchableWithoutFeedback>
@@ -110,6 +199,11 @@ const Message = (props: MessageProps) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1
+    },
+    empty: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     message_form: {
         backgroundColor: colors.secondary
@@ -131,11 +225,12 @@ const styles = StyleSheet.create({
         padding: 5,
         paddingLeft: 10,
         paddingRight: 10,
+        backgroundColor: colors.white,
         borderColor: colors.white,
         maxHeight: 80
     },
     message_form_input_text: {
-        color: colors.white
+        color: 'black'
     },
     profile_content: {
         marginTop: 20,
@@ -185,4 +280,7 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Message;
+const mapStateToProps = (state: RootProps) => ({
+    user: state.user
+})
+export default connect(mapStateToProps, { set_error })(Message);

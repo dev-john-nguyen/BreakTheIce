@@ -6,6 +6,7 @@ const INITIAL_STATE = {
     ids: [],
     rooms: [],
     previews: [],
+    fbListener: ''
 }
 
 

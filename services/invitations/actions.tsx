@@ -4,11 +4,9 @@ import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './tsTypes';
 import { UserRootStateProps } from '../user/tsTypes';
 import { fireDb } from '../firebase';
-import { InvitationsDb, InvitationsDb_Inbound, InvitationsDb_Outbound, FriendsDb, FriendsUsersDb } from '../../utils/variables';
+import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
-import { SENT_INVITATION_UPDATE_USER } from '../near_users/actionTypes';
-//@ts-ignore
-import { firestore } from 'firebase';
+import { UPDATE_INVITE_NEAR_USER } from '../near_users/actionTypes';
 import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
 
 //define the structure of the invitation
@@ -26,7 +24,7 @@ export const send_invitation = (invitationObj: InvitationObject) => async (dispa
 
     //will need to update the near user of which the invitation was sent
     dispatch({
-        type: SENT_INVITATION_UPDATE_USER,
+        type: UPDATE_INVITE_NEAR_USER,
         payload: invitationObj.sentTo
     })
     dispatch({

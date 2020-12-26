@@ -30,5 +30,5 @@ export const ProfilePage = 'Profile';
 //bottomTabs
 export const bottomTabsHome = 'Home';
 export const bottomTabInvitations = 'Invitations';
-export const bottomTabMessages = 'Messages';
+export const bottomTabChat = 'Chat';
 export const bottomTabsProfile = 'Profile'

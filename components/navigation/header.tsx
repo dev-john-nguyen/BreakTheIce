@@ -7,7 +7,7 @@ interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
 }
 
-const renderTitle = (route: RouteProps['props']) => {
+const renderTitle = (route: RouteProps['props'], navigation: any) => {
     if (!route.params || !route.params.title) {
         switch (route.name) {
             case 'Home':
@@ -27,7 +27,7 @@ export const screenOptions = (props: { navigation: any, route: RouteProps['props
     headerTitle: () => {
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>{renderTitle(props.route)}</Text>
+                <Text style={styles.text}>{renderTitle(props.route, props.navigation)}</Text>
                 <View style={styles.underline} />
             </View>
         )

@@ -7,9 +7,8 @@ import { StateCityProps } from '../user/tsTypes';
 import { NearByUsersProps } from './tsTypes';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
-
-//@ts-ignore
-import { firestore } from 'firebase';
+import firebase from 'firebase';
+import { SET_ERROR } from '../utils/actionTypes';
 
 
 //find near by users
@@ -18,7 +17,7 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
         .collection(LocationsDb)
         .doc(stateCity.state)
         .collection(stateCity.city)
-        .where(firestore.FieldPath.documentId(), "!=", uid)
+        .where(firebase.firestore.FieldPath.documentId(), "!=", uid)
         .onSnapshot(function (querySnapshot) {
 
             var nearByUsers: Array<NearByUsersProps> = [];
@@ -98,6 +97,12 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                     nearBy: nearByUsers,
                     all: allUsers
                 }
+            })
+        }, err => {
+            console.log(err)
+            dispatch({
+                type: SET_ERROR,
+                payload: 'Oops! We are having trouble retrieving near by users.'
             })
         })
 }

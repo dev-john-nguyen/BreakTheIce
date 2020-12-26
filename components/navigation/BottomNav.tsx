@@ -4,7 +4,7 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { profileSvg, searchSvg, invitationSvg, messageSvg } from '../../utils/svgs';
-import { bottomTabInvitations, bottomTabMessages, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
+import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
 
 const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const focusedOptions = descriptors[state.routes[state.index].key].options;
@@ -24,7 +24,7 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
                 return (
                     <SvgXml xml={invitationSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
                 )
-            case bottomTabMessages:
+            case bottomTabChat:
                 return (
                     <SvgXml xml={messageSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
                 )

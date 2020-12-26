@@ -6,9 +6,23 @@ export const colors = {
     secondary: '#99F3BD',
     tertiary: '#d2f6c5',
     quaternary: 'f6f7d4',
-    white: '#ffffff'
+    white: '#ffffff',
+    red: '#ff4646'
 }
 
+//base styles
+
+export const emptyStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    text: {
+        fontSize: 16,
+        color: colors.primary
+    }
+})
 
 //profileSvg
 
@@ -19,6 +33,11 @@ export const profileStyles = StyleSheet.create({
     friend: {
         position: 'absolute',
         right: -5
+    },
+    friend_small: {
+        position: 'absolute',
+        right: -5,
+        top: -2
     }
 })
 
@@ -104,17 +123,18 @@ const ListContainerButtonBase = {
 }
 
 //list containers
-export const ListContainerStyle = StyleSheet.create({
+export const ListContainerStyle = (color: string, backgroundColor?: string) => StyleSheet.create({
     container: {
         borderBottomWidth: 2,
         borderTopWidth: 2,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
         marginTop: 20,
-        position: 'relative'
+        position: 'relative',
     },
     content: {
         flexDirection: 'row',
+        backgroundColor: backgroundColor ? backgroundColor : undefined,
         paddingLeft: 30,
         paddingRight: 10,
         paddingTop: 20,
@@ -135,7 +155,7 @@ export const ListContainerStyle = StyleSheet.create({
     },
     topLeft_text: {
         fontSize: 8,
-        color: colors.primary
+        color: color
     },
     profile_section_text: {
         bottom: 5
@@ -143,13 +163,13 @@ export const ListContainerStyle = StyleSheet.create({
     username: {
         marginTop: 15,
         fontSize: 16,
-        color: colors.primary,
+        color: color,
         textAlign: 'center',
         overflow: 'visible'
     },
     age: {
         fontSize: 12,
-        color: colors.primary,
+        color: color,
         textAlign: 'center'
     },
     content_section: {
@@ -163,10 +183,19 @@ export const ListContainerStyle = StyleSheet.create({
     },
     content_section_text: {
         fontSize: 12,
-        color: colors.primary,
+        color: color,
         display: 'flex',
         justifyContent: 'center',
         textAlign: 'center'
+    },
+    content_section_small: {
+        alignSelf: 'flex-end',
+        flexDirection: 'row'
+    },
+    content_section_small_text: {
+        fontSize: 8,
+        color: colors.secondary,
+        margin: 5
     },
     content_section_buttons: {
         marginTop: 20,
@@ -185,7 +214,7 @@ export const ListContainerStyle = StyleSheet.create({
     },
     content_section_button_primary_text: {
         color: colors.white,
-        fontSize: 10
+        fontSize: 12
     },
     content_section_button_secondary: {
         ...ListContainerButtonBase,
@@ -200,13 +229,14 @@ export const ListContainerStyle = StyleSheet.create({
     },
     content_section_button_secondary_text: {
         color: colors.primary,
-        fontSize: 10
+        fontSize: 12
     },
     content_section_button_secondary_text_pressed: {
         color: colors.white,
-        fontSize: 10
+        fontSize: 12
     },
 })
+
 
 //modal
 export const modalStyle = StyleSheet.create({

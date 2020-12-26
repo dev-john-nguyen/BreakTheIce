@@ -6,8 +6,8 @@ export interface ChatActionProps {
 export interface MessageProps {
     sentAt: Date;
     sentBy: string;
-    sentTo: string;
     message: string;
+    docId: string;
 }
 
 export interface ChatObjectProps {
@@ -16,12 +16,13 @@ export interface ChatObjectProps {
 }
 
 export type ChatPreviewProps = {
+    dateCreated: Date;
     docId: string;
     usersInfo: Array<{ uid: string, username: string }>;
-    uids: Array<string>;
     recentMsg: string;
-    recentUsername: string;
+    recentUid: string;
     dateSent: Date;
+    unread: boolean;
 }
 
 export interface ChatRootProps {

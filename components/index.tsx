@@ -9,7 +9,8 @@ import { RootProps } from '../services';
 import { NavigationContainer } from '@react-navigation/native';
 import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation/utils'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { bottomTabInvitations, bottomTabMessages, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
+import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
+import { colors } from '../utils/styles';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -27,10 +28,10 @@ const Base = (props: Base) => {
         if (props.user.uid) {
             return (
                 <NavigationContainer>
-                    <BottomTabs.Navigator backBehavior='history' tabBar={props => <BottomNav {...props} />}>
+                    <BottomTabs.Navigator backBehavior='history' lazy={true} tabBar={props => <BottomNav {...props} />}>
                         <BottomTabs.Screen name={bottomTabsHome} component={HomeStackScreen} />
                         <BottomTabs.Screen name={bottomTabInvitations} component={InvitationsStackScreen} />
-                        <BottomTabs.Screen name={bottomTabMessages} component={ChatStackScreen} />
+                        <BottomTabs.Screen name={bottomTabChat} component={ChatStackScreen} />
                         <BottomTabs.Screen name={bottomTabsProfile} component={MeStackScreen} initialParams={{ title: props.user.username }} />
                     </BottomTabs.Navigator>
                 </NavigationContainer>
@@ -43,14 +44,9 @@ const Base = (props: Base) => {
         <View style={styles.container}>
             <StatusBar style='inverted' />
             {props.error &&
-                <View style={styles.errorContainer}>
-                    <View style={styles.errorText}>
-                        <Text>{props.error}</Text>
-                        <Pressable onPress={() => props.remove_error()}>
-                            <Text>Okay</Text>
-                        </Pressable>
-                    </View>
-                </View>
+                <Pressable onPress={() => props.remove_error()} style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{props.error}</Text>
+                </Pressable>
             }
             {handleRender()}
         </View>
@@ -68,15 +64,13 @@ const styles = StyleSheet.create({
         top: 40,
         zIndex: 100,
         width: Math.round(Dimensions.get('window').width),
-        padding: 10
+        padding: 10,
+        backgroundColor: colors.red
     },
     errorText: {
-        width: '100%',
-        backgroundColor: '#ff4646',
-        color: '#f6f7d4',
+        color: colors.white,
         textAlign: 'center',
-        padding: 10,
-        borderRadius: 5
+        fontSize: 14
     }
 });
 

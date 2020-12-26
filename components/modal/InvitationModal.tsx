@@ -9,12 +9,13 @@ import { send_invitation } from '../../services/invitations/actions';
 import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/tsTypes';
 import { UserRootStateProps } from '../../services/user/tsTypes';
+import { RootProps } from '../../services';
 
 interface MyModalProps {
     visible: boolean;
-    handleClose: (val: boolean) => void;
+    handleClose: () => void;
     send_invitation: InvitationsDispatchActionProps['send_invitation'];
-    targetUser: NearByUsersProps;
+    targetUser: NearByUsersProps | undefined;
     user: UserRootStateProps;
 }
 
@@ -24,6 +25,7 @@ const InviteModal = (props: MyModalProps) => {
 
     const handleSendInvitation = async () => {
         if (message.length < 10) return console.log('not long enough bitch')
+        if (!props.targetUser) return console.log('no user targeted')
         if (!props.targetUser.uid || !props.user.uid) return console.log('not able to get uid');
         //init invitation object
 
@@ -43,6 +45,7 @@ const InviteModal = (props: MyModalProps) => {
         await props.send_invitation(invitationContent)
             .then(() => {
                 setBtnStatus('Sent')
+                props.handleClose()
             })
             .catch((err) => {
                 console.log(err)
@@ -55,13 +58,13 @@ const InviteModal = (props: MyModalProps) => {
             visible={props.visible}
             animationType='fade'
             transparent={true}
-            onRequestClose={() => props.handleClose(false)}
+            onRequestClose={() => props.handleClose()}
         >
             <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={modalStyle.center_view}>
                         <View style={modalStyle.modal_view}>
-                            <Pressable style={modalStyle.close_button} onPress={() => props.handleClose(false)}>
+                            <Pressable style={modalStyle.close_button} onPress={() => props.handleClose()}>
                                 <SvgXml xml={closeSvg} width='20' height='20' fill={colors.white} />
                             </Pressable>
                             <Text style={modalStyle.header_text}>Invite</Text>
@@ -89,4 +92,8 @@ const InviteModal = (props: MyModalProps) => {
     )
 }
 
-export default connect(null, { send_invitation })(InviteModal);
+const mapStateToProps = (state: RootProps) => ({
+    user: state.user
+})
+
+export default connect(mapStateToProps, { send_invitation })(InviteModal);

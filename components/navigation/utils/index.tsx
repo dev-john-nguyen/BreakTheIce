@@ -1,6 +1,7 @@
 import React from 'react';
+import { Pressable } from 'react-native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, BaseRouter } from '@react-navigation/native';
+import { RouteProp } from '@react-navigation/native';
 import Home from '../../home';
 import NearByList from '../../nearbylist';
 import Invitations from '../../invitations';
@@ -9,9 +10,16 @@ import Friends from '../../friends';
 import Chat from '../../chat';
 import Message from '../../chat/components/Message';
 import Me from '../../me';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
-import { screenOptions } from '../header';
+import Settings from '../../settings';
+import GeneralSettings from '../../settings/components/General';
+import EditProfile from '../../settings/components/EditProfile';
+import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/tsTypes';
+import { SettingsSvgHeader } from '../../../utils/components';
+import { NearByUsersProps } from '../../../services/near_users/tsTypes';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { PlaceProp } from '../../placesvisted/utils';
+import PlacesVisted from '../../placesvisted';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -37,13 +45,18 @@ export enum MeScreenOptions {
     Settings = 'Settings'
 }
 
-type RootBottomParamList = {
+export type RootBottomParamList = {
     Home: {
         screen: HomeScreenOptions,
         params: { profileUid: string }
     };
-    Invitations: undefined;
-    Friends: undefined;
+    Chat: {
+        screen: 'Message',
+        initial?: boolean;
+        params: {
+            targetUser: NearByUsersProps;
+        }
+    };
 }
 
 type ProfileRouteParams = {
@@ -66,10 +79,12 @@ type InvitationsStackParams = {
     Profile: ProfileRouteParams
 }
 
-type ChatStackParams = {
+export type ChatStackParams = {
     Chat: undefined,
     Message: {
-        usersInfo: ChatPreviewProps['usersInfo']
+        msgDocId: ChatPreviewProps['docId'],
+        unread: boolean,
+        targetUser?: NearByUsersProps
     },
     Profile: ProfileRouteParams
 }
@@ -79,20 +94,24 @@ type MeStackParams = {
     Me: { title: string };
     Profile: ProfileRouteParams;
     Settings: undefined;
+    EditProfile: { title: string } | undefined;
+    GeneralSettings: { title: string } | undefined;
+    PlacesVisted: { placesVisted: PlaceProp[], title?: string }
 }
 
-export type FriendsBottomTabNavProp = BottomTabNavigationProp<RootBottomParamList, 'Friends'>;
+
+export type NearByListNavProp = BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp;
+
 export type HomeScreenRouteProp = RouteProp<HomeStackParams, "Home" | "NearByList" | "Profile">;
 export type HomeStackNavigationProp = StackNavigationProp<HomeStackParams>;
-
 export type InvitationsScreenRouteProp = RouteProp<InvitationsStackParams, "Invitations" | "Profile">
 export type InvitationsStackNavigationProp = StackNavigationProp<InvitationsStackParams>;
 
 export type ChatScreenRouteProp = RouteProp<ChatStackParams, "Chat" | "Message" | "Profile">
-export type MessageScreenRouteProp = RouteProp<ChatStackParams, "Message">
 export type ChatStackNavigationProp = StackNavigationProp<ChatStackParams>;
 
-export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings">
+export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditProfile" | "GeneralSettings" | "PlacesVisted">
+export type SettingScreenRouteProp = RouteProp<MeStackParams, "Settings">
 export type MeStackNavigationProp = StackNavigationProp<MeStackParams>
 
 const HomeStack = createStackNavigator<HomeStackParams>();
@@ -122,11 +141,21 @@ export const MeStackScreen = (props: any) => {
     const { title } = props.route.params;
 
     return <MeStack.Navigator screenOptions={screenOptions}>
-        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} />
+        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={({ navigation }) => ({
+            headerRight: () => (<Pressable onPress={() => navigation.push('Settings')}>
+                {({ pressed }) => <SettingsSvgHeader pressed={pressed} />}
+            </Pressable>)
+        })} />
         <MeStack.Screen name="Friends" component={Friends} />
         <MeStack.Screen name="Profile" component={Profile}
-            options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}
+            options={({ route }) => ({
+                title: route.params.title ? route.params.title : 'Profile'
+            })}
             initialParams={{ profileUid: '' }} />
+        <MeStack.Screen name="Settings" component={Settings} />
+        <MeStack.Screen name="GeneralSettings" component={GeneralSettings} initialParams={{ title: 'General' }} />
+        <MeStack.Screen name="EditProfile" component={EditProfile} initialParams={{ title: 'Profile' }} />
+        <MeStack.Screen name="PlacesVisted" component={PlacesVisted} initialParams={{ title: 'Places Visted' }} />
     </MeStack.Navigator>
 }
 
