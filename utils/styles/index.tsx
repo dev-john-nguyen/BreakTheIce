@@ -1,17 +1,22 @@
-import { StyleSheet, Pressable, Dimensions } from 'react-native'
+import { StyleSheet, Dimensions } from 'react-native'
 
 //colors
 export const colors = {
     primary: '#28DF99',
     secondary: '#99F3BD',
     tertiary: '#d2f6c5',
-    quaternary: 'f6f7d4',
+    quaternary: '#f6f7d4',
     white: '#ffffff',
-    red: '#ff4646'
+    red: '#ff4646',
+    lightRed: '#ff8585'
 }
 
-//base styles
+//font styles
+export const fontStyles = StyleSheet.create({
 
+})
+
+//base styles
 export const emptyStyles = StyleSheet.create({
     container: {
         flex: 1,
@@ -110,7 +115,24 @@ export const buttonsStyles = StyleSheet.create({
     button_inactive_text: {
         fontSize: 12,
         color: colors.white
-    }
+    },
+    button_red_outline: {
+        ...buttonBase,
+        borderColor: colors.red
+    },
+    button_red_outline_pressed: {
+        ...buttonBase,
+        backgroundColor: colors.lightRed,
+        borderColor: colors.lightRed
+    },
+    button_red_outline_text: {
+        color: colors.red,
+        fontSize: 12
+    },
+    button_red_outline_text_pressed: {
+        color: colors.white,
+        fontSize: 12
+    },
 })
 
 const ListContainerButtonBase = {
@@ -292,6 +314,7 @@ export const modalStyle = StyleSheet.create({
 })
 
 
+///not in use anymore
 export const baseStyles = StyleSheet.create({
     button: {
         marginTop: 5,

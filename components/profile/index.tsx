@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, TextInput, StyleSheet, ActivityIndicator, Modal, StyleProp } from 'react-native';
-import { HomeScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
-import { UsersDb } from '../../utils/variables';
+import { View, Text, Pressable, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { ProfileScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
 import { colors, buttonsStyles, modalStyle } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';
@@ -11,108 +10,65 @@ import { UserRootStateProps } from '../../services/user/tsTypes';
 import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
-import { fireDb } from '../../services/firebase';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg } from '../../utils/svgs';
 import InvitationModal from '../modal/InvitationModal';
+import { set_current_profile, remove_current_profile } from '../../services/profile/actions';
+import { ProfileDispatchActionProps, TimelineLocationProps } from '../../services/profile/tsTypes';
+import Timeline from '../timeline';
+import { PlaceProp } from '../../services/profile/tsTypes';
+import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 
 interface ProfileProps {
     navigation: HomeStackNavigationProp;
-    route: HomeScreenRouteProp;
-    set_error: (message: string) => void;
+    route: ProfileScreenRouteProp;
+    set_error: UtilsDispatchActionProps['set_error']
     user: UserRootStateProps;
     nearUsers: NearUsersRootProps['all'];
     friends: FriendsRootProps['users'];
     outboundInvitations: InvitationsRootProps['outbound'];
-}
-
-interface ProfileUserProps extends UserRootStateProps {
-    friend: boolean;
+    set_current_profile: ProfileDispatchActionProps['set_current_profile'];
 }
 
 //Summary
 ///Profile shows the whole profile of the user depending on if the user is PRIVATE or not
 const Profile = (props: ProfileProps) => {
-    const [profileUser, setProfileUser] = useState<NearByUsersProps | undefined>();
-    const [errorMsg, setErrorMsg] = useState<string>('');
+    const [profileUser, setProfileUser] = useState<NearByUsersProps>();
+    const [notFound, setNotFound] = useState<boolean>(false);
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
 
     useEffect(() => {
-        //fetch the profile of the useßr using profileUid that is passed in params
-        (async () => {
-            if (!props.route.params || !props.route.params.profileUid) {
-                props.set_error('User id not found!')
-                props.navigation.goBack()
-                return;
-            }
+        //set redux state profile
+        if (!props.route.params || !props.route.params.profileUid) {
+            props.set_error('User id not found!', 'error')
+            props.navigation.goBack()
+            return;
+        }
 
-            const { profileUid } = props.route.params;
+        var mount = true;
 
-            //first search in all users to get the profile
-            //reason I can't get from friends is because if the friends updates profile
-            //the friendsObj will not update, but rather near_users and profile will only update
-            var profileUserObj: NearByUsersProps | undefined;
-
-            for (let i = 0; i < props.nearUsers.length; i++) {
-                if (props.nearUsers[i].uid === profileUid) {
-                    profileUserObj = { ...props.nearUsers[i] }
-                    break;
+        props.set_current_profile(props.route.params.profileUid)
+            .then((resProfile) => {
+                if (resProfile) {
+                    mount && setProfileUser(resProfile)
+                } else {
+                    mount && setNotFound(true);
                 }
-            }
+            })
+            .catch(err => {
+                console.log(err)
+                props.set_error("Oops! Looks like we had trouble fetching the profile.", "error")
+            })
 
-            //check to see if the profileObj is empty... if it is fetch it from server
-            if (!profileUserObj) {
-                profileUserObj = await fireDb.collection(UsersDb).doc(profileUid).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            const docData = doc.data();
-
-                            if (!docData) return undefined;
-
-                            const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate, username } = docData
-
-                            return {
-                                uid: doc.id,
-                                username,
-                                location,
-                                name,
-                                bioShort,
-                                bioLong,
-                                stateCity,
-                                gender,
-                                age,
-                                isPrivate,
-                                friend: false,
-                                distance: 0,
-                                sentInvite: false
-                            }
-
-                        } else {
-                            return undefined;
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                        return undefined;
-                    })
-            }
-
-            //if the profileUserObj is still empty it meant that we weren't able to find the profile
-            //and so set error or not found
-            if (!profileUserObj) {
-                setErrorMsg("Oops! User not found.")
-            } else {
-                setProfileUser(profileUserObj)
-            }
-
-        })()
+        //remove on unmount
+        //note: the fetched profile should have updated redux near_users state
+        return () => { mount = false };
 
     }, [props.route, props.outboundInvitations])
 
-
-    if (errorMsg) return (<View><Text>{errorMsg}</Text></View>)
-
     if (!profileUser) return (<View><ActivityIndicator /></View>)
+
+    if (notFound) return (<View><Text>Not Found</Text></View>)
 
     const baseText = (text: string | number, additionalStyle: Object) => (
         <Text style={[styles.base_text, additionalStyle]}>
@@ -147,6 +103,18 @@ const Profile = (props: ProfileProps) => {
         )
     }
 
+    const onPlacePress = (location: TimelineLocationProps) => {
+        if (location.placesVisited) {
+            props.navigation.push('PlacesVisited',
+                {
+                    placesVisited: location.placesVisited,
+                    title: location.city
+                })
+        } else {
+            props.set_error("No locations have been saved for this location", "warning")
+        }
+    }
+
     return (
         <View style={styles.container}>
             <InvitationModal
@@ -167,9 +135,7 @@ const Profile = (props: ProfileProps) => {
             <View style={styles.bio}>
                 {baseText(profileUser.bioLong, { fontSize: 12 })}
             </View>
-            <View style={styles.timeline}>
-
-            </View>
+            <Timeline timeline={profileUser.timeline} onPlacePress={onPlacePress} auth={false} />
         </View>
     )
 }
@@ -209,11 +175,6 @@ const styles = StyleSheet.create({
     bioText: {
         fontSize: 12
     },
-    timeline: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: 'orange',
-    },
     invite_modal: {
         flex: 1,
         backgroundColor: 'green'
@@ -229,4 +190,4 @@ const mapStateToProps = (state: RootProps) => ({
     nearUsers: state.nearUsers.all
 })
 
-export default connect(mapStateToProps, { send_invitation, set_error })(Profile);
+export default connect(mapStateToProps, { send_invitation, set_error, set_current_profile })(Profile);

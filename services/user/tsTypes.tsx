@@ -1,13 +1,15 @@
 import { LocationObject } from 'expo-location';
-
+import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
 
 export interface UserActionProps {
     type: string;
     payload?: {
-        uid?: string,
-        location?: LocationObject,
-        stateCity?: StateCityProps
-    } | UserRootStateProps
+        uid: string,
+        location: LocationObject,
+        stateCity: StateCityProps,
+        placesVisited: PlaceProp[],
+        locationDocId: string
+    }
 }
 export interface StateCityProps {
     state: string;
@@ -26,10 +28,13 @@ export interface UserRootStateProps {
     gender: string;
     isPrivate: boolean;
     fetchFail?: boolean;
+    timeline?: TimelineLocationProps[]
 }
 
 export interface UserDispatchActionsProps {
     set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => void;
+    update_profile: (data: any) => void
+    update_timeline_places_visited: (uid: string, locationDocId: string, placesVisited: PlaceProp[]) => Promise<PlaceProp[] | void>
 }
 
 // export interface UserProfileProps {

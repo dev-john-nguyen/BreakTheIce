@@ -1,9 +1,10 @@
 import { LocationObject } from 'expo-location';
 import { StateCityProps, UserRootStateProps } from '../user/tsTypes';
+import { LocationHistoryProps } from '../profile/tsTypes';
 
 export interface NearUsersActionProps {
     type: string;
-    payload?: NearUsersRootProps | UserRootStateProps['uid']
+    payload?: NearUsersRootProps | string | { uid: string, timeline: LocationHistoryProps[] }
 }
 
 export interface NearByUsersProps extends UserRootStateProps {

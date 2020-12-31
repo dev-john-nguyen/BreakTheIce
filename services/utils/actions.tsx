@@ -1,9 +1,9 @@
 import { SET_ERROR, REMOVE_ERROR, SET_LOADING, REMOVE_LOADING } from './actionTypes';
 
 
-export const set_error = (message: String) => ({
+export const set_error = (message: String, color: string) => ({
     type: SET_ERROR,
-    payload: message
+    payload: { message, color }
 })
 
 export const remove_error = () => ({

@@ -10,12 +10,13 @@ import { ChatDb, ChatMessageDb } from '../../../utils/variables';
 import { MessageProps } from '../../../services/chat/tsTypes';
 import { RootProps } from '../../../services';
 import { set_error } from '../../../services/utils/actions';
+import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
     navigation: ChatStackNavigationProp;
     user: RootProps['user'];
-    set_error: (msg: string) => void;
+    set_error: UtilsDispatchActionProps['set_error']
 }
 
 const Message = (props: ComMessageProps) => {
@@ -42,7 +43,7 @@ const Message = (props: ComMessageProps) => {
             setMessages(messages)
         },
             err => {
-                props.set_error('Oops! Failed to get messages')
+                props.set_error('Oops! Failed to get messages', 'error')
                 setMessages('empty');
             }
         )
@@ -73,7 +74,7 @@ const Message = (props: ComMessageProps) => {
 
     const handleSentMessage = () => {
 
-        if (messageTxt.length < 1) return props.set_error('empty')
+        if (messageTxt.length < 1) return props.set_error('empty', 'error')
 
         Keyboard.dismiss();
 
@@ -107,7 +108,7 @@ const Message = (props: ComMessageProps) => {
             newChatId = chatRef.id;
         } else {
             //fail
-            return props.set_error("Oops! Wasn't able to find user information");
+            return props.set_error("Oops! Wasn't able to find user information", 'error');
         }
 
         batch.set(chatRef, chatObj, { merge: true })
@@ -129,7 +130,7 @@ const Message = (props: ComMessageProps) => {
             })
             .catch((err) => {
                 console.log(err)
-                props.set_error("Sorry, wasn't able to send your message, please try again.")
+                props.set_error("Sorry, wasn't able to send your message, please try again.", 'error')
             })
     }
 

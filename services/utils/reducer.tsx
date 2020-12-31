@@ -11,7 +11,10 @@ export default (state: Object = INITIAL_STATE, action: UtilsActionProps) => {
         case SET_ERROR:
             return {
                 ...state,
-                error: action.payload
+                error: {
+                    message: action.payload.message,
+                    color: action.payload.color ? action.payload.color : 'red'
+                }
             }
         case REMOVE_ERROR:
             return {

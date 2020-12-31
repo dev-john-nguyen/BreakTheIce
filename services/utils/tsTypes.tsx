@@ -1,9 +1,17 @@
 export interface UtilsRootStateProps {
-    error: string;
+    error: {
+        message: string,
+        color: string
+    };
     loading: boolean;
+    color: 'error' | 'warning'
 }
 
 export interface UtilsActionProps {
     type: string;
-    payload?: string
+    payload: { message: string, color?: string }
+}
+
+export interface UtilsDispatchActionProps {
+    set_error: (message: string, color: 'error' | 'warning') => void;
 }

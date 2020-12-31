@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, FlatList } from 'react-native';
-import { connect } from 'react-redux';
-import { RootProps } from '../../services';
 import { colors } from '../../utils/styles';
 import { SettingsSvg, EditSvg } from '../../utils/components';
 import { MeStackNavigationProp } from '../navigation/utils';
@@ -60,8 +58,5 @@ const styles = StyleSheet.create({
     }
 })
 
-const mapStateToProps = (state: RootProps) => ({
 
-})
-
-export default connect(mapStateToProps, {})(Settings);
+export default Settings;

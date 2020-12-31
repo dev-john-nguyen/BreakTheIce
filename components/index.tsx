@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import { remove_error } from '../services/utils/actions';
+import { UtilsRootStateProps } from '../services/utils/tsTypes';
 import Login from './login';
 import BottomNav from './navigation/BottomNav';
 import { RootProps } from '../services';
@@ -15,7 +16,7 @@ import { colors } from '../utils/styles';
 const BottomTabs = createBottomTabNavigator();
 
 interface Base {
-    error: string;
+    error: UtilsRootStateProps['error'];
     loading: boolean;
     remove_error: () => void;
     user: RootProps['user']
@@ -40,37 +41,44 @@ const Base = (props: Base) => {
         else { return <Login /> }
     }
 
+    const renderError = () => {
+        const errorStyle = errorStyles(props.error.color)
+
+        return <Pressable onPress={() => props.remove_error()} style={errorStyle.errorContainer}>
+            <Text style={errorStyle.errorText}>{props.error.message}</Text>
+        </Pressable>
+    }
+
     return (
         <View style={styles.container}>
             <StatusBar style='inverted' />
-            {props.error &&
-                <Pressable onPress={() => props.remove_error()} style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{props.error}</Text>
-                </Pressable>
-            }
+            {props.error && renderError()}
             {handleRender()}
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'stretch',
-        justifyContent: 'space-between',
-    },
+const errorStyles = (color: string) => StyleSheet.create({
     errorContainer: {
         position: 'absolute',
         top: 40,
         zIndex: 100,
         width: Math.round(Dimensions.get('window').width),
         padding: 10,
-        backgroundColor: colors.red
+        backgroundColor: color !== 'red' ? colors.quaternary : colors.red
     },
     errorText: {
-        color: colors.white,
+        color: color !== 'red' ? colors.primary : colors.white,
         textAlign: 'center',
         fontSize: 14
+    }
+})
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'stretch',
+        justifyContent: 'space-between',
     }
 });
 
