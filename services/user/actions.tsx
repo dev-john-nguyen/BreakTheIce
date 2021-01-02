@@ -1,5 +1,5 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED } from './actionTypes';
-import { set_loading, remove_loading } from '../utils/actions';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED, ADD_NEW_TIMELINE_LOCATION } from './actionTypes';
+import { set_loading, remove_loading, set_banner } from '../utils/actions';
 import { firebase, fireDb } from '../firebase';
 import { AppDispatch } from '../../App';
 import { StateCityProps, UserRootStateProps } from './tsTypes';
@@ -11,7 +11,7 @@ import { RootProps } from '..';
 import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb, UsersTimelineDb } from '../../utils/variables'
 import { SET_MESSAGES } from '../chat/actionTypes';
 import { SET_ERROR } from '../utils/actionTypes';
-import { PlaceProp } from '../profile/tsTypes';
+import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
 // const baseUrl = 'http://localhost:5050';
 
 interface FetchUserProps {
@@ -141,7 +141,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
     })
 }
 
-export const update_timeline_places_visited = (uid: string, locationDocId: string, placesVisited: PlaceProp[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const update_timeline_places_visited = (uid: string, timelineLocDocId: string, placesVisited: PlaceProp[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
     if (uid !== getState().user.uid) {
         dispatch({
             type: SET_ERROR,
@@ -158,11 +158,11 @@ export const update_timeline_places_visited = (uid: string, locationDocId: strin
         }
     }
 
-    return fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).doc(locationDocId).update({ placesVisited: placesVisited })
+    return fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).doc(timelineLocDocId).update({ placesVisited: placesVisited })
         .then(() => {
             dispatch({
                 type: UPDATE_PLACES_VISITED,
-                payload: { placesVisited, locationDocId }
+                payload: { placesVisited, timelineLocDocId }
             })
 
             return placesVisited
@@ -173,6 +173,41 @@ export const update_timeline_places_visited = (uid: string, locationDocId: strin
                 type: SET_ERROR,
                 payload: 'Oops! Something went wrong with updating your edits.'
             })
+        })
+}
+
+export const add_timeline_location = (newLocation: Omit<TimelineLocationProps, 'docId'>) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    const uid = getState().user.uid;
+
+    if (!uid) {
+        dispatch(set_banner("Sorry, it looks like we are having trouble find your user id.", "error"))
+        return;
+    }
+
+    return await fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).add(newLocation)
+        .then((resObj) => {
+
+            if (!resObj.id) throw new Error("DocId was not found in the object response");
+
+            const addedLocation: TimelineLocationProps = {
+                ...newLocation,
+                docId: resObj.id
+            }
+
+            dispatch({
+                type: ADD_NEW_TIMELINE_LOCATION,
+                payload: addedLocation
+            })
+
+            dispatch(set_banner(`${newLocation.city} successfully created!`, 'success'))
+
+            //success
+            return true
+
+        })
+        .catch((err) => {
+            console.log(err);
+            dispatch(set_banner(`Oops! Something went wrong saving ${newLocation.city}.`, 'error'))
         })
 }
 

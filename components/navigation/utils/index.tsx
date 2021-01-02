@@ -20,7 +20,7 @@ import { NearByUsersProps } from '../../../services/near_users/tsTypes';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { PlaceProp } from '../../../services/profile/tsTypes';
 import PlacesVisited from '../../placesVisited';
-import NewLocation from '../../newLocation';
+import AddLocationForm from '../../timeline/components/AddLocationForm';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -100,7 +100,7 @@ type MeStackParams = {
     EditProfile: { title: string } | undefined;
     GeneralSettings: { title: string } | undefined;
     PlacesVisited: { placesVisited: PlaceProp[], locationDocId: string, title: string, uid: string }
-    NewLocation: { title: string } | undefined
+    AddLocationForm: { title: string } | undefined
 }
 
 
@@ -116,7 +116,7 @@ export type InvitationsStackNavigationProp = StackNavigationProp<InvitationsStac
 export type ChatScreenRouteProp = RouteProp<ChatStackParams, "Chat" | "Message" | "Profile">
 export type ChatStackNavigationProp = StackNavigationProp<ChatStackParams>;
 
-export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditProfile" | "GeneralSettings" | "PlacesVisited" | "NewLocation">
+export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditProfile" | "GeneralSettings" | "PlacesVisited" | "AddLocationForm">
 export type SettingScreenRouteProp = RouteProp<MeStackParams, "Settings">
 export type MeStackNavigationProp = StackNavigationProp<MeStackParams>
 
@@ -163,7 +163,7 @@ export const MeStackScreen = (props: any) => {
         <MeStack.Screen name="GeneralSettings" component={GeneralSettings} initialParams={{ title: 'General' }} />
         <MeStack.Screen name="EditProfile" component={EditProfile} initialParams={{ title: 'Profile' }} />
         <MeStack.Screen name="PlacesVisited" component={PlacesVisited} initialParams={{ title: 'Places Visted' }} />
-        <MeStack.Screen name="NewLocation" component={NewLocation} initialParams={{ title: 'New Location' }} />
+        <MeStack.Screen name="AddLocationForm" component={AddLocationForm} initialParams={{ title: 'New Location' }} />
     </MeStack.Navigator>
 }
 

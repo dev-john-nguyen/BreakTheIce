@@ -1,4 +1,4 @@
-import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED } from './actionTypes';
+import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED, ADD_NEW_TIMELINE_LOCATION, REMOVE_NEW_TIMELINE_LOCATION, UPDATE_NEW_TIMELINE_LOCATION } from './actionTypes';
 import { UserActionProps, UserRootStateProps } from './tsTypes';
 import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
 
@@ -29,7 +29,6 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
                 fetchFail: true
             }
         case SET_USER:
-            if (!action.payload) return state;
             return action.payload;
         case REMOVE_USER:
             return {
@@ -37,7 +36,6 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
                 uid: null
             }
         case SET_LOCATION:
-            if (!action.payload) return state;
             return {
                 ...state,
                 location: action.payload.location,
@@ -50,7 +48,6 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
                 stateCity: null
             }
         case UPDATE_LOCATION:
-            if (!action.payload) return state;
             return {
                 ...state,
                 location: action.payload.location
@@ -61,20 +58,57 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
                 timeline: action.payload
             }
         case UPDATE_PLACES_VISITED:
-            if (!action.payload) return state;
             return {
                 ...state,
                 timeline: update_timeline(state.timeline, action.payload)
+            }
+        case ADD_NEW_TIMELINE_LOCATION:
+            return {
+                ...state,
+                timeline: [...state.timeline, action.payload]
+            }
+        case REMOVE_NEW_TIMELINE_LOCATION:
+            return {
+                ...state,
+                timeline: () => {
+                    const docId: string = action.payload.timelineLocDocId;
+                    const timeline: TimelineLocationProps[] = state.timeline;
+
+                    for (let i = 0; i < timeline.length; i++) {
+                        if (timeline[i].docId == docId) {
+                            timeline.splice(i, 1)
+                            break;
+                        }
+                    }
+                    return [...timeline]
+                }
+            }
+        case UPDATE_NEW_TIMELINE_LOCATION:
+            return {
+                ...state,
+                timeline: () => {
+                    const timelineLocObj: TimelineLocationProps = action.payload.timelineLocObj;
+                    const timeline: TimelineLocationProps[] = state.timeline;
+
+                    for (let i = 0; i < timeline.length; i++) {
+                        if (timeline[i].docId == timelineLocObj.docId) {
+                            timeline[i] = timelineLocObj
+                            break;
+                        }
+                    }
+
+                    return [...timeline]
+                }
             }
         default:
             return state;
     }
 }
 
-function update_timeline(timeline: TimelineLocationProps[], { locationDocId, placesVisited }: { locationDocId: string, placesVisited: PlaceProp[] }) {
+function update_timeline(timeline: TimelineLocationProps[], { timelineLocDocId, placesVisited }: { timelineLocDocId: string, placesVisited: PlaceProp[] }) {
 
     for (let i = 0; i < timeline.length; i++) {
-        if (timeline[i].docId == locationDocId) {
+        if (timeline[i].docId == timelineLocDocId) {
             timeline[i].placesVisited = placesVisited
             break;
         }

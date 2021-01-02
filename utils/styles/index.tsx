@@ -13,7 +13,15 @@ export const colors = {
 
 //font styles
 export const fontStyles = StyleSheet.create({
-
+    small: {
+        fontSize: 10
+    },
+    medium: {
+        fontSize: 12
+    },
+    large: {
+        fontSize: 14
+    }
 })
 
 //base styles

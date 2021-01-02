@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Picker, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { CustomButton } from '../../utils/components';
-import { listOfStates, listOfCountriesObj } from '../../utils/variables';
-import { TimelineLocationProps } from '../../services/profile/tsTypes';
-import { colors } from '../../utils/styles';
+import { CustomButton } from '../../../utils/components';
+import { listOfStates, listOfCountriesObj } from '../../../utils/variables';
+import { TimelineLocationProps } from '../../../services/profile/tsTypes';
+import { colors } from '../../../utils/styles';
 import { connect } from 'react-redux';
+import { add_timeline_location } from '../../../services/user/actions';
+import { UserDispatchActionsProps } from '../../../services/user/tsTypes';
+import { MeStackNavigationProp } from '../../navigation/utils';
+import { set_banner } from '../../../services/utils/actions';
+import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 
-export default () => {
+interface AddTimelineLocationProps {
+    add_timeline_location: UserDispatchActionsProps['add_timeline_location'];
+    navigation: MeStackNavigationProp;
+    set_banner: UtilsDispatchActionProps['set_banner']
+}
+
+const AddTimelineLocation = ({ add_timeline_location, navigation, set_banner }: AddTimelineLocationProps) => {
     const [startAt, setStartAt] = useState(new Date())
     const [endAt, setEndAt] = useState(new Date())
     const [city, setCity] = useState('');
@@ -55,7 +66,34 @@ export default () => {
             placesVisited: []
         }
 
-        console.log(newLocation)
+        //check if any values are empty and dates are correct
+        var key: keyof typeof newLocation;
+
+        for (key in newLocation) {
+            if (key == 'state' || key == 'country') {
+                if (!newLocation.state || !newLocation.country) {
+                    return set_banner('Please select a country or state', 'warning');
+                }
+            } else {
+                if (key != 'placesVisited') {
+                    if (!newLocation[key]) {
+                        return set_banner('Please make all steps are completed!', 'warning');
+                    }
+                }
+            }
+        }
+
+        add_timeline_location(newLocation)
+            .then((res) => {
+                if (res) {
+                    navigation.goBack()
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+                //unexpected
+            })
+
     }
 
     const renderForm = () => {
@@ -205,3 +243,5 @@ const styles = StyleSheet.create({
         margin: 20
     }
 })
+
+export default connect(null, { add_timeline_location, set_banner })(AddTimelineLocation);
