@@ -68,7 +68,8 @@ export const fetch_profile = async (uid: string) => {
                     bioShort: data.bioShort ? data.bioShort : '',
                     gender: data.gender ? data.gender : null,
                     isPrivate: data.isPrivate ? data.isPrivate : false,
-                    location: data.location ? data.location : null
+                    location: data.location ? data.location : null,
+                    gallery: data.gallery ? data.gallery : []
                 }
 
                 return {

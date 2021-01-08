@@ -1,4 +1,4 @@
-import { SET_ERROR, REMOVE_ERROR, SET_LOADING, REMOVE_LOADING, SET_BANNER } from './actionTypes';
+import { SET_ERROR, REMOVE_ERROR, SET_LOADING, REMOVE_LOADING, SET_BANNER, SET_STATUS_BAR, REMOVE_BANNER } from './actionTypes';
 
 
 export const set_error = (message: String, color: string) => ({
@@ -12,6 +12,15 @@ export const set_banner = (message: string, type: 'error' | 'warning' | 'success
         message,
         type
     }
+})
+
+export const remove_banner = () => ({
+    type: REMOVE_BANNER
+})
+
+export const set_status_bar = (status: number) => ({
+    type: SET_STATUS_BAR,
+    payload: status
 })
 
 export const remove_error = () => ({

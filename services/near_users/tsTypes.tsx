@@ -1,13 +1,13 @@
 import { LocationObject } from 'expo-location';
 import { StateCityProps, UserRootStateProps } from '../user/tsTypes';
-import { LocationHistoryProps } from '../profile/tsTypes';
+import { TimelineLocationProps } from '../profile/tsTypes';
 
 export interface NearUsersActionProps {
     type: string;
-    payload?: NearUsersRootProps | string | { uid: string, timeline: LocationHistoryProps[] }
+    payload?: NearUsersRootProps | string | { uid: string, timeline: TimelineLocationProps[] }
 }
 
-export interface NearByUsersProps extends UserRootStateProps {
+export interface NearByUsersProps extends Omit<UserRootStateProps, 'gallery'> {
     friend: boolean;
     distance: number;
     sentInvite: boolean;

@@ -1,10 +1,11 @@
-import { SET_ERROR, REMOVE_ERROR, SET_LOADING, REMOVE_LOADING, SET_BANNER, REMOVE_BANNER } from './actionTypes';
+import { SET_ERROR, REMOVE_ERROR, SET_LOADING, REMOVE_LOADING, SET_BANNER, REMOVE_BANNER, SET_STATUS_BAR } from './actionTypes';
 import { UtilsActionProps } from './tsTypes'
 
 const INITIAL_STATE = {
     error: null,
     loading: true,
-    banner: null
+    banner: null,
+    statusBar: null
 }
 
 export default (state: Object = INITIAL_STATE, action: UtilsActionProps) => {
@@ -41,6 +42,11 @@ export default (state: Object = INITIAL_STATE, action: UtilsActionProps) => {
             return {
                 ...state,
                 banner: null
+            }
+        case SET_STATUS_BAR:
+            return {
+                ...state,
+                statusBar: action.payload
             }
         default:
             return state;

@@ -4,7 +4,8 @@ export const locationDistanceIntervalToUpdate = 20; //meters
 export const locationSpeedToUpdate = 5 //
 // export const locationTimeToUpdate = 60000 //in miliseconds => 1 minute
 export const messageMaxLen = 100;
-export const messagePlaceholder = 'Initate the conversation'
+export const messagePlaceholder = 'Initate the conversation';
+export const galleryImgSizeLimit = 10000000;
 
 //DB Collections
 export const LocationsDb = 'Locations';

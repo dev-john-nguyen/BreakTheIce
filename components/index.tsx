@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions, StyleProp } from 'react-native';
 import { connect } from 'react-redux';
-import { remove_error } from '../services/utils/actions';
+import { remove_error, remove_banner } from '../services/utils/actions';
 import { UtilsRootStateProps } from '../services/utils/tsTypes';
 import Login from './login';
 import BottomNav from './navigation/BottomNav';
@@ -18,7 +18,9 @@ const BottomTabs = createBottomTabNavigator();
 interface Base {
     utils: UtilsRootStateProps;
     remove_error: () => void;
-    user: RootProps['user']
+    remove_banner: () => void;
+    user: RootProps['user'];
+
 }
 
 const Base = (props: Base) => {
@@ -51,7 +53,7 @@ const Base = (props: Base) => {
     const Banner = () => {
         const bannerStyle = errorStyles(props.utils.banner.type)
 
-        return <Pressable onPress={() => props.remove_error()} style={bannerStyle.errorContainer}>
+        return <Pressable onPress={() => props.remove_banner()} style={bannerStyle.errorContainer}>
             <Text style={bannerStyle.errorText}>{props.utils.banner.message}</Text>
         </Pressable>
     }
@@ -131,4 +133,4 @@ const mapStateToProps = (state: RootProps) => ({
     user: state.user
 })
 
-export default connect(mapStateToProps, { remove_error })(Base)
+export default connect(mapStateToProps, { remove_error, remove_banner })(Base)

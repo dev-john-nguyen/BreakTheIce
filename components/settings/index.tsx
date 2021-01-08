@@ -1,12 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, FlatList } from 'react-native';
 import { colors } from '../../utils/styles';
-import { SettingsSvg, EditSvg } from '../../utils/components';
+import { SettingsSvg, EditSvg, PortraitSvg } from '../../utils/components';
 import { MeStackNavigationProp } from '../navigation/utils';
 
 const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
     return (
         <View style={styles.container}>
+            <TouchableHighlight
+                style={styles.item_container}
+                onPress={() => navigation.push("EditGallery")}
+                underlayColor={colors.secondary}
+            >
+                <View style={styles.content}>
+                    <PortraitSvg />
+                    <Text style={styles.text}>Edit Gallery</Text>
+                </View>
+            </TouchableHighlight>
+
             <TouchableHighlight
                 style={styles.item_container}
                 onPress={() => navigation.push("EditProfile")}
@@ -17,8 +28,9 @@ const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
                     <Text style={styles.text}>Edit Profile</Text>
                 </View>
             </TouchableHighlight>
+
             <TouchableHighlight
-                style={[styles.item_container, { marginTop: 50 }]}
+                style={styles.item_container}
                 onPress={() => navigation.push("GeneralSettings")}
                 underlayColor={colors.secondary}
             >
@@ -43,7 +55,8 @@ const styles = StyleSheet.create({
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
         position: 'relative',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: 20
     },
     content: {
         flexDirection: 'row',

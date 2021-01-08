@@ -127,8 +127,6 @@ const Home = (props: HomeProps) => {
         }
     }, [currentLocation])
 
-    const handleOnListViewPress = () => props.navigation.push('NearByList')
-
     return (
         <View style={styles.container}>
             {props.user.location && props.user.stateCity ?
@@ -151,11 +149,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: RootProps) => ({
     user: state.user,
 })
-
-// Home.propType = {
-//     user: PropTypes.object.isRequired,
-//     set_and_listen_near_users: PropTypes.func.isRequired
-// }
 
 export default connect(mapStateToProps, {
     set_and_listen_user_location, set_and_listen_near_users, set_and_listen_invitations, set_and_listen_friends,

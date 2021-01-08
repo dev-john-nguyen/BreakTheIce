@@ -9,12 +9,25 @@ export interface UserActionProps {
         stateCity: StateCityProps,
         placesVisited: PlaceProp[],
         timelineLocDocId: string,
-        timelineLocObj: TimelineLocationProps
+        timelineLocObj: TimelineLocationProps,
+        gallery: GalleryProps
     }
 }
 export interface StateCityProps {
     state: string;
     city: string
+}
+
+export interface GalleryProps {
+    url: string;
+    description: string;
+    updatedAt: Date;
+    id: string;
+}
+
+export interface NewGalleryProps extends Omit<GalleryProps, 'url' | 'updatedAt'> {
+    uri: string;
+    blob: Blob;
 }
 
 export interface UserRootStateProps {
@@ -28,6 +41,7 @@ export interface UserRootStateProps {
     bioShort: string;
     gender: string;
     isPrivate: boolean;
+    gallery: GalleryProps[];
     fetchFail?: boolean;
     timeline?: TimelineLocationProps[]
 }
@@ -35,8 +49,9 @@ export interface UserRootStateProps {
 export interface UserDispatchActionsProps {
     set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => void;
     update_profile: (data: any) => void
-    update_timeline_places_visited: (uid: string, locationDocId: string, placesVisited: PlaceProp[]) => Promise<PlaceProp[] | void>;
-    add_timeline_location: (newLocation: Omit<TimelineLocationProps, 'docId'>) => Promise<void | boolean | undefined>;
+    save_gallery: (newGallery: NewGalleryProps[]) => void;
+    // update_timeline_places_visited: (uid: string, locationDocId: string, placesVisited: PlaceProp[]) => Promise<PlaceProp[] | void>;
+    // add_timeline_location: (newLocation: Omit<TimelineLocationProps, 'docId'>) => Promise<void | boolean | undefined>;
 }
 
 // export interface UserProfileProps {

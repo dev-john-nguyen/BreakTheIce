@@ -15,8 +15,6 @@ import { userDefaultSvg } from '../../utils/svgs';
 import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile, remove_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, TimelineLocationProps } from '../../services/profile/tsTypes';
-import Timeline from '../timeline';
-import { PlaceProp } from '../../services/profile/tsTypes';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 
 interface ProfileProps {
@@ -103,18 +101,6 @@ const Profile = (props: ProfileProps) => {
         )
     }
 
-    const onPlacePress = (location: TimelineLocationProps) => {
-        if (location.placesVisited) {
-            props.navigation.push('PlacesVisited',
-                {
-                    placesVisited: location.placesVisited,
-                    title: location.city
-                })
-        } else {
-            props.set_error("No locations have been saved for this location", "warning")
-        }
-    }
-
     return (
         <View style={styles.container}>
             <InvitationModal
@@ -135,7 +121,6 @@ const Profile = (props: ProfileProps) => {
             <View style={styles.bio}>
                 {baseText(profileUser.bioLong, { fontSize: 12 })}
             </View>
-            <Timeline timeline={profileUser.timeline} onPlacePress={onPlacePress} auth={false} />
         </View>
     )
 }

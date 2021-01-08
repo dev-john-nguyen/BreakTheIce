@@ -1,17 +1,19 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED, ADD_NEW_TIMELINE_LOCATION } from './actionTypes';
-import { set_loading, remove_loading, set_banner } from '../utils/actions';
-import { firebase, fireDb } from '../firebase';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY } from './actionTypes';
+import { set_loading, remove_loading, set_status_bar, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { StateCityProps, UserRootStateProps } from './tsTypes';
+import { StateCityProps, UserRootStateProps, NewGalleryProps, GalleryProps } from './tsTypes';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location } from './utils';
 import { validate_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
-import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb, UsersTimelineDb } from '../../utils/variables'
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb } from '../../utils/variables'
 import { SET_MESSAGES } from '../chat/actionTypes';
 import { SET_ERROR } from '../utils/actionTypes';
-import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
+import { fireStorage, fireDb, myFire } from '../firebase';
+import firebase from 'firebase';
+
+// import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
 // const baseUrl = 'http://localhost:5050';
 
 interface FetchUserProps {
@@ -20,7 +22,7 @@ interface FetchUserProps {
 }
 
 export const verifyAuth = (): any => (dispatch: AppDispatch) => {
-    firebase.auth().onAuthStateChanged(async (user) => {
+    myFire.auth().onAuthStateChanged(async (user) => {
         dispatch(set_loading)
         if (user) {
 
@@ -141,79 +143,194 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
     })
 }
 
-export const update_timeline_places_visited = (uid: string, timelineLocDocId: string, placesVisited: PlaceProp[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-    if (uid !== getState().user.uid) {
-        dispatch({
+export const save_gallery = (newGallery: NewGalleryProps[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+
+    if (newGallery.length < 1) {
+        return dispatch({
             type: SET_ERROR,
-            payload: 'Invalid user id. Cannot proceed to save the updates.'
+            payload: 'No images found.'
         })
-        return;
     }
 
-    //splice out the placesVisted that have removed as true
-    for (let i = 0; i < placesVisited.length; i++) {
-        //splice if removed is true
-        if (placesVisited[i].removed) {
-            placesVisited.splice(i, 1)
+    if (newGallery.length > 5) {
+        return dispatch({
+            type: SET_ERROR,
+            payload: 'Exceeds the maxium number of images of 5.'
+        })
+    }
+
+    const uid = getState().user.uid;
+    var gallery: GalleryProps[] = [];
+
+    for (let i = 0; i < newGallery.length; i++) {
+        var { blob, description, id } = newGallery[i]
+        var path: string = `${uid}/gallery-img-${i}`;
+        var updatedAt: Date = new Date();
+        var uploadTask = fireStorage.ref().child(path).put(blob)
+
+        try {
+            await fireStorage_task_listener(uploadTask, dispatch, i, newGallery.length)
+                .then((url: string) => gallery.push({ url, description, updatedAt, id }))
+        } catch (e) {
+            dispatch(set_banner(e, 'error'))
         }
+
     }
 
-    return fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).doc(timelineLocDocId).update({ placesVisited: placesVisited })
+
+    if (gallery.length < 1) {
+        return dispatch(set_banner('No images found', 'error'))
+    }
+
+    fireDb.collection(UsersDb).doc(uid).set({
+        gallery: gallery
+    }, { merge: true })
         .then(() => {
             dispatch({
-                type: UPDATE_PLACES_VISITED,
-                payload: { placesVisited, timelineLocDocId }
+                type: SET_GALLERY,
+                payload: { gallery }
             })
-
-            return placesVisited
         })
         .catch(err => {
-            console.log(err)
-            dispatch({
+            return dispatch({
                 type: SET_ERROR,
-                payload: 'Oops! Something went wrong with updating your edits.'
+                payload: 'No images saved'
             })
         })
 }
 
-export const add_timeline_location = (newLocation: Omit<TimelineLocationProps, 'docId'>) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-    const uid = getState().user.uid;
+async function fireStorage_task_listener(uploadTask: firebase.storage.UploadTask, dispatch: AppDispatch, index: number, galleryLen: number): Promise<string> {
 
-    if (!uid) {
-        dispatch(set_banner("Sorry, it looks like we are having trouble find your user id.", "error"))
-        return;
-    }
+    return new Promise(function (resolve, reject) {
+        // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+            function (snapshot) {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
 
-    return await fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).add(newLocation)
-        .then((resObj) => {
+                var progress = (uploadProgress + index) / galleryLen
 
-            if (!resObj.id) throw new Error("DocId was not found in the object response");
+                dispatch(set_status_bar(progress))
 
-            const addedLocation: TimelineLocationProps = {
-                ...newLocation,
-                docId: resObj.id
-            }
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED: // or 'paused'
+                        dispatch(set_banner('Imaged paused', 'warning'))
+                        break;
+                    case firebase.storage.TaskState.RUNNING: // or 'running'
+                        break;
+                }
+            }, function (error) {
+                console.log(error)
 
-            dispatch({
-                type: ADD_NEW_TIMELINE_LOCATION,
-                payload: addedLocation
-            })
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                var errMsg: string = '';
 
-            dispatch(set_banner(`${newLocation.city} successfully created!`, 'success'))
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        errMsg = "Permission denied. You don't have access."
+                        break;
 
-            //success
-            return true
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        errMsg = "The upload was cancelled."
+                        break;
 
-        })
-        .catch((err) => {
-            console.log(err);
-            dispatch(set_banner(`Oops! Something went wrong saving ${newLocation.city}.`, 'error'))
-        })
+                    default:
+                        errMsg = 'Unexpected error occurred. Please try again.'
+                }
+
+                reject(errMsg)
+
+            }, function () {
+                // Upload completed successfully, now we can get the download URL
+                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                    resolve(downloadURL)
+                });
+
+            });
+    })
 }
+
 
 export const update_profile = () => {
 
 }
+
+
+
+
+// export const update_timeline_places_visited = (uid: string, timelineLocDocId: string, placesVisited: PlaceProp[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+//     if (uid !== getState().user.uid) {
+//         dispatch({
+//             type: SET_ERROR,
+//             payload: 'Invalid user id. Cannot proceed to save the updates.'
+//         })
+//         return;
+//     }
+
+//     //splice out the placesVisted that have removed as true
+//     for (let i = 0; i < placesVisited.length; i++) {
+//         //splice if removed is true
+//         if (placesVisited[i].removed) {
+//             placesVisited.splice(i, 1)
+//         }
+//     }
+
+//     return fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).doc(timelineLocDocId).update({ placesVisited: placesVisited })
+//         .then(() => {
+//             dispatch({
+//                 type: UPDATE_PLACES_VISITED,
+//                 payload: { placesVisited, timelineLocDocId }
+//             })
+
+//             return placesVisited
+//         })
+//         .catch(err => {
+//             console.log(err)
+//             dispatch({
+//                 type: SET_ERROR,
+//                 payload: 'Oops! Something went wrong with updating your edits.'
+//             })
+//         })
+// }
+
+// export const add_timeline_location = (newLocation: Omit<TimelineLocationProps, 'docId'>) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+//     const uid = getState().user.uid;
+
+//     if (!uid) {
+//         dispatch(set_banner("Sorry, it looks like we are having trouble find your user id.", "error"))
+//         return;
+//     }
+
+//     return await fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).add(newLocation)
+//         .then((resObj) => {
+
+//             if (!resObj.id) throw new Error("DocId was not found in the object response");
+
+//             const addedLocation: TimelineLocationProps = {
+//                 ...newLocation,
+//                 docId: resObj.id
+//             }
+
+//             dispatch({
+//                 type: ADD_NEW_TIMELINE_LOCATION,
+//                 payload: addedLocation
+//             })
+
+//             dispatch(set_banner(`${newLocation.city} successfully created!`, 'success'))
+
+//             //success
+//             return true
+
+//         })
+//         .catch((err) => {
+//             console.log(err);
+//             dispatch(set_banner(`Oops! Something went wrong saving ${newLocation.city}.`, 'error'))
+//         })
+// }
+
 
 // export const update_user_location = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 //     if (!newLocation.coords) return;

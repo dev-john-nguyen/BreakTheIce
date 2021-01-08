@@ -13,14 +13,12 @@ import Me from '../../me';
 import Settings from '../../settings';
 import GeneralSettings from '../../settings/components/General';
 import EditProfile from '../../settings/components/EditProfile';
+import EditGallery from '../../gallery/components/Edit';
 import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/tsTypes';
-import { SettingsSvgHeader, EditSvg } from '../../../utils/components';
+import { SettingsSvgHeader } from '../../../utils/components';
 import { NearByUsersProps } from '../../../services/near_users/tsTypes';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { PlaceProp } from '../../../services/profile/tsTypes';
-import PlacesVisited from '../../placesVisited';
-import AddLocationForm from '../../timeline/components/AddLocationForm';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -72,8 +70,7 @@ type ProfileRouteParams = {
 type HomeStackParams = {
     Home: undefined,
     NearByList: undefined,
-    Profile: ProfileRouteParams,
-    PlacesVisited: { placesVisited: PlaceProp[], title: string }
+    Profile: ProfileRouteParams
 }
 
 type InvitationsStackParams = {
@@ -99,14 +96,13 @@ type MeStackParams = {
     Settings: undefined;
     EditProfile: { title: string } | undefined;
     GeneralSettings: { title: string } | undefined;
-    PlacesVisited: { placesVisited: PlaceProp[], locationDocId: string, title: string, uid: string }
-    AddLocationForm: { title: string } | undefined
+    EditGallery: { title: string } | undefined;
 }
 
 
 export type NearByListNavProp = BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp;
 
-export type HomeScreenRouteProp = RouteProp<HomeStackParams, "Home" | "NearByList" | "Profile" | "PlacesVisited">;
+export type HomeScreenRouteProp = RouteProp<HomeStackParams, "Home" | "NearByList" | "Profile">;
 export type ProfileScreenRouteProp = RouteProp<HomeStackParams, "Profile">;
 export type HomeStackNavigationProp = StackNavigationProp<HomeStackParams>;
 
@@ -116,7 +112,7 @@ export type InvitationsStackNavigationProp = StackNavigationProp<InvitationsStac
 export type ChatScreenRouteProp = RouteProp<ChatStackParams, "Chat" | "Message" | "Profile">
 export type ChatStackNavigationProp = StackNavigationProp<ChatStackParams>;
 
-export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditProfile" | "GeneralSettings" | "PlacesVisited" | "AddLocationForm">
+export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditProfile" | "GeneralSettings" | "EditGallery">
 export type SettingScreenRouteProp = RouteProp<MeStackParams, "Settings">
 export type MeStackNavigationProp = StackNavigationProp<MeStackParams>
 
@@ -140,7 +136,6 @@ export const HomeStackScreen = () => (
         <HomeStack.Screen name="Profile" component={Profile}
             options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}
             initialParams={{ profileUid: '' }} />
-        <HomeStack.Screen name="PlacesVisited" component={PlacesVisited} initialParams={{ title: 'Places Visted' }} />
     </HomeStack.Navigator>
 )
 
@@ -162,8 +157,7 @@ export const MeStackScreen = (props: any) => {
         <MeStack.Screen name="Settings" component={Settings} />
         <MeStack.Screen name="GeneralSettings" component={GeneralSettings} initialParams={{ title: 'General' }} />
         <MeStack.Screen name="EditProfile" component={EditProfile} initialParams={{ title: 'Profile' }} />
-        <MeStack.Screen name="PlacesVisited" component={PlacesVisited} initialParams={{ title: 'Places Visted' }} />
-        <MeStack.Screen name="AddLocationForm" component={AddLocationForm} initialParams={{ title: 'New Location' }} />
+        <MeStack.Screen name="EditGallery" component={EditGallery} initialParams={{ title: 'Gallery' }} />
     </MeStack.Navigator>
 }
 

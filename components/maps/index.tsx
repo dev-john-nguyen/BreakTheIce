@@ -73,6 +73,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         //start watching position
         // this._isMounted = true
         // this.handleWatchPosition();
+
     }
 
     onRegionChange = (region: RegionProps) => {

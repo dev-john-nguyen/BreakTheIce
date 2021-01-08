@@ -8,7 +8,9 @@ export const colors = {
     quaternary: '#f6f7d4',
     white: '#ffffff',
     red: '#ff4646',
-    lightRed: '#ff8585'
+    lightRed: '#ff8585',
+    darkGreen: '#16c79a',
+    lightGrey: '#eee'
 }
 
 //font styles
@@ -69,7 +71,8 @@ export const buttonsStyles = StyleSheet.create({
     button_primary: {
         ...buttonBase,
         backgroundColor: colors.primary,
-        borderColor: colors.primary
+        borderColor: colors.primary,
+        alignItems: 'center'
     },
     button_primary_text: {
         color: colors.white,
@@ -78,16 +81,19 @@ export const buttonsStyles = StyleSheet.create({
     button_primary_pressed: {
         ...buttonBase,
         backgroundColor: colors.secondary,
-        borderColor: colors.secondary
+        borderColor: colors.secondary,
+        alignItems: 'center'
     },
     button_secondary: {
         ...buttonBase,
-        borderColor: colors.primary
+        borderColor: colors.primary,
+        alignItems: 'center'
     },
     button_secondary_pressed: {
         ...buttonBase,
         borderColor: colors.primary,
-        backgroundColor: colors.primary
+        backgroundColor: colors.primary,
+        alignItems: 'center'
     },
     button_secondary_text: {
         fontSize: 12,

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Pressable, StyleProp, Text } from 'react-native';
 import { profileStyles, colors, buttonsStyles } from '../styles';
 import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg, linkSvg, settingSvg, editSvg, airplaneSvg, saveSvg } from '../svgs';
+import { userDefaultSvg, linkSvg, settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg } from '../svgs';
 
 export const ProfileImg = ({ friend, fillColor }: { friend: boolean, fillColor?: string }) => (
     <View style={profileStyles.container}>
@@ -28,16 +28,27 @@ export const SettingsSvg = ({ styles }: { styles?: StyleProp<any> }) => (
 )
 
 export const EditSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
-    <SvgXml xml={editSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white} style={styles} />
+    <SvgXml xml={editSvg} width='30' height='30' fill={pressed ? colors.white : colors.primary} style={styles} />
 )
 
 export const SaveSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
     <SvgXml xml={saveSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white} style={styles} />
 )
 
+export const PlusSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
+    <SvgXml xml={plusSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white} style={styles} />
+)
+
 export const AirplaneSvg = ({ styles }: { styles?: StyleProp<any> }) => (
     <SvgXml xml={airplaneSvg} width='20' height='20' fill={colors.primary} style={styles} />
 )
+
+export const PortraitSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
+    <SvgXml xml={portraitSvg} width='30' height='30' fill={pressed ? colors.white : colors.primary} style={styles} />
+)
+
+
+
 
 //buttons
 export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string, onPress: () => void, type: "primary" | "secondary" | "white_outline" | "red_outline", moreStyles?: StyleProp<any> }) => {

@@ -1,4 +1,6 @@
 import fb from 'firebase/app';
+import 'firebase/firestore';
+import 'firebase/storage';
 // @ts-ignore
 import { FIREBASE_APIKEY, FIREBASE_AUTHDOMAIN, FIREBASE_MEASUREMENTID, FIREBASE_DATABASEURL, FIREBASE_PROJECTID, FIREBASE_STORAGEBUCKET, FIREBASE_MESSAGINGSENDERID, FIREBASE_APPID } from '@env';
 
@@ -13,9 +15,10 @@ const firebaseConfig = {
     measurementId: FIREBASE_MEASUREMENTID
 };
 
-export const firebase = !fb.apps.length ? fb.initializeApp(firebaseConfig) : fb.app();
+export const myFire = !fb.apps.length ? fb.initializeApp(firebaseConfig) : fb.app();
+export const fireDb = myFire.firestore();
+export const fireStorage = myFire.storage();
 
-export const fireDb = firebase.firestore();
 // Initialize Firebase
 // export const firebase = () => {
 //     firebase.apps.length === 0 && firebase.initializeApp(firebaseConfig)

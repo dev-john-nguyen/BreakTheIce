@@ -8,7 +8,8 @@ export interface UtilsRootStateProps {
     banner: {
         message: string,
         type: string
-    }
+    };
+    statusBar: number
 }
 
 export interface UtilsActionProps {
@@ -19,4 +20,5 @@ export interface UtilsActionProps {
 export interface UtilsDispatchActionProps {
     set_error: (message: string, color: 'error' | 'warning') => void;
     set_banner: (message: string, type: 'error' | 'warning' | 'success') => void;
+    set_status_bar: (status: number) => void;
 }

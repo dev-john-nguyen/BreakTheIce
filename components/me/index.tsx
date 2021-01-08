@@ -1,54 +1,29 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import Timeline from '../timeline';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg } from '../../utils/svgs';
 import { colors, buttonsStyles } from '../../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { TimelineLocationProps } from '../../services/profile/tsTypes';
-import { set_timeline } from '../../services/profile/actions';
-import { TimelineDispatchActionProps } from '../../services/profile/tsTypes';
 import { set_error } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
+import Gallery from '../gallery';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
     user: RootProps['user'];
-    set_timeline: TimelineDispatchActionProps['set_timeline'];
     set_error: UtilsDispatchActionProps['set_error'];
 }
 
-const Me = ({ navigation, user, set_timeline, set_error }: MeProps) => {
-
-    useEffect(() => {
-        !user.timeline && set_timeline(user.uid)
-    }, [])
-
-    const onPlacePress = (location: TimelineLocationProps) => {
-        if (location.placesVisited) {
-            navigation.push('PlacesVisited',
-                {
-                    placesVisited: location.placesVisited,
-                    locationDocId: location.docId,
-                    uid: user.uid,
-                    title: location.city
-                })
-        } else {
-            set_error("No locations have been saved for this location", "warning")
-        }
-    }
-
-    const redirectNewLocation = () => {
-        navigation.push('NewLocation');
-    }
+const Me = ({ navigation, user, set_error }: MeProps) => {
 
     const baseText = (text: string | number, additionalStyle: Object) => (
         <Text style={[styles.base_text, additionalStyle]}>
             {text}
         </Text>
     )
+
     return (
         <View style={styles.container}>
             <View style={styles.header_section}>
@@ -70,12 +45,7 @@ const Me = ({ navigation, user, set_timeline, set_error }: MeProps) => {
             <View style={styles.bio}>
                 {baseText(user.bioLong, { fontSize: 12 })}
             </View>
-            <Timeline
-                timeline={user.timeline}
-                onPlacePress={onPlacePress}
-                auth={true}
-                redirectNewLocation={redirectNewLocation}
-            />
+            <Gallery gallery={user.gallery} />
         </View>
     )
 }
@@ -85,6 +55,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'flex-start',
+        paddingBottom: 0,
         padding: 10
     },
     base_text: {
@@ -111,9 +82,7 @@ const styles = StyleSheet.create({
     bio: {
         flexBasis: 'auto',
         padding: 20,
-    },
-    bioText: {
-        fontSize: 12
+
     }
 })
 
@@ -121,4 +90,4 @@ const mapStateToProps = (state: RootProps) => ({
     user: state.user
 })
 
-export default connect(mapStateToProps, { set_timeline, set_error, })(Me);
+export default connect(mapStateToProps, { set_error, })(Me);
