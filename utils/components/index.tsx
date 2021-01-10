@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Pressable, StyleProp, Text } from 'react-native';
 import { profileStyles, colors, buttonsStyles } from '../styles';
 import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg, linkSvg, settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg } from '../svgs';
+import { userDefaultSvg, linkSvg, settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg, minusSvg } from '../svgs';
 
 export const ProfileImg = ({ friend, fillColor }: { friend: boolean, fillColor?: string }) => (
     <View style={profileStyles.container}>
@@ -37,6 +37,17 @@ export const SaveSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?
 
 export const PlusSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
     <SvgXml xml={plusSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white} style={styles} />
+)
+
+export const MinusSvg = ({ styles, onPress }: { styles?: StyleProp<any>, onPress: () => void }) => (
+    <Pressable
+        style={styles}
+        onPress={onPress}
+    >
+        {({ pressed }) => (
+            <SvgXml xml={minusSvg} width='30' height='30' fill={pressed ? colors.greyRed : colors.darkRed} />
+        )}
+    </Pressable>
 )
 
 export const AirplaneSvg = ({ styles }: { styles?: StyleProp<any> }) => (

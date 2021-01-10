@@ -1,16 +1,16 @@
 import React from 'react';
 import { FlatList, View, StyleSheet, Image, ListRenderItemInfo, Text } from 'react-native';
-import { GalleryProps } from '../../services/user/tsTypes';
+import { GalleryItemProps } from '../../services/user/tsTypes';
 import { colors } from '../../utils/styles';
 
 interface GalleryComProps {
-    gallery: GalleryProps[]
+    gallery: GalleryItemProps[]
 }
 
 export default ({ gallery }: GalleryComProps) => {
-    const renderItem = ({ item, index }: ListRenderItemInfo<GalleryProps>) => (
+    const renderItem = ({ item, index }: ListRenderItemInfo<GalleryItemProps>) => (
         <View style={[styles.gallery_container, index > 0 ? { margin: 30 } : { marginTop: 0, margin: 30 }]}>
-            <Image source={{ uri: item.url }} style={styles.gallery_image} />
+            <Image source={{ uri: item.cachedUrl ? item.cachedUrl : item.url, cache: 'force-cache' }} style={styles.gallery_image} />
             <View style={styles.gallery_text_container}>
                 <Text style={styles.gallery_text}>{item.description}</Text>
             </View>

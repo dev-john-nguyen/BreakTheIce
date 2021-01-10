@@ -1,9 +1,9 @@
 import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY } from './actionTypes';
 import { set_loading, remove_loading, set_status_bar, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { StateCityProps, UserRootStateProps, NewGalleryProps, GalleryProps } from './tsTypes';
+import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps } from './tsTypes';
 import { LocationObject } from 'expo-location';
-import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location } from './utils';
+import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
 import { validate_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
@@ -12,6 +12,7 @@ import { SET_MESSAGES } from '../chat/actionTypes';
 import { SET_ERROR } from '../utils/actionTypes';
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
+import { cacheImage } from '../../utils/functions';
 
 // import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
 // const baseUrl = 'http://localhost:5050';
@@ -42,6 +43,10 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
 
                     //check if profile data exists
                     if (fetchUserRes.profile) {
+
+                        //cache images
+                        fetchUserRes.profile.gallery = await cache_user_images(fetchUserRes.profile.gallery)
+
                         dispatch({
                             type: SET_USER,
                             payload: fetchUserRes.profile
@@ -53,18 +58,21 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                         })
                     }
 
-                    //check if there are any chatIds
-                    if (fetchUserRes.chatIds) {
-                        dispatch({
-                            type: SET_MESSAGES,
-                            payload: fetchUserRes.chatIds
-                        })
-                    } else {
-                        dispatch({
-                            type: SET_ERROR,
-                            payload: "Couldn't retrieve your messages"
-                        })
-                    }
+                    // //* Dont' need chatIds anymore */
+                    // //check if there are any chatIds
+                    // if (fetchUserRes.chatIds) {
+                    //     dispatch({
+                    //         type: SET_MESSAGES,
+                    //         payload: fetchUserRes.chatIds
+                    //     })
+                    // } else {
+                    //     dispatch({
+                    //         type: SET_ERROR,
+                    //         payload: "Couldn't retrieve your messages"
+                    //     })
+                    // }
+
+
                 } else {
                     dispatch({
                         type: USER_FETCHED_FAILED,
@@ -143,53 +151,60 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
     })
 }
 
-export const save_gallery = (newGallery: NewGalleryProps[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    if (newGallery.length < 1) {
-        return dispatch({
-            type: SET_ERROR,
-            payload: 'No images found.'
-        })
-    }
+    // if (newGallery.length < 1) {
+    //     return dispatch({
+    //         type: SET_ERROR,
+    //         payload: 'No images found.'
+    //     })
+    // }
 
-    if (newGallery.length > 5) {
-        return dispatch({
-            type: SET_ERROR,
-            payload: 'Exceeds the maxium number of images of 5.'
-        })
+    if (newGallery.length > 4) {
+        return dispatch(set_banner('Exceeds the maxium number of images of 5.', 'error'))
     }
 
     const uid = getState().user.uid;
-    var gallery: GalleryProps[] = [];
+    var gallery: GalleryItemProps[] = [];
+
+    //process items that only have blobs
 
     for (let i = 0; i < newGallery.length; i++) {
-        var { blob, description, id } = newGallery[i]
-        var path: string = `${uid}/gallery-img-${i}`;
-        var updatedAt: Date = new Date();
-        var uploadTask = fireStorage.ref().child(path).put(blob)
+        var { blob, description, id, url, updatedAt, name } = newGallery[i]
 
-        try {
-            await fireStorage_task_listener(uploadTask, dispatch, i, newGallery.length)
-                .then((url: string) => gallery.push({ url, description, updatedAt, id }))
-        } catch (e) {
-            dispatch(set_banner(e, 'error'))
+        if (blob) {
+            var path: string = `${uid}/gallery/${name}`;
+            var newUpdatedAt: Date = new Date();
+            var uploadTask = fireStorage.ref().child(path).put(blob)
+
+            try {
+                await fireStorage_task_listener(uploadTask, dispatch, i, newGallery.length)
+                    .then((genUrl: string) => gallery.push({ url: genUrl, description, updatedAt: newUpdatedAt, id, name }))
+            } catch (e) {
+                dispatch(set_banner(e, 'error'))
+            }
+        } else {
+            if (url && updatedAt) {
+                gallery.push({ url, description, updatedAt, id, name })
+            }
         }
-
     }
 
 
-    if (gallery.length < 1) {
-        return dispatch(set_banner('No images found', 'error'))
-    }
+    // if (gallery.length < 1) {
+    //     return dispatch(set_banner('No images found', 'error'))
+    // }
 
     fireDb.collection(UsersDb).doc(uid).set({
         gallery: gallery
     }, { merge: true })
         .then(() => {
+            dispatch(set_status_bar(0));
             dispatch({
                 type: SET_GALLERY,
                 payload: { gallery }
-            })
+            });
+            dispatch(set_banner('Gallery successfully updated!', 'success'));
         })
         .catch(err => {
             return dispatch({

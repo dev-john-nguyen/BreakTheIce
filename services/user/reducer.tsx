@@ -1,5 +1,5 @@
 import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED, ADD_NEW_TIMELINE_LOCATION, REMOVE_NEW_TIMELINE_LOCATION, UPDATE_NEW_TIMELINE_LOCATION, SET_GALLERY } from './actionTypes';
-import { UserActionProps, UserRootStateProps } from './tsTypes';
+import { UserActionProps, GalleryItemProps } from './tsTypes';
 import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
 
 
@@ -23,6 +23,7 @@ const INITIAL_STATE = {
 }
 
 export default (state = INITIAL_STATE, action: UserActionProps) => {
+
     switch (action.type) {
         case USER_FETCHED_FAILED:
             return {

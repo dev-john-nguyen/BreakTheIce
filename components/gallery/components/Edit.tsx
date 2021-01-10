@@ -3,49 +3,52 @@ import { View, Image, StyleSheet, TextInput, Pressable } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
-import { NewGalleryProps, UserRootStateProps } from '../../../services/user/tsTypes';
+import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/tsTypes';
 import { connect } from 'react-redux';
 import * as Progress from 'react-native-progress';
 import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
 import { UserDispatchActionsProps } from '../../../services/user/tsTypes';
-import { UtilsRootStateProps } from '../../../services/utils/tsTypes';
-import { CustomButton, SaveSvg, PlusSvg } from '../../../utils/components';
-import DraggableFlatList from "react-native-draggable-flatlist";
+import { UtilsRootStateProps, UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
+import { SaveSvg, MinusSvg } from '../../../utils/components';
+import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { AutoId } from '../../../utils/functions';
 import _ from 'lodash'
 import { MeStackNavigationProp } from '../../navigation/utils';
+import { set_banner } from '../../../services/utils/actions';
+import { Feather } from '@expo/vector-icons';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { hashCode } from '../../../utils/functions';
+
 //Summary
 //image limit will be set to 10000000 byte = 10mb
+//need to lower the size
 interface UploadImageProps {
     save_gallery: UserDispatchActionsProps['save_gallery'];
     statusBar: UtilsRootStateProps['statusBar'];
     gallery: UserRootStateProps['gallery'];
     navigation: MeStackNavigationProp;
+    set_banner: UtilsDispatchActionProps['set_banner'];
 }
 
-interface ImgObsProps {
-    id: string;
-    uri?: string;
-    url?: string;
-    blob?: Blob;
-    description: string;
-}
+const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner }: UploadImageProps) => {
+    const [imgObjs, setImgObjs] = useState<NewGalleryItemProps[]>([]);
 
-const UploadImage = ({ save_gallery, statusBar, gallery, navigation }: UploadImageProps) => {
-    const [imgObjs, setImgObjs] = useState<ImgObsProps[]>([]);
-
-
-    React.useLayoutEffect(() => {
+    useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <View style={{ flexDirection: 'row', right: 20 }}>
-                    <Pressable onPress={pickImage}>
-                        {({ pressed }) => <PlusSvg pressed={pressed} styles={{ marginRight: 10 }} />}
-                    </Pressable >
-                    <Pressable onPress={handleSaveGallery}>
-                        {({ pressed }) => <SaveSvg pressed={pressed} />}
-                    </Pressable >
+                <View style={{ flexDirection: 'row', right: statusBar ? 5 : 20 }}>
+                    {statusBar ?
+                        <Progress.Bar progress={statusBar} color={colors.white} width={120} /> :
+                        <>
+                            <Pressable onPress={pickImage} style={{ marginRight: 5 }}>
+                                {({ pressed }) => <Feather name='plus-circle' size={30} color={pressed ? colors.secondary : colors.white} />}
+                            </Pressable >
+                            <Pressable onPress={handleSaveGallery}>
+                                {({ pressed }) => <SaveSvg pressed={pressed} />}
+                            </Pressable >
+                        </>
+                    }
                 </View>
 
             )
@@ -53,87 +56,134 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation }: UploadIma
     })
 
     useEffect(() => {
-        //copy gallery to component
-
-        setImgObjs(_.cloneDeep(gallery));
-
         (async () => {
+
+            gallery && setImgObjs(_.cloneDeep(gallery));
+
             try {
                 const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync();
 
-                if (CameraRollStatus === 'granted') {
+                if (CameraRollStatus !== 'granted') {
+                    set_banner('Camera roll access denied. Will need access to edit gallery.', 'warning')
                 }
             } catch (e) {
-                console.log(e)
+                set_banner('Oops! Something went wrong accessing your camera roll.', 'error')
             }
         })()
-    }, [])
+
+    }, [gallery])
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: .5
+            quality: 1
         });
 
         if (!result.cancelled) {
-            //get blob
 
+            //resize
+            // const manipResult = await ImageManipulator.manipulateAsync(
+            //     result.uri,
+            //     [{ resize: { width: 500, height: 500 } }],
+            //     { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+            // );
+            const manipResult = await ImageManipulator.manipulateAsync(
+                result.uri,
+                [{ resize: { width: 600, height: 450 } }],
+                { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+            );
+
+            //get blob
             var imgBlob: Blob;
+
             try {
-                var response = await fetch(result.uri)
+                var response = await fetch(manipResult.uri)
                 imgBlob = await response.blob();
             } catch (e) {
-                return console.log(e)
+                console.log(e)
+                return set_banner('Oops! Something went wrong fetching your image.', 'error')
             }
 
             if (imgBlob.size > galleryImgSizeLimit) {
-                return console.log('Image too large. Image must be 10mb or smaller.');
+                return set_banner('Image too large. Image must be 10mb or smaller.', 'warning');
             }
 
-            imgObjs.push({
-                uri: result.uri,
+            //generate the image name
+            //might be an issue if the user what's to adjust the photo in some way and resubmit it
+            var name: string = hashCode(manipResult.uri)
+
+            imgObjs.unshift({
+                uri: manipResult.uri,
                 blob: imgBlob,
                 description: '',
-                id: AutoId.newId()
+                id: AutoId.newId(),
+                name: name
             });
 
             setImgObjs([...imgObjs]);
         }
     };
 
-    const handleSaveGallery = () => {
-        // save_gallery(imgObjs)
-        console.log(imgObjs)
+    const handleRemoveGalleryItem = (id: string) => {
+        var newImgObjs = imgObjs.filter(item => item.id !== id);
+        setImgObjs(newImgObjs)
     }
 
-    const renderItem = ({ item, index, drag, isActive }: any): ReactNode => {
-        return (
-            <Pressable
-                style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-                onLongPress={drag}
-            >
-                <View style={[styles.image_content, isActive && styles.image_content_drag]}>
-                    <Image source={{ uri: item.uri ? item.uri : item.url }} style={styles.image} />
-                    <TextInput
-                        style={styles.image_description_input}
-                        placeholder="Add a description... (100 character limit)"
-                        multiline={true}
-                        maxLength={100}
-                        value={imgObjs[index] ? imgObjs[index].description : ''}
-                        onChangeText={(text) => {
+    const handleSaveGallery = () => {
+        //allow description to be empty
+        //check if any changes were made
+
+        if (_.isEqual(imgObjs, gallery)) {
+            return set_banner('Looks like there were no changes found.', 'warning');
+        }
+
+        imgObjs.forEach((item, index) => {
+            if ((!item.url && !item.blob) || !item.id) {
+                return set_banner(`Oops! Looks like image #${index + 1} did not load correctly. Please try to remove and upload again.`, 'error')
+            }
+        })
+
+        save_gallery(imgObjs)
+    }
+
+    const renderItem = ({ item, index, drag, isActive }: RenderItemParams<NewGalleryItemProps>): ReactNode => (
+        <Pressable
+            style={{
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+            onLongPress={drag}
+        >
+            <View style={[styles.image_content, isActive && styles.image_content_drag]}>
+                <MinusSvg styles={styles.minus_svg} onPress={() => handleRemoveGalleryItem(item.id)} />
+                <Image
+                    source={{ uri: item.uri ? item.uri : item.cachedUrl ? item.cachedUrl : item.url, cache: 'force-cache' }} style={styles.image}
+
+                />
+                {/* <Image
+                    source={{ uri: item.cachedUrl, cache: 'only-if-cached' }} style={styles.image}
+
+                /> */}
+                <TextInput
+                    style={styles.image_description_input}
+                    placeholder="Add a description... (100 character limit)"
+                    multiline={true}
+                    maxLength={100}
+                    value={index && imgObjs[index] ? imgObjs[index].description : ''}
+                    onChangeText={(text) => {
+                        if (index) {
                             imgObjs[index].description = text
                             setImgObjs([...imgObjs])
-                        }}
-                    />
-                </View>
-            </Pressable>
-        );
-    };
+                        } else {
+                            set_banner('Dragging has not completed.', 'warning')
+                        }
+                    }}
+                />
+            </View>
+        </Pressable>
+    );
 
     return (
         <View style={styles.container}>
@@ -158,6 +208,12 @@ const styles = StyleSheet.create({
         padding: 50,
         paddingTop: 30,
         paddingBottom: 10
+    },
+    minus_svg: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        zIndex: 10
     },
     add_image_container: {
         alignSelf: 'center',
@@ -240,4 +296,4 @@ const mapStateToProps = (state: RootProps) => ({
     gallery: state.user.gallery
 })
 
-export default connect(mapStateToProps, { save_gallery })(UploadImage);
+export default connect(mapStateToProps, { save_gallery, set_banner })(UploadImage);

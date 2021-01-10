@@ -6,6 +6,7 @@ import { RootProps } from '../../../services';
 import { update_profile } from '../../../services/user/actions';
 import { UserDispatchActionsProps } from '../../../services/user/tsTypes';
 import { colors, buttonsStyles } from '../../../utils/styles';
+import EditGallery from '../../gallery/components/Edit';
 
 interface EditProfileProps {
     user: RootProps['user'];
@@ -75,7 +76,6 @@ const EditProfile = (props: EditProfileProps) => {
                         </Picker>
                     </View>
                 </View>
-
                 <Pressable onPress={handleFormSubmit} style={buttonsStyles.button_primary}>
                     <Text style={buttonsStyles.button_primary_text}>Update</Text>
                 </Pressable>

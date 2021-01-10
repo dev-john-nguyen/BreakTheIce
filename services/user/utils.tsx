@@ -1,7 +1,8 @@
 import { fireDb } from '../firebase';
 import { LocationsDb, UsersDb } from '../../utils/variables';
-import { StateCityProps, UserRootStateProps } from './tsTypes';
+import { StateCityProps, UserRootStateProps, GalleryItemProps } from './tsTypes';
 import { LocationObject } from 'expo-location';
+import { cacheImage } from '../../utils/functions';
 
 //summary
 ////check if users state and city location has changed since last stored entry
@@ -72,6 +73,9 @@ export const fetch_profile = async (uid: string) => {
                     gallery: data.gallery ? data.gallery : []
                 }
 
+
+                //* Dont' need chatIds anymore */
+
                 return {
                     profile: profileObj,
                     chatIds: data.chatIds ? data.chatIds : []
@@ -80,4 +84,23 @@ export const fetch_profile = async (uid: string) => {
                 return;
             }
         })
+}
+
+export async function cache_user_images(gallery: GalleryItemProps[]) {
+
+    for (let i = 0; i < gallery.length; i++) {
+        var cachedUrl: string | void;
+        try {
+            cachedUrl = await cacheImage(gallery[i].url)
+        } catch (e) {
+            console.log(e)
+        }
+        if (cachedUrl) {
+            gallery[i].cachedUrl = cachedUrl
+        } else {
+            console.log(`failed to cached img url ${gallery[i].url}`)
+        }
+    }
+
+    return gallery;
 }

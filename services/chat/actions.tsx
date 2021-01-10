@@ -8,14 +8,14 @@ import { ChatPreviewProps } from './tsTypes';
 
 export const set_and_listen_messages = (uid: string) => (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    const chatIds: Array<string> = getState().chat.ids;
+    // const chatIds: Array<string> = getState().chat.ids;
     if (!uid) return dispatch({
         type: SET_ERROR,
         payload: "Couldn't find your user id to fetch your messages"
     });
 
     //check if there are any messages
-    if (chatIds.length < 1) return;
+    // if (chatIds.length < 1) return;
 
     var fireDbChatListner = fireDb.collection(ChatDb).where('uids', 'array-contains', uid).onSnapshot(querySnapshot => {
         var chatPreviews: ChatPreviewProps[] = [];
