@@ -76,10 +76,7 @@ export const fetch_profile = async (uid: string) => {
 
                 //* Dont' need chatIds anymore */
 
-                return {
-                    profile: profileObj,
-                    chatIds: data.chatIds ? data.chatIds : []
-                };
+                return { profile: profileObj }
             } else {
                 return;
             }

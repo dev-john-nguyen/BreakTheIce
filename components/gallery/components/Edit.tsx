@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode, useLayoutEffect } from 'react';
-import { View, Image, StyleSheet, TextInput, Pressable } from 'react-native';
+import { View, Image, StyleSheet, TextInput, Pressable, KeyboardAvoidingView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
@@ -91,7 +91,7 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
             // );
             const manipResult = await ImageManipulator.manipulateAsync(
                 result.uri,
-                [{ resize: { width: 600, height: 450 } }],
+                [{ resize: { width: 600 } }],
                 { compress: 1, format: ImageManipulator.SaveFormat.PNG }
             );
 
@@ -113,6 +113,8 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
             //generate the image name
             //might be an issue if the user what's to adjust the photo in some way and resubmit it
             var name: string = hashCode(manipResult.uri)
+
+            console.log(name)
 
             imgObjs.unshift({
                 uri: manipResult.uri,
@@ -171,9 +173,9 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
                     placeholder="Add a description... (100 character limit)"
                     multiline={true}
                     maxLength={100}
-                    value={index && imgObjs[index] ? imgObjs[index].description : ''}
+                    value={index !== undefined && imgObjs[index] ? imgObjs[index].description : ''}
                     onChangeText={(text) => {
-                        if (index) {
+                        if (index !== undefined) {
                             imgObjs[index].description = text
                             setImgObjs([...imgObjs])
                         } else {
@@ -187,13 +189,16 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
 
     return (
         <View style={styles.container}>
-            <DraggableFlatList
-                contentContainerStyle={styles.flat_list}
-                data={imgObjs}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => `draggable-item-${item.id ? item.id : index.toString()}`}
-                onDragEnd={({ data }) => setImgObjs(data)}
-            />
+            <KeyboardAvoidingView keyboardVerticalOffset={120} behavior={'height'} style={{ flex: 1 }}>
+                <DraggableFlatList
+                    contentContainerStyle={styles.flat_list}
+                    keyboardDismissMode='interactive'
+                    data={imgObjs}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => `draggable-item-${item.id ? item.id : index.toString()}`}
+                    onDragEnd={({ data }) => setImgObjs(data)}
+                />
+            </KeyboardAvoidingView>
         </View>
     )
 
@@ -207,7 +212,7 @@ const styles = StyleSheet.create({
     flat_list: {
         padding: 50,
         paddingTop: 30,
-        paddingBottom: 10
+        paddingBottom: 10,
     },
     minus_svg: {
         position: 'absolute',

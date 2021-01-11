@@ -1,6 +1,5 @@
-import { Image } from 'react-native';
-import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system'
+
 export class AutoId {
     static newId(len?: number): string {
         // Alphanumeric characters

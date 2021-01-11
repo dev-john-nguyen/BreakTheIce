@@ -75,7 +75,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
                     if (!docData) return undefined;
 
-                    const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate, username } = docData
+                    const { location, name, bioShort, bioLong, stateCity, gender, age, isPrivate, username, gallery } = docData
 
                     return {
                         uid: doc.id,
@@ -90,7 +90,8 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                         isPrivate,
                         friend: false,
                         distance: 0,
-                        sentInvite: false
+                        sentInvite: false,
+                        gallery
                     }
 
                 } else {
@@ -103,52 +104,52 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
             })
     }
 
-    //fetch timeline
-    if (profileUserObj && !profileUserObj.timeline) {
-        const timelineData = await fireDb.collection(UsersDb).doc(profileUid).collection(UsersTimelineDb).get()
-            .then(querySnapshot => {
-                var timelineData: TimelineLocationProps[] = [];
+    // //fetch timeline
+    // if (profileUserObj && !profileUserObj.timeline) {
+    //     const timelineData = await fireDb.collection(UsersDb).doc(profileUid).collection(UsersTimelineDb).get()
+    //         .then(querySnapshot => {
+    //             var timelineData: TimelineLocationProps[] = [];
 
-                querySnapshot.forEach(doc => {
-                    if (doc.exists) {
-                        const { country, city, state, comment, startAt, endAt, createdAt, updatedAt, placesVisited } = doc.data();
+    //             querySnapshot.forEach(doc => {
+    //                 if (doc.exists) {
+    //                     const { country, city, state, comment, startAt, endAt, createdAt, updatedAt, placesVisited } = doc.data();
 
-                        timelineData.push({
-                            docId: doc.id,
-                            country,
-                            city,
-                            state,
-                            comment,
-                            startAt: startAt.toDate(),
-                            endAt: endAt.toDate(),
-                            createdAt: createdAt.toDate(),
-                            updatedAt: updatedAt.toDate(),
-                            placesVisited
-                        })
-                    }
-                })
+    //                     timelineData.push({
+    //                         docId: doc.id,
+    //                         country,
+    //                         city,
+    //                         state,
+    //                         comment,
+    //                         startAt: startAt.toDate(),
+    //                         endAt: endAt.toDate(),
+    //                         createdAt: createdAt.toDate(),
+    //                         updatedAt: updatedAt.toDate(),
+    //                         placesVisited
+    //                     })
+    //                 }
+    //             })
 
-                return timelineData
-            })
-            .catch((err) => {
-                console.log(err)
-                dispatch({
-                    type: SET_ERROR,
-                    payload: 'Oops! Looks like we had trouble fetching your previous locations'
-                })
-                return;
-            })
+    //             return timelineData
+    //         })
+    //         .catch((err) => {
+    //             console.log(err)
+    //             dispatch({
+    //                 type: SET_ERROR,
+    //                 payload: 'Oops! Looks like we had trouble fetching your previous locations'
+    //             })
+    //             return;
+    //         })
 
 
-        //if timeline comes back with data then update the near_users in state  
-        if (timelineData) {
-            profileUserObj.timeline = timelineData
-            dispatch({
-                type: UPDATE_TIMELINE_NEAR_USER,
-                payload: timelineData
-            })
-        }
-    }
+    //     //if timeline comes back with data then update the near_users in state  
+    //     if (timelineData) {
+    //         profileUserObj.timeline = timelineData
+    //         dispatch({
+    //             type: UPDATE_TIMELINE_NEAR_USER,
+    //             payload: timelineData
+    //         })
+    //     }
+    // }
 
 
     if (!profileUserObj) {

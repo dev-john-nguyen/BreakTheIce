@@ -33,7 +33,7 @@ const Me = ({ navigation, user, set_error }: MeProps) => {
                         {baseText(user.name, { fontSize: 24 })}
                         {baseText(`${user.age} years old`, { fontSize: 14 })}
                     </View>
-                    <Pressable onPress={() => navigation.push('Friends')}
+                    <Pressable onPress={() => navigation.navigate('Friends')}
                         style={({ pressed }) => (
                             pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
                         )}

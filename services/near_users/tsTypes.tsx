@@ -1,5 +1,5 @@
 import { LocationObject } from 'expo-location';
-import { StateCityProps, UserRootStateProps } from '../user/tsTypes';
+import { StateCityProps, UserRootStateProps, GalleryItemProps } from '../user/tsTypes';
 import { TimelineLocationProps } from '../profile/tsTypes';
 
 export interface NearUsersActionProps {
@@ -11,7 +11,9 @@ export interface NearByUsersProps extends Omit<UserRootStateProps, 'gallery'> {
     friend: boolean;
     distance: number;
     sentInvite: boolean;
+    gallery: (GalleryItemProps & { nearbyUserCachedUrl: string | void | undefined })[]
 }
+
 
 export interface NearUsersRootProps {
     nearBy: Array<NearByUsersProps>;

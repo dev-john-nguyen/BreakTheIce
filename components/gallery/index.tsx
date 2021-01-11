@@ -1,21 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, View, StyleSheet, Image, ListRenderItemInfo, Text } from 'react-native';
 import { GalleryItemProps } from '../../services/user/tsTypes';
 import { colors } from '../../utils/styles';
+import { cacheImage } from '../../utils/functions';
+import _ from 'lodash';
+import { NearByUsersProps } from '../../services/near_users/tsTypes';
 
 interface GalleryComProps {
-    gallery: GalleryItemProps[]
+    gallery: (GalleryItemProps & { nearbyUserCachedUrl?: string | void | undefined })[]
+    nearByUser?: true
 }
 
-export default ({ gallery }: GalleryComProps) => {
-    const renderItem = ({ item, index }: ListRenderItemInfo<GalleryItemProps>) => (
-        <View style={[styles.gallery_container, index > 0 ? { margin: 30 } : { marginTop: 0, margin: 30 }]}>
-            <Image source={{ uri: item.cachedUrl ? item.cachedUrl : item.url, cache: 'force-cache' }} style={styles.gallery_image} />
+export default ({ gallery, nearByUser }: GalleryComProps) => {
+
+    const renderItem = ({ item, index }: ListRenderItemInfo<GalleryItemProps>) => {
+        var uri: string = '';
+        if (nearByUser) {
+            const { nearbyUserCachedUrl, url } = gallery[index];
+            uri = nearbyUserCachedUrl ? nearbyUserCachedUrl : url
+
+        } else {
+            const { cachedUrl, url } = gallery[index]
+            uri = cachedUrl ? cachedUrl : url
+        }
+
+        return <View style={[styles.gallery_container, index > 0 ? { margin: 30 } : { marginTop: 0, margin: 30 }]}>
+            <Image source={{ uri, cache: 'force-cache' }} style={styles.gallery_image} />
             <View style={styles.gallery_text_container}>
                 <Text style={styles.gallery_text}>{item.description}</Text>
             </View>
         </View>
-    )
+    }
 
     return <FlatList
         style={styles.container}

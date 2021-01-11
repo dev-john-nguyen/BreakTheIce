@@ -9,7 +9,7 @@ import { getDistance } from 'geolib';
 import { RootProps } from '..';
 import firebase from 'firebase';
 import { SET_ERROR } from '../utils/actionTypes';
-
+import { cacheImage } from '../../utils/functions';
 
 //find near by users
 export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
@@ -23,9 +23,16 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
             var nearByUsers: Array<NearByUsersProps> = [];
             var allUsers: Array<NearByUsersProps> = [];
 
-            querySnapshot.docs.forEach(doc => {
+            querySnapshot.docs.forEach(async (doc) => {
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                const { username, location, name, bioShort, bioLong, stateCity, gender, age, isPrivate } = doc.data()
+                const { username, location, name, bioShort, bioLong, stateCity, gender, age, isPrivate, gallery } = doc.data()
+
+
+                var userPreviewData = {
+                    uid: doc.id,
+                    location,
+                    bioShort
+                }
 
                 var userData: NearByUsersProps = {
                     uid: doc.id,
@@ -40,7 +47,8 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                     isPrivate,
                     friend: false,
                     distance: 0,
-                    sentInvite: false
+                    sentInvite: false,
+                    gallery
                 }
 
                 //check if the coords are missing
@@ -85,7 +93,16 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
 
 
                 if (distanceBetweenPoints < acceptedRadius) {
+                    if (userData.gallery && userData.gallery.length > 0) {
+                        //cache gallery images
+                        userData.gallery.forEach(async (img, index) => {
+                            userData.gallery[index].nearbyUserCachedUrl = await cacheImage(img.url)
+                        })
+                    }
+
                     nearByUsers.push(userData)
+                    //cache gallery images
+
                 }
 
                 allUsers.push(userData)

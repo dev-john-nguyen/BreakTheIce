@@ -16,6 +16,7 @@ import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile, remove_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, TimelineLocationProps } from '../../services/profile/tsTypes';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
+import Gallery from '../gallery';
 
 interface ProfileProps {
     navigation: HomeStackNavigationProp;
@@ -121,6 +122,7 @@ const Profile = (props: ProfileProps) => {
             <View style={styles.bio}>
                 {baseText(profileUser.bioLong, { fontSize: 12 })}
             </View>
+            <Gallery gallery={profileUser.gallery} nearByUser={true} />
         </View>
     )
 }

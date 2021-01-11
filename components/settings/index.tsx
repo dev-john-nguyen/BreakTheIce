@@ -9,7 +9,7 @@ const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
         <View style={styles.container}>
             <TouchableHighlight
                 style={styles.item_container}
-                onPress={() => navigation.push("EditGallery")}
+                onPress={() => navigation.navigate("EditGallery")}
                 underlayColor={colors.secondary}
             >
                 <View style={styles.content}>
@@ -20,7 +20,7 @@ const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
 
             <TouchableHighlight
                 style={styles.item_container}
-                onPress={() => navigation.push("EditProfile")}
+                onPress={() => navigation.navigate("EditProfile")}
                 underlayColor={colors.secondary}
             >
                 <View style={styles.content}>
@@ -31,7 +31,7 @@ const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
 
             <TouchableHighlight
                 style={styles.item_container}
-                onPress={() => navigation.push("GeneralSettings")}
+                onPress={() => navigation.navigate("GeneralSettings")}
                 underlayColor={colors.secondary}
             >
                 <View style={styles.content}>
