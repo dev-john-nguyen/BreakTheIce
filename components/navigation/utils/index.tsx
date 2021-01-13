@@ -11,8 +11,6 @@ import Chat from '../../chat';
 import Message from '../../chat/components/Message';
 import Me from '../../me';
 import Settings from '../../settings';
-import GeneralSettings from '../../settings/components/General';
-import EditProfile from '../../settings/components/EditProfile';
 import EditGallery from '../../gallery/components/Edit';
 import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/tsTypes';
@@ -94,8 +92,6 @@ type MeStackParams = {
     Me: { title: string };
     Profile: ProfileRouteParams;
     Settings: undefined;
-    EditProfile: { title: string } | undefined;
-    GeneralSettings: { title: string } | undefined;
     EditGallery: { title: string } | undefined;
 }
 
@@ -112,7 +108,7 @@ export type InvitationsStackNavigationProp = StackNavigationProp<InvitationsStac
 export type ChatScreenRouteProp = RouteProp<ChatStackParams, "Chat" | "Message" | "Profile">
 export type ChatStackNavigationProp = StackNavigationProp<ChatStackParams>;
 
-export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditProfile" | "GeneralSettings" | "EditGallery">
+export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditGallery">
 export type SettingScreenRouteProp = RouteProp<MeStackParams, "Settings">
 export type MeStackNavigationProp = StackNavigationProp<MeStackParams>
 
@@ -155,8 +151,6 @@ export const MeStackScreen = (props: any) => {
             })}
             initialParams={{ profileUid: '' }} />
         <MeStack.Screen name="Settings" component={Settings} />
-        <MeStack.Screen name="GeneralSettings" component={GeneralSettings} initialParams={{ title: 'General' }} />
-        <MeStack.Screen name="EditProfile" component={EditProfile} initialParams={{ title: 'Profile' }} />
         <MeStack.Screen name="EditGallery" component={EditGallery} initialParams={{ title: 'Gallery' }} />
     </MeStack.Navigator>
 }

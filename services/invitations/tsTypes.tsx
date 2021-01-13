@@ -1,5 +1,5 @@
 
-import { UserRootStateProps } from '../user/tsTypes';
+import { UserRootStateProps } from '../user/user.types';
 
 export interface InvitationsActionProps {
     type: string;

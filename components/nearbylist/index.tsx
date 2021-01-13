@@ -33,7 +33,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
     }
 
     handleNearUsersOnPress = (nearUser: NearByUsersProps) => {
-        this.props.navigation.push(ProfilePage, {
+        this.props.navigation.navigate(ProfilePage, {
             profileUid: nearUser.uid,
             title: nearUser.username
         })

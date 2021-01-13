@@ -1,6 +1,6 @@
 import { fireDb } from '../firebase';
 import { LocationsDb, UsersDb } from '../../utils/variables';
-import { StateCityProps, UserRootStateProps, GalleryItemProps } from './tsTypes';
+import { StateCityProps, UserRootStateProps, GalleryItemProps, UserProfilePreviewProps } from './user.types';
 import { LocationObject } from 'expo-location';
 import { cacheImage } from '../../utils/functions';
 
@@ -12,35 +12,49 @@ import { cacheImage } from '../../utils/functions';
 //getRedux stateCity and if it is empty. If empty then just update the stateCity in profile
 //if not empty then compare if the newStateCity is not equal to the redux stateCity. If not equal need to remove
 //previous path and and the new path. else do nothing.
-export const fireDb_init_user_location = async (rxProfileObj: UserRootStateProps, stateCity: StateCityProps, location: LocationObject) => {
+export const fireDb_init_user_location = async (userData: UserRootStateProps, stateCity: StateCityProps, location: LocationObject) => {
     var batch = fireDb.batch();
 
     //fireDb Profile Path
-    const ProfileRef = fireDb.collection(UsersDb).doc(rxProfileObj.uid);
+    const userRef = fireDb.collection(UsersDb).doc(userData.uid);
 
-    if (rxProfileObj.stateCity && rxProfileObj.stateCity.city && rxProfileObj.stateCity.state) {
+    var updateUserData = { stateCity: stateCity, offline: false }
+
+    if (userData.stateCity && userData.stateCity.city && userData.stateCity.state) {
         //check if the dbStatZip different than currentStateZip
-        if (stateCity.state !== rxProfileObj.stateCity.state || stateCity.city !== rxProfileObj.stateCity.city) {
+        if (stateCity.state !== userData.stateCity.state || stateCity.city !== userData.stateCity.city) {
             //remove the path of previous location in the Location collection
-            const OldLocationRef = fireDb.collection(LocationsDb).doc(rxProfileObj.stateCity.state).collection(rxProfileObj.stateCity.city).doc(rxProfileObj.uid)
+            const OldLocationRef = fireDb.collection(LocationsDb).doc(userData.stateCity.state).collection(userData.stateCity.city).doc(userData.uid)
             batch.delete(OldLocationRef)
-            batch.set(ProfileRef, { stateCity: stateCity }, { merge: true })
+            batch.update(userRef, updateUserData)
         }
 
     } else {
-        batch.set(ProfileRef, { stateCity: stateCity }, { merge: true })
+        console.log(updateUserData)
+        batch.update(userRef, updateUserData)
     }
 
-    //now set/update new location
+    //now set/update new profilePreview in location collection
     //need to update locationRef with the updated location city
-    const LocationRef = fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(rxProfileObj.uid)
-    batch.set(LocationRef, { ...rxProfileObj, location: location, stateCity: stateCity })
+
+    const LocationRef = fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(userData.uid)
+
+    const profilePreview: UserProfilePreviewProps = {
+        uid: userData.uid,
+        username: userData.username,
+        location: location,
+        bioShort: userData.bioShort,
+        age: userData.age,
+        hideOnMap: userData.hideOnMap
+    }
+
+    batch.set(LocationRef, profilePreview)
 
     return await batch.commit()
 }
 
-export const fireDb_update_user_location = async (rxProfileObj: UserRootStateProps, newLocation: LocationObject) => {
-    await fireDb.collection(LocationsDb).doc(rxProfileObj.stateCity.state).collection(rxProfileObj.stateCity.city).doc(rxProfileObj.uid).set({
+export const fireDb_update_user_location = async (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => {
+    await fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(uid).set({
         location: newLocation
     }, { merge: true })
 }
@@ -68,13 +82,11 @@ export const fetch_profile = async (uid: string) => {
                     bioLong: data.bioLong ? data.bioLong : '',
                     bioShort: data.bioShort ? data.bioShort : '',
                     gender: data.gender ? data.gender : null,
-                    isPrivate: data.isPrivate ? data.isPrivate : false,
                     location: data.location ? data.location : null,
-                    gallery: data.gallery ? data.gallery : []
+                    hideOnMap: data.hideOnMap ? data.hideOnMap : false,
+                    gallery: data.gallery ? data.gallery : [],
+                    offline: data.offline === undefined ? false : data.offline
                 }
-
-
-                //* Dont' need chatIds anymore */
 
                 return { profile: profileObj }
             } else {
@@ -83,7 +95,7 @@ export const fetch_profile = async (uid: string) => {
         })
 }
 
-export async function cache_user_images(gallery: GalleryItemProps[]) {
+export async function cache_user_images(gallery: GalleryItemProps[], uriType: 'cachedUrl' | 'nearUserUri') {
 
     for (let i = 0; i < gallery.length; i++) {
         var cachedUrl: string | void;
@@ -93,7 +105,7 @@ export async function cache_user_images(gallery: GalleryItemProps[]) {
             console.log(e)
         }
         if (cachedUrl) {
-            gallery[i].cachedUrl = cachedUrl
+            gallery[i][uriType] = cachedUrl
         } else {
             console.log(`failed to cached img url ${gallery[i].url}`)
         }

@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { colors } from '../../utils/styles'
 import Maps from '../maps';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { set_and_listen_user_location } from '../../services/user/actions';
+import { set_and_listen_user_location, go_online } from '../../services/user/actions';
 import { set_and_listen_near_users } from '../../services/near_users/actions';
 import { set_and_listen_invitations } from '../../services/invitations/actions';
 import { set_and_listen_friends } from '../../services/friends/actions';
 import { set_and_listen_messages } from '../../services/chat/actions';
-import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/tsTypes';
+import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/user.types';
 import { NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
 import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
 import { ChatDispatchActionsProps } from '../../services/chat/tsTypes';
@@ -20,6 +19,7 @@ import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
 // @ts-ignore
 import { GEOCODER_KEY } from '@env'
+import { CustomButton } from '../../utils/components';
 // @ts-ignore
 Geocoder.init(GEOCODER_KEY);
 
@@ -31,6 +31,7 @@ interface HomeProps {
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
     set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
+    go_online: UserDispatchActionsProps['go_online'];
 }
 
 interface CurrentLocationProps {
@@ -98,13 +99,12 @@ const Home = (props: HomeProps) => {
                 let location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest });
 
                 if (location) {
-                    const fetchedUserstateCity: StateCityProps | undefined = await getUserstateCity(location);
-                    if (fetchedUserstateCity) {
-                        setCurrentLocation({
-                            location: location,
-                            stateCity: fetchedUserstateCity
-                        })
+                    const stateCity: StateCityProps | undefined = await getUserstateCity(location);
+
+                    if (stateCity) {
+                        setCurrentLocation({ location, stateCity })
                     }
+
                 }
             } catch (e) {
                 console.log(e)
@@ -118,14 +118,32 @@ const Home = (props: HomeProps) => {
 
     useEffect(() => {
         //initate and set all the listeners
-        if (currentLocation && currentLocation.location && currentLocation.stateCity) {
-            props.set_and_listen_user_location(currentLocation.stateCity, currentLocation.location);
+        if (currentLocation
+            && currentLocation.location
+            && currentLocation.stateCity) {
             props.set_and_listen_friends(props.user.uid);
             props.set_and_listen_invitations(props.user.uid);
             props.set_and_listen_near_users(props.user.uid, currentLocation.stateCity, currentLocation.location);
             props.set_and_listen_messages(props.user.uid);
         }
     }, [currentLocation])
+
+
+    useEffect(() => {
+        if (currentLocation &&
+            currentLocation.location &&
+            currentLocation.stateCity
+            && !props.user.offline) {
+            props.set_and_listen_user_location(currentLocation.stateCity, currentLocation.location);
+        }
+    }, [props.user.offline, currentLocation])
+
+
+    if (props.user.offline) {
+        return <View style={styles.container}>
+            <CustomButton text='Go Online' type='primary' onPress={props.go_online} />
+        </View>
+    }
 
     return (
         <View style={styles.container}>
@@ -152,5 +170,5 @@ const mapStateToProps = (state: RootProps) => ({
 
 export default connect(mapStateToProps, {
     set_and_listen_user_location, set_and_listen_near_users, set_and_listen_invitations, set_and_listen_friends,
-    set_and_listen_messages
+    set_and_listen_messages, go_online
 })(Home);

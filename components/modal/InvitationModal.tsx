@@ -8,7 +8,7 @@ import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptio
 import { send_invitation } from '../../services/invitations/actions';
 import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/tsTypes';
-import { UserRootStateProps } from '../../services/user/tsTypes';
+import { UserRootStateProps } from '../../services/user/user.types';
 import { RootProps } from '../../services';
 
 interface MyModalProps {

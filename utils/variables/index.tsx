@@ -9,6 +9,7 @@ export const galleryImgSizeLimit = 10000000;
 
 //DB Collections
 export const LocationsDb = 'Locations';
+export const LocationsUsersDb = 'Users';
 export const UsersDb = 'Users';
 export const ProfileDb = 'Profile'
 export const InvitationsDb = 'Invitations'

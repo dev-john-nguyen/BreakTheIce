@@ -1,5 +1,5 @@
-import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_USER_TIMELINE, UPDATE_PLACES_VISITED, ADD_NEW_TIMELINE_LOCATION, REMOVE_NEW_TIMELINE_LOCATION, UPDATE_NEW_TIMELINE_LOCATION, SET_GALLERY } from './actionTypes';
-import { UserActionProps, GalleryItemProps } from './tsTypes';
+import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
+import { UserActionProps } from './user.types';
 import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
 
 
@@ -41,7 +41,9 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
             return {
                 ...state,
                 location: action.payload.location,
-                stateCity: action.payload.stateCity
+                stateCity: action.payload.stateCity,
+                locationListener: action.payload.locationListener,
+                offline: false
             }
         case REMOVE_LOCATION:
             return {
@@ -59,57 +61,23 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
                 ...state,
                 gallery: action.payload.gallery
             }
-
-
-
-        case SET_USER_TIMELINE:
+        case GO_OFFILINE:
             return {
                 ...state,
-                timeline: action.payload
+                offline: true
             }
-        case UPDATE_PLACES_VISITED:
+        case GO_ONLINE:
             return {
                 ...state,
-                timeline: update_timeline(state.timeline, action.payload)
+                offline: false
             }
-        case ADD_NEW_TIMELINE_LOCATION:
+        case UPDATE_PROFILE:
+        case UPDATE_PRIVACY:
             return {
                 ...state,
-                timeline: [...state.timeline, action.payload]
+                ...action.payload
             }
-        case REMOVE_NEW_TIMELINE_LOCATION:
-            return {
-                ...state,
-                timeline: () => {
-                    const docId: string = action.payload.timelineLocDocId;
-                    const timeline: TimelineLocationProps[] = state.timeline;
 
-                    for (let i = 0; i < timeline.length; i++) {
-                        if (timeline[i].docId == docId) {
-                            timeline.splice(i, 1)
-                            break;
-                        }
-                    }
-                    return [...timeline]
-                }
-            }
-        case UPDATE_NEW_TIMELINE_LOCATION:
-            return {
-                ...state,
-                timeline: () => {
-                    const timelineLocObj: TimelineLocationProps = action.payload.timelineLocObj;
-                    const timeline: TimelineLocationProps[] = state.timeline;
-
-                    for (let i = 0; i < timeline.length; i++) {
-                        if (timeline[i].docId == timelineLocObj.docId) {
-                            timeline[i] = timelineLocObj
-                            break;
-                        }
-                    }
-
-                    return [...timeline]
-                }
-            }
         default:
             return state;
     }

@@ -1,5 +1,5 @@
 import { fireDb } from '../../../App';
-import { StateZipProps } from '../../../services/user/tsTypes'
+import { StateZipProps } from '../../../services/user/user.types'
 import { Profile, Locations } from '../../../utils/variables';
 
 export const updateProfileLocationStateZip = async (uid: string, userStateZip: StateZipProps) => {

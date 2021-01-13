@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { FlatList, View, StyleSheet, Image, ListRenderItemInfo, Text } from 'react-native';
-import { GalleryItemProps } from '../../services/user/tsTypes';
+import { GalleryItemProps } from '../../services/user/user.types';
 import { colors } from '../../utils/styles';
 import { cacheImage } from '../../utils/functions';
 import _ from 'lodash';
 import { NearByUsersProps } from '../../services/near_users/tsTypes';
 
 interface GalleryComProps {
-    gallery: (GalleryItemProps & { nearbyUserCachedUrl?: string | void | undefined })[]
+    gallery: GalleryItemProps[];
     nearByUser?: true
 }
 
@@ -16,8 +16,8 @@ export default ({ gallery, nearByUser }: GalleryComProps) => {
     const renderItem = ({ item, index }: ListRenderItemInfo<GalleryItemProps>) => {
         var uri: string = '';
         if (nearByUser) {
-            const { nearbyUserCachedUrl, url } = gallery[index];
-            uri = nearbyUserCachedUrl ? nearbyUserCachedUrl : url
+            const { url, nearUserUri } = gallery[index];
+            uri = nearUserUri ? nearUserUri : url
 
         } else {
             const { cachedUrl, url } = gallery[index]

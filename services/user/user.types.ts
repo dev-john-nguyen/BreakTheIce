@@ -10,9 +10,11 @@ export interface UserActionProps {
         placesVisited: PlaceProp[],
         timelineLocDocId: string,
         timelineLocObj: TimelineLocationProps,
-        gallery: GalleryItemProps[]
+        gallery: GalleryItemProps[],
+        locationListener: { remove: () => void }
     }
 }
+
 export interface StateCityProps {
     state: string;
     city: string
@@ -24,6 +26,7 @@ export interface GalleryItemProps {
     updatedAt: Date;
     id: string;
     cachedUrl?: string;
+    nearUserUri?: string;
     name: string;
 }
 
@@ -36,6 +39,16 @@ export interface NewGalleryItemProps {
     description: string;
     updatedAt?: Date;
     cachedUrl?: string;
+    removed?: boolean
+}
+
+export interface UserProfilePreviewProps {
+    uid: string;
+    username: string;
+    bioShort: string;
+    location: LocationObject;
+    age: number;
+    hideOnMap: boolean;
 }
 
 export interface UserRootStateProps {
@@ -48,26 +61,31 @@ export interface UserRootStateProps {
     bioLong: string;
     bioShort: string;
     gender: string;
-    isPrivate: boolean;
     gallery: GalleryItemProps[];
+    hideOnMap: boolean;
+    offline: boolean;
     fetchFail?: boolean;
-    timeline?: TimelineLocationProps[]
+    locationListener?: { remove: () => void }
+}
+
+export interface UpdateUserProfileProps {
+    name: string;
+    bioShort: string;
+    bioLong: string;
+    age: number;
+    gender: string;
+}
+
+export interface UpdateUserPrivacyProps {
+    offline: boolean;
+    hideOnMap: boolean;
 }
 
 export interface UserDispatchActionsProps {
     set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => void;
-    update_profile: (data: any) => void
+    update_profile: (updatedProfileData: UpdateUserProfileProps) => Promise<any>;
+    update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => void;
-    // update_timeline_places_visited: (uid: string, locationDocId: string, placesVisited: PlaceProp[]) => Promise<PlaceProp[] | void>;
-    // add_timeline_location: (newLocation: Omit<TimelineLocationProps, 'docId'>) => Promise<void | boolean | undefined>;
+    go_offline: () => void;
+    go_online: () => void;
 }
-
-// export interface UserProfileProps {
-//     uid: string;
-//     name: string;
-//     age: number;
-//     bioLong: string;
-//     bioShort: string;
-//     gender: string;
-//     stateCity: StateCityProps;
-// }

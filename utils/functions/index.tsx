@@ -36,6 +36,7 @@ export async function cacheImage(image: string) {
         })
         .catch(err => {
             console.log(err)
+            return ''
         })
 
     // if (cachedImage) {

@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { ProfileScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
-import { colors, buttonsStyles, modalStyle } from '../../utils/styles';
+import { colors, buttonsStyles } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';
 import { set_error } from '../../services/utils/actions';
 import { InvitationsRootProps } from '../../services/invitations/tsTypes';
-import { UserRootStateProps } from '../../services/user/tsTypes';
+import { UserRootStateProps } from '../../services/user/user.types';
 import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg } from '../../utils/svgs';
 import InvitationModal from '../modal/InvitationModal';
-import { set_current_profile, remove_current_profile } from '../../services/profile/actions';
-import { ProfileDispatchActionProps, TimelineLocationProps } from '../../services/profile/tsTypes';
+import { set_current_profile } from '../../services/profile/actions';
+import { ProfileDispatchActionProps, ProfileUserProps } from '../../services/profile/tsTypes';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
 
@@ -32,7 +32,7 @@ interface ProfileProps {
 //Summary
 ///Profile shows the whole profile of the user depending on if the user is PRIVATE or not
 const Profile = (props: ProfileProps) => {
-    const [profileUser, setProfileUser] = useState<NearByUsersProps>();
+    const [profileUser, setProfileUser] = useState<ProfileUserProps>();
     const [notFound, setNotFound] = useState<boolean>(false);
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
 
@@ -56,7 +56,7 @@ const Profile = (props: ProfileProps) => {
             })
             .catch(err => {
                 console.log(err)
-                props.set_error("Oops! Looks like we had trouble fetching the profile.", "error")
+                mount && setNotFound(true)
             })
 
         //remove on unmount
@@ -65,9 +65,10 @@ const Profile = (props: ProfileProps) => {
 
     }, [props.route, props.outboundInvitations])
 
-    if (!profileUser) return (<View><ActivityIndicator /></View>)
 
     if (notFound) return (<View><Text>Not Found</Text></View>)
+
+    if (!profileUser) return (<View><ActivityIndicator /></View>)
 
     const baseText = (text: string | number, additionalStyle: Object) => (
         <Text style={[styles.base_text, additionalStyle]}>

@@ -9,6 +9,7 @@ import { RootProps } from '../../services';
 import { set_error } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
+import { CustomButton } from '../../utils/components';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
@@ -23,6 +24,8 @@ const Me = ({ navigation, user, set_error }: MeProps) => {
             {text}
         </Text>
     )
+
+    const directToGallery = () => navigation.navigate('EditGallery')
 
     return (
         <View style={styles.container}>
@@ -45,6 +48,7 @@ const Me = ({ navigation, user, set_error }: MeProps) => {
             <View style={styles.bio}>
                 {baseText(user.bioLong, { fontSize: 12 })}
             </View>
+            <CustomButton type='primary' text='Edit Gallery' onPress={directToGallery} />
             <Gallery gallery={user.gallery} />
         </View>
     )

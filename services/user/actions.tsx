@@ -1,26 +1,19 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY } from './actionTypes';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
 import { set_loading, remove_loading, set_status_bar, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps } from './tsTypes';
+import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps } from './user.types';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
 import { validate_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
-import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb } from '../../utils/variables'
-import { SET_MESSAGES } from '../chat/actionTypes';
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, LocationsUsersDb, LocationsDb, UsersDb } from '../../utils/variables'
 import { SET_ERROR } from '../utils/actionTypes';
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
-import { cacheImage } from '../../utils/functions';
 
 // import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
 // const baseUrl = 'http://localhost:5050';
-
-interface FetchUserProps {
-    profile: UserRootStateProps;
-    chatIds: Array<any>;
-}
 
 export const verifyAuth = (): any => (dispatch: AppDispatch) => {
     myFire.auth().onAuthStateChanged(async (user) => {
@@ -28,7 +21,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
         if (user) {
 
             //get the user profile and chatIds
-            var fetchUserRes: FetchUserProps | undefined;
+            var fetchUserRes: { profile: UserRootStateProps } | undefined;
 
             try {
                 fetchUserRes = await fetch_profile(user.uid)
@@ -45,7 +38,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                     if (fetchUserRes.profile) {
 
                         //cache images
-                        fetchUserRes.profile.gallery = await cache_user_images(fetchUserRes.profile.gallery)
+                        fetchUserRes.profile.gallery = await cache_user_images(fetchUserRes.profile.gallery, 'cachedUrl')
 
                         dispatch({
                             type: SET_USER,
@@ -90,6 +83,12 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
 
 export const set_and_listen_user_location = (stateCity: StateCityProps, location: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
+    //check if user is offline
+    if (getState().user.offline) {
+        return dispatch(set_banner('you are offline', 'warning'))
+    }
+
+
     try {
         //batch operation to init user location and perform the nesscary updates
         await fireDb_init_user_location(getState().user, stateCity, location);
@@ -101,7 +100,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
         })
     }
 
-    Location.watchPositionAsync({ distanceInterval: locationDistanceIntervalToUpdate }, async (newLocation) => {
+    const locationListener = await Location.watchPositionAsync({ distanceInterval: locationDistanceIntervalToUpdate }, async (newLocation) => {
         //to allow user to go back to location region
         // this.setState({ userLocation: newLocation })
 
@@ -121,8 +120,9 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
         if ((newLocation.coords.speed && newLocation.coords.speed > locationSpeedToUpdate)) return;
 
         //update user location in the server
+
         try {
-            await fireDb_update_user_location(getState().user, newLocation);
+            await fireDb_update_user_location(user.uid, user.stateCity, newLocation);
         } catch (e) {
             console.log(e)
             dispatch({
@@ -146,21 +146,15 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
         type: SET_LOCATION,
         payload: {
             stateCity: stateCity,
-            location: location
+            location: location,
+            locationListener
         }
     })
 }
 
 export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    // if (newGallery.length < 1) {
-    //     return dispatch({
-    //         type: SET_ERROR,
-    //         payload: 'No images found.'
-    //     })
-    // }
-
-    if (newGallery.length > 4) {
+    if (newGallery.length > 5) {
         return dispatch(set_banner('Exceeds the maxium number of images of 5.', 'error'))
     }
 
@@ -170,7 +164,19 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
     //process items that only have blobs
 
     for (let i = 0; i < newGallery.length; i++) {
-        var { blob, description, id, url, updatedAt, name } = newGallery[i]
+        var { blob, description, id, url, updatedAt, name, removed } = newGallery[i]
+
+        if (removed) {
+            var path: string = `${uid}/gallery/${name}`;
+            fireStorage.ref().child(path).delete()
+                .then(() => {
+                    console.log('successfully deleted')
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+            continue;
+        }
 
         if (blob) {
             var path: string = `${uid}/gallery/${name}`;
@@ -178,7 +184,7 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
             var uploadTask = fireStorage.ref().child(path).put(blob)
 
             try {
-                await fireStorage_task_listener(uploadTask, dispatch, i, newGallery.length)
+                await image_task_listener(uploadTask, dispatch, i, newGallery.length)
                     .then((genUrl: string) => gallery.push({ url: genUrl, description, updatedAt: newUpdatedAt, id, name }))
             } catch (e) {
                 dispatch(set_banner(e, 'error'))
@@ -190,20 +196,20 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         }
     }
 
-
-    // if (gallery.length < 1) {
-    //     return dispatch(set_banner('No images found', 'error'))
-    // }
-
     fireDb.collection(UsersDb).doc(uid).set({
         gallery: gallery
     }, { merge: true })
-        .then(() => {
-            dispatch(set_status_bar(0));
+        .then(async () => {
+            //cache images and update gallery
+
+            const cachedGallery = await cache_user_images(gallery, 'cachedUrl')
+
             dispatch({
                 type: SET_GALLERY,
-                payload: { gallery }
+                payload: { gallery: cachedGallery }
             });
+
+            dispatch(set_status_bar(0));
             dispatch(set_banner('Gallery successfully updated!', 'success'));
         })
         .catch(err => {
@@ -214,7 +220,7 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         })
 }
 
-async function fireStorage_task_listener(uploadTask: firebase.storage.UploadTask, dispatch: AppDispatch, index: number, galleryLen: number): Promise<string> {
+async function image_task_listener(uploadTask: firebase.storage.UploadTask, dispatch: AppDispatch, index: number, galleryLen: number): Promise<string> {
 
     return new Promise(function (resolve, reject) {
         // Listen for state changes, errors, and completion of the upload.
@@ -268,155 +274,57 @@ async function fireStorage_task_listener(uploadTask: firebase.storage.UploadTask
     })
 }
 
+export const go_offline = () => (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid, stateCity, locationListener } = getState().user
 
-export const update_profile = () => {
+    //remove listener
+    if (locationListener) locationListener.remove()
 
+    var batch = fireDb.batch()
+
+    const locationRef = fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(uid)
+
+    const userRef = fireDb.collection(UsersDb).doc(uid)
+
+    batch.update(userRef, { offline: true })
+
+    batch.delete(locationRef)
+
+    batch.commit()
+        .then(() => {
+            dispatch({ type: GO_OFFILINE })
+        })
+        .catch(err => {
+            console.log(err)
+            dispatch(set_banner('Failed to go offiline.', 'error'))
+        })
 }
 
+export const go_online = () => (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid } = getState().user
 
+    fireDb.collection(UsersDb).doc(uid).update({ offline: false })
+        .then(() => dispatch({ type: GO_ONLINE }))
+        .catch((err) => {
+            console.log(err)
+            dispatch(set_banner('Oops! Failed to go offline. Please try again.', 'error'))
+        })
+}
 
+export const update_profile = (updatedProfileVals: UpdateUserProfileProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-// export const update_timeline_places_visited = (uid: string, timelineLocDocId: string, placesVisited: PlaceProp[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-//     if (uid !== getState().user.uid) {
-//         dispatch({
-//             type: SET_ERROR,
-//             payload: 'Invalid user id. Cannot proceed to save the updates.'
-//         })
-//         return;
-//     }
+    const { uid } = getState().user;
 
-//     //splice out the placesVisted that have removed as true
-//     for (let i = 0; i < placesVisited.length; i++) {
-//         //splice if removed is true
-//         if (placesVisited[i].removed) {
-//             placesVisited.splice(i, 1)
-//         }
-//     }
+    await fireDb.collection(UsersDb).doc(uid).update(updatedProfileVals);
+    dispatch({ type: UPDATE_PROFILE, payload: updatedProfileVals });
+    dispatch(set_banner('Saved', 'success'));
+}
 
-//     return fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).doc(timelineLocDocId).update({ placesVisited: placesVisited })
-//         .then(() => {
-//             dispatch({
-//                 type: UPDATE_PLACES_VISITED,
-//                 payload: { placesVisited, timelineLocDocId }
-//             })
+export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-//             return placesVisited
-//         })
-//         .catch(err => {
-//             console.log(err)
-//             dispatch({
-//                 type: SET_ERROR,
-//                 payload: 'Oops! Something went wrong with updating your edits.'
-//             })
-//         })
-// }
+    const { uid } = getState().user;
 
-// export const add_timeline_location = (newLocation: Omit<TimelineLocationProps, 'docId'>) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-//     const uid = getState().user.uid;
-
-//     if (!uid) {
-//         dispatch(set_banner("Sorry, it looks like we are having trouble find your user id.", "error"))
-//         return;
-//     }
-
-//     return await fireDb.collection(UsersDb).doc(uid).collection(UsersTimelineDb).add(newLocation)
-//         .then((resObj) => {
-
-//             if (!resObj.id) throw new Error("DocId was not found in the object response");
-
-//             const addedLocation: TimelineLocationProps = {
-//                 ...newLocation,
-//                 docId: resObj.id
-//             }
-
-//             dispatch({
-//                 type: ADD_NEW_TIMELINE_LOCATION,
-//                 payload: addedLocation
-//             })
-
-//             dispatch(set_banner(`${newLocation.city} successfully created!`, 'success'))
-
-//             //success
-//             return true
-
-//         })
-//         .catch((err) => {
-//             console.log(err);
-//             dispatch(set_banner(`Oops! Something went wrong saving ${newLocation.city}.`, 'error'))
-//         })
-// }
-
-
-// export const update_user_location = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-//     if (!newLocation.coords) return;
-
-//     try {
-//         await fireDb_update_user_location(getState().user, newLocation);
-//     } catch (e) {
-//         console.log(e)
-//         return
-//     }
-
-//     return dispatch({
-//         type: UPDATE_LOCATION,
-//         payload: { location }
-//     })
-// }
-
-// export const set_user_location = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
-//     if (!newLocation.coords) return;
-
-//     try {
-//         //update server user location and remove coords from Location collection if need be
-//         await fireDb_update_state_city(uid, stateCity);
-
-//         //update Location collection with the users current zip
-//         await fireDb_update_user_location(getState().user, newLocation);
-
-//     } catch (e) {
-//         console.log(e)
-//     }
-
-//     return dispatch({
-//         type: SET_LOCATION,
-//         payload: {
-//             stateCity: stateCity,
-//             location: location
-//         }
-//     })
-// }
-
-// export const sign_up = (email: string, password: string) => async (dispatch: AppDispatch) => {
-
-//     firebase.auth().createUserWithEmailAndPassword(email, password)
-//         .then((user) => {
-//             console.log(user)
-//             // Signed in 
-//             // ...
-//         })
-//         .catch((error) => {
-//             console.log(error)
-//             var errorCode = error.code;
-//             var errorMessage = error.message;
-//         });
-
-    // var response;
-
-    // try {
-    //     response = await axios.post(baseUrl + '/signup', { username, password })
-    // } catch (e) {
-    //     console.log(e)
-    //     return dispatch({
-    //         type: SET_ERROR,
-    //         payload: 'Something went wrong'
-    //     })
-    // }
-
-    // console.log(response.data)
-    // return;
-
-    // dispatch({
-    //     type: SIGN_UP,
-    //     payload: response.data
-    // })
-// }
+    await fireDb.collection(UsersDb).doc(uid).update(updatedPrivacyData);
+    dispatch({ type: UPDATE_PRIVACY, payload: updatedPrivacyData });
+    dispatch(set_banner('Saved', 'success'));
+}

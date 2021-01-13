@@ -3,12 +3,12 @@ import { View, Image, StyleSheet, TextInput, Pressable, KeyboardAvoidingView } f
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
-import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/tsTypes';
+import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/user.types';
 import { connect } from 'react-redux';
 import * as Progress from 'react-native-progress';
 import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
-import { UserDispatchActionsProps } from '../../../services/user/tsTypes';
+import { UserDispatchActionsProps } from '../../../services/user/user.types';
 import { UtilsRootStateProps, UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { SaveSvg, MinusSvg } from '../../../utils/components';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
@@ -41,11 +41,11 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
                     {statusBar ?
                         <Progress.Bar progress={statusBar} color={colors.white} width={120} /> :
                         <>
-                            <Pressable onPress={pickImage} style={{ marginRight: 5 }}>
-                                {({ pressed }) => <Feather name='plus-circle' size={30} color={pressed ? colors.secondary : colors.white} />}
+                            <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
+                                {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.white} />}
                             </Pressable >
                             <Pressable onPress={handleSaveGallery}>
-                                {({ pressed }) => <SaveSvg pressed={pressed} />}
+                                {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.white} />}
                             </Pressable >
                         </>
                     }
@@ -87,7 +87,7 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
             // const manipResult = await ImageManipulator.manipulateAsync(
             //     result.uri,
             //     [{ resize: { width: 500, height: 500 } }],
-            //     { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+            //     { compress: 1, format:ß ImageManipulator.SaveFormat.PNG }
             // );
             const manipResult = await ImageManipulator.manipulateAsync(
                 result.uri,
@@ -111,10 +111,10 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
             }
 
             //generate the image name
-            //might be an issue if the user what's to adjust the photo in some way and resubmit it
-            var name: string = hashCode(manipResult.uri)
 
-            console.log(name)
+            //might be an issue if the user what's to adjust the photo in some way and resubmit it ** resolved .. realized manipulate will return a diff uri
+
+            var name: string = hashCode(manipResult.uri)
 
             imgObjs.unshift({
                 uri: manipResult.uri,
@@ -129,8 +129,16 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
     };
 
     const handleRemoveGalleryItem = (id: string) => {
-        var newImgObjs = imgObjs.filter(item => item.id !== id);
-        setImgObjs(newImgObjs)
+        //find item and set removed to true
+        var index = imgObjs.findIndex(item => item.id === id);
+
+        if (index !== undefined) {
+            imgObjs[index].removed = true
+        } else {
+            return set_banner('Issues removing the image', 'error')
+        }
+
+        setImgObjs([...imgObjs])
     }
 
     const handleSaveGallery = () => {
@@ -159,15 +167,10 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
             onLongPress={drag}
         >
             <View style={[styles.image_content, isActive && styles.image_content_drag]}>
-                <MinusSvg styles={styles.minus_svg} onPress={() => handleRemoveGalleryItem(item.id)} />
+                {item.removed ? <Feather name='trash-2' size={30} color={colors.red} style={styles.trash} /> : <Feather name='trash' size={30} color={colors.white} onPress={() => handleRemoveGalleryItem(item.id)} style={styles.trash} />}
                 <Image
                     source={{ uri: item.uri ? item.uri : item.cachedUrl ? item.cachedUrl : item.url, cache: 'force-cache' }} style={styles.image}
-
                 />
-                {/* <Image
-                    source={{ uri: item.cachedUrl, cache: 'only-if-cached' }} style={styles.image}
-
-                /> */}
                 <TextInput
                     style={styles.image_description_input}
                     placeholder="Add a description... (100 character limit)"
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
         paddingTop: 30,
         paddingBottom: 10,
     },
-    minus_svg: {
+    trash: {
         position: 'absolute',
         top: 5,
         right: 5,

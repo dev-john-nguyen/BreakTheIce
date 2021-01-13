@@ -9,7 +9,7 @@ import profileReducer from './profile/reducer';
 
 import { NearUsersRootProps } from './near_users/tsTypes';
 import { UtilsRootStateProps } from './utils/tsTypes';
-import { UserRootStateProps } from './user/tsTypes';
+import { UserRootStateProps } from './user/user.types';
 import { InvitationsRootProps } from './invitations/tsTypes';
 import { FriendsRootProps } from './friends/tsTypes';
 import { ChatRootProps } from './chat/tsTypes';

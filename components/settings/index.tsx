@@ -1,44 +1,92 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableHighlight, Pressable, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { connect } from 'react-redux';
+import { update_profile, update_privacy } from '../../services/user/actions';
 import { colors } from '../../utils/styles';
-import { SettingsSvg, EditSvg, PortraitSvg } from '../../utils/components';
 import { MeStackNavigationProp } from '../navigation/utils';
+import EditProfile from './components/EditProfile';
+import Privacy from './components/Privacy';
+import { RootProps } from '../../services';
+import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/user.types';
+import { set_banner } from '../../services/utils/actions';
+import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 
-const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
+interface SettingsProps {
+    navigation: MeStackNavigationProp;
+    user: UserRootStateProps;
+    update_profile: UserDispatchActionsProps['update_profile'];
+    update_privacy: UserDispatchActionsProps['update_privacy'];
+    set_banner: UtilsDispatchActionProps['set_banner']
+}
+
+enum TargetOptions {
+    profile,
+    privacy,
+    password,
+    contacts
+}
+
+const Settings = ({ navigation, user, update_profile, set_banner, update_privacy }: SettingsProps) => {
+    const [target, setTarget] = useState<TargetOptions>(TargetOptions.profile)
+
+    const RenderTarget = () => {
+        switch (target) {
+            case TargetOptions.privacy:
+                return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
+            case TargetOptions.profile:
+            default:
+                return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} />
+        }
+    }
+
     return (
         <View style={styles.container}>
-            <TouchableHighlight
-                style={styles.item_container}
-                onPress={() => navigation.navigate("EditGallery")}
-                underlayColor={colors.secondary}
-            >
-                <View style={styles.content}>
-                    <PortraitSvg />
-                    <Text style={styles.text}>Edit Gallery</Text>
-                </View>
-            </TouchableHighlight>
+            <View style={styles.options_content}>
+                <TouchableHighlight
+                    style={[styles.item_container, target === TargetOptions.profile && styles.active]}
+                    onPress={() => setTarget(TargetOptions.profile)}
+                    underlayColor={colors.secondary}
+                >
+                    <View style={styles.content}>
+                        <Text style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Edit Profile</Text>
+                    </View>
+                </TouchableHighlight>
 
-            <TouchableHighlight
-                style={styles.item_container}
-                onPress={() => navigation.navigate("EditProfile")}
-                underlayColor={colors.secondary}
-            >
-                <View style={styles.content}>
-                    <EditSvg />
-                    <Text style={styles.text}>Edit Profile</Text>
-                </View>
-            </TouchableHighlight>
+                <TouchableHighlight
+                    style={[styles.item_container, target === TargetOptions.privacy && styles.active]}
+                    onPress={() => setTarget(TargetOptions.privacy)}
+                    underlayColor={colors.secondary}
+                >
+                    <View style={styles.content}>
+                        <Text style={[styles.text, target === TargetOptions.privacy && styles.active_text]}>Privacy</Text>
+                    </View>
+                </TouchableHighlight>
 
-            <TouchableHighlight
-                style={styles.item_container}
-                onPress={() => navigation.navigate("GeneralSettings")}
-                underlayColor={colors.secondary}
-            >
-                <View style={styles.content}>
-                    <SettingsSvg />
-                    <Text style={styles.text}>General Settings</Text>
-                </View>
-            </TouchableHighlight>
+                <TouchableHighlight
+                    style={styles.item_container}
+                    onPress={() => setTarget(TargetOptions.password)}
+                    underlayColor={colors.secondary}
+                >
+                    <View style={styles.content}>
+                        <Text style={styles.text}>Change Password</Text>
+                    </View>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    style={styles.item_container}
+                    onPress={() => setTarget(TargetOptions.contacts)}
+                    underlayColor={colors.secondary}
+                >
+                    <View style={styles.content}>
+                        <Text style={styles.text}>Manage Contacts</Text>
+                    </View>
+                </TouchableHighlight>
+            </View>
+            <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1 }}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <RenderTarget />
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
         </View>
     )
 }
@@ -46,30 +94,47 @@ const Settings = ({ navigation }: { navigation: MeStackNavigationProp }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: 'row'
+    },
+    options_content: {
+        flexBasis: '30%',
         alignItems: 'stretch',
-        justifyContent: 'center'
+        borderRightColor: colors.primary,
+        borderRightWidth: 1
+    },
+    active: {
+        backgroundColor: colors.secondary
+    },
+    active_text: {
+        fontSize: 10,
+        color: colors.white
+    },
+    target_content: {
+        flex: 1,
+        marginTop: 10
     },
     item_container: {
-        borderBottomWidth: 2,
-        borderTopWidth: 2,
         borderBottomColor: colors.primary,
+        borderBottomWidth: 1,
         borderTopColor: colors.primary,
+        borderTopWidth: 1,
+        paddingTop: 10,
+        paddingBottom: 10,
         position: 'relative',
         alignItems: 'center',
-        marginBottom: 20
+        marginTop: 20
     },
     content: {
-        flexDirection: 'row',
-        padding: 20,
-        width: '50%',
-        justifyContent: 'space-evenly',
         alignItems: 'center'
     },
     text: {
-        fontSize: 12,
+        fontSize: 10,
         color: colors.primary
     }
 })
 
+const mapStateToProps = (state: RootProps) => ({
+    user: state.user,
+})
 
-export default Settings;
+export default connect(mapStateToProps, { update_profile, set_banner, update_privacy })(Settings);

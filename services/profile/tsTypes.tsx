@@ -1,4 +1,5 @@
 import { NearByUsersProps } from '../near_users/tsTypes';
+import { UserRootStateProps } from '../user/user.types';
 
 export interface TimelineActionProp {
     type: string;
@@ -30,9 +31,10 @@ export interface PlaceProp {
 }
 
 
+export interface ProfileUserProps extends UserRootStateProps, NearByUsersProps { }
+
 export interface ProfileRootProps {
-    current: NearByUsersProps;
-    history: any;
+    history: ProfileUserProps[];
 }
 
 export interface TimelineRootProps {
@@ -47,6 +49,6 @@ export interface TimelineDispatchActionProps {
 
 export interface ProfileDispatchActionProps {
     set_timeline: (uid: string) => void;
-    set_current_profile: (profileUid: string) => Promise<void | NearByUsersProps>;
+    set_current_profile: (profileUid: string) => Promise<void | ProfileUserProps>;
     remove_current_profile: () => void;
 }

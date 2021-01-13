@@ -2,7 +2,7 @@ import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET
 import { SET_ERROR } from '../utils/actionTypes';
 import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './tsTypes';
-import { UserRootStateProps } from '../user/tsTypes';
+import { UserRootStateProps } from '../user/user.types';
 import { fireDb } from '../firebase';
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';

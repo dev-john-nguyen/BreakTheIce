@@ -1,8 +1,5 @@
 import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, UPDATE_INVITE_NEAR_USER } from './actionTypes'
 import { NearUsersActionProps, NearUsersRootProps } from './tsTypes';
-import { UserRootStateProps } from '../user/tsTypes';
-import { UPDATE_TIMELINE_NEAR_USER } from '../profile/actionTypes';
-import { LocationHistoryProps } from '../profile/tsTypes';
 
 const INITIAL_STATE = {
     nearBy: [],
@@ -39,17 +36,6 @@ export default (state: NearUsersRootProps = INITIAL_STATE, action: NearUsersActi
                     break;
                 }
             }
-            return state;
-        case UPDATE_TIMELINE_NEAR_USER:
-            const payload = action.payload as { uid: string, timeline: LocationHistoryProps[] };
-
-            for (let i = 0; i < state.all.length; i++) {
-                if (payload.uid === state.all[i].uid) {
-                    state.all[i].timeline = payload.timeline
-                    break;
-                }
-            }
-
             return state;
         default:
             return state
