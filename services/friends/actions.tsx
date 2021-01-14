@@ -1,13 +1,21 @@
-import { SET_FRIENDS } from './actionTypes';
+import { SET_FRIENDS, INIT_FRIENDS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { FriendObjProps } from './tsTypes';
 import { SET_ERROR } from '../utils/actionTypes';
+import { RootProps } from '..';
+import { set_banner } from '../utils/actions';
 
-export const set_and_listen_friends = (uid: string) => (dispatch: AppDispatch) => {
+export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid } = getState().user;
 
-    fireDb.collection(FriendsDb).doc(uid).collection(FriendsUsersDb).onSnapshot((querySnapShot) => {
+    if (!uid) {
+        dispatch(set_banner("Failed to find your user id.", "error"))
+        return;
+    }
+
+    const friendListener = fireDb.collection(FriendsDb).doc(uid).collection(FriendsUsersDb).onSnapshot((querySnapShot) => {
         //prepare friendsArr
         var friendsArr: Array<FriendObjProps> = [];
 
@@ -39,5 +47,10 @@ export const set_and_listen_friends = (uid: string) => (dispatch: AppDispatch) =
         })
     })
 
-    return Promise.resolve('success')
+    dispatch({
+        type: INIT_FRIENDS,
+        payload: { friendListener }
+    })
+
+    return friendListener
 }

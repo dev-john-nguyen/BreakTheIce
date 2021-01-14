@@ -1,15 +1,16 @@
 
-import { UserRootStateProps } from '../user/user.types';
+import { UserRootStateProps } from '../user/types';
 
 export interface InvitationsActionProps {
     type: string;
-    payload?: Array<InvitationObject>;
+    payload: { invitationListener: () => void };
 }
 
 export interface InvitationsRootProps {
     inbound: Array<InvitationObject>
     outbound: Array<InvitationObject>
     fetched: boolean;
+    invitationListener?: () => void;
 }
 
 export enum InvitationStatusOptions {
@@ -32,6 +33,6 @@ export interface InvitationObject {
 
 export interface InvitationsDispatchActionProps {
     send_invitation: (invitationContent: InvitationObject) => Promise<any>;
-    set_and_listen_invitations: (uid: UserRootStateProps['uid']) => void;
+    set_and_listen_invitations: () => undefined | (() => void);
     update_inviter_invitation: (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => void;
 }

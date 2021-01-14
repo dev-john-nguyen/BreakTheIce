@@ -1,6 +1,6 @@
 import { fireDb } from '../firebase';
 import { LocationsDb, UsersDb } from '../../utils/variables';
-import { StateCityProps, UserRootStateProps, GalleryItemProps, UserProfilePreviewProps } from './user.types';
+import { StateCityProps, UserRootStateProps, GalleryItemProps, UserProfilePreviewProps } from './types';
 import { LocationObject } from 'expo-location';
 import { cacheImage } from '../../utils/functions';
 

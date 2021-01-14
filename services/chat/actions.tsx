@@ -4,20 +4,19 @@ import { AppDispatch } from '../../App';
 import { RootProps } from '../';
 import { ChatDb } from '../../utils/variables';
 import { SET_ERROR } from '../utils/actionTypes';
-import { ChatPreviewProps } from './tsTypes';
+import { ChatPreviewProps } from './types';
+import { set_banner } from '../utils/actions';
 
-export const set_and_listen_messages = (uid: string) => (dispatch: AppDispatch, getState: () => RootProps) => {
+export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    // const chatIds: Array<string> = getState().chat.ids;
-    if (!uid) return dispatch({
-        type: SET_ERROR,
-        payload: "Couldn't find your user id to fetch your messages"
-    });
+    const { uid, username } = getState().user;
 
-    //check if there are any messages
-    // if (chatIds.length < 1) return;
+    if (!uid) {
+        dispatch(set_banner("Failed to find your user id.", "error"))
+        return;
+    }
 
-    var fireDbChatListner = fireDb.collection(ChatDb).where('uids', 'array-contains', uid).onSnapshot(querySnapshot => {
+    var chatListener = fireDb.collection(ChatDb).where('usersInfo', 'array-contains', { uid, username }).onSnapshot(querySnapshot => {
         var chatPreviews: ChatPreviewProps[] = [];
 
         querySnapshot.docs.forEach(doc => {
@@ -52,21 +51,8 @@ export const set_and_listen_messages = (uid: string) => (dispatch: AppDispatch, 
     )
 
 
-    dispatch({ type: SET_FETCHED })
+    dispatch({ type: SET_FETCHED, payload: { chatListener } })
 
+    return chatListener
 
-    // fireDb.collection(ChatDb).where(firestore.FieldPath.documentId(), 'in', chatIds).get()
-    //     .then(()querySnapshot => {
-    //         querySnapshot.docs.forEach(doc => {
-    //             doc.ref.collection(ChatMessageDb).get()
-    //         })
-    //     })
-    // var  = fireDb.batch();
-
-    // for (let i = 0; i < chatIds.length; i++) {
-    //     var chatMessageRef = fireDb.collection(ChatDb).doc(chatIds[i]).collection(ChatMessageDb);
-
-    //     batch.
-    // }
-    // fireDb.collection(ChatDb).doc()collection(ChatMessageDb)
 }

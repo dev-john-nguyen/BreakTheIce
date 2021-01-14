@@ -13,7 +13,7 @@ import Me from '../../me';
 import Settings from '../../settings';
 import EditGallery from '../../gallery/components/Edit';
 import { screenOptions } from '../Header';
-import { ChatPreviewProps } from '../../../services/chat/tsTypes';
+import { ChatPreviewProps } from '../../../services/chat/types';
 import { SettingsSvgHeader } from '../../../utils/components';
 import { NearByUsersProps } from '../../../services/near_users/tsTypes';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -52,6 +52,7 @@ export type RootBottomParamList = {
         initial?: boolean;
         params: {
             targetUser: NearByUsersProps;
+            title: string;
         }
     };
 }
@@ -96,7 +97,7 @@ type MeStackParams = {
 }
 
 
-export type NearByListNavProp = BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp;
+export type HomeToChatNavProp = BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp;
 
 export type HomeScreenRouteProp = RouteProp<HomeStackParams, "Home" | "NearByList" | "Profile">;
 export type ProfileScreenRouteProp = RouteProp<HomeStackParams, "Profile">;

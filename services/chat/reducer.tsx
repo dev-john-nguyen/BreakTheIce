@@ -1,16 +1,16 @@
 import { SET_MESSAGES, SET_CHAT_PREVIEWS, SET_FETCHED } from './actionTypes';
-import { ChatActionProps, ChatRootProps } from './tsTypes';
+import { ChatActionProps, ChatRootProps } from './types';
 
 const INITIAL_STATE = {
     fetched: false,
     ids: [],
     rooms: [],
     previews: [],
-    fbListener: ''
+    chatListener: undefined
 }
 
 
-export default (state: ChatRootProps = INITIAL_STATE, action: ChatActionProps) => {
+export default (state = INITIAL_STATE, action: ChatActionProps) => {
     switch (action.type) {
         case SET_CHAT_PREVIEWS:
             return {
@@ -24,7 +24,8 @@ export default (state: ChatRootProps = INITIAL_STATE, action: ChatActionProps) =
         case SET_FETCHED:
             return {
                 ...state,
-                fetched: true
+                fetched: true,
+                chatListener: action.payload.chatListener
             }
         default:
             return state;

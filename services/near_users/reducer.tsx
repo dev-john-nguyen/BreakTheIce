@@ -1,20 +1,25 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, UPDATE_INVITE_NEAR_USER } from './actionTypes'
+import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, UPDATE_INVITE_NEAR_USER, INIT_NEAR_USERS } from './actionTypes'
 import { NearUsersActionProps, NearUsersRootProps } from './tsTypes';
 
 const INITIAL_STATE = {
     nearBy: [],
     all: [],
-    fetched: false
+    fetched: false,
+    nearUsersListener: undefined
 }
 
-export default (state: NearUsersRootProps = INITIAL_STATE, action: NearUsersActionProps) => {
+export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
     switch (action.type) {
         case SET_NEAR_USERS:
-            let payloadSet = action.payload as NearUsersRootProps
             return {
-                nearBy: payloadSet.nearBy,
-                all: payloadSet.all,
+                nearBy: action.payload.nearBy,
+                all: action.payload.all,
                 fetched: true
+            }
+        case INIT_NEAR_USERS:
+            return {
+                ...state,
+                nearUsersListener: action.payload.nearUsersListener
             }
         case REMOVE_NEAR_USERS:
             return {
@@ -22,10 +27,9 @@ export default (state: NearUsersRootProps = INITIAL_STATE, action: NearUsersActi
                 fetched: false
             }
         case UPDATE_NEAR_USERS:
-            let payloadUpdate = action.payload as NearUsersRootProps
             return {
                 ...state,
-                nearBy: payloadUpdate.nearBy
+                nearBy: action.payload.nearBy
             }
         case UPDATE_INVITE_NEAR_USER:
             //find the nearUser in nearBy and update sentInvite to true

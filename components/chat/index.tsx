@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { ProfileImg } from '../../utils/components';
 import { ChatScreenRouteProp, ChatStackNavigationProp } from '../navigation/utils'
 import { RootProps } from '../../services';
-import { ChatPreviewProps } from '../../services/chat/tsTypes'
+import { ChatPreviewProps } from '../../services/chat/types'
 interface ChatProps {
     navigation: ChatStackNavigationProp;
     route: ChatScreenRouteProp;
@@ -22,8 +22,8 @@ const Chat = (props: ChatProps) => {
         setChatPreviews([...props.chat.previews])
     }, [props.chat.previews])
 
-    const handleRedirectToMessage = (preview: ChatPreviewProps, unread: boolean) => {
-        props.navigation.push('Message', { msgDocId: preview.docId, unread });
+    const handleRedirectToMessage = (preview: ChatPreviewProps) => {
+        props.navigation.push('Message', { msgDocId: preview.docId, unread: preview.unread, title: renderFriendUsername(preview.usersInfo) });
     }
 
     const renderFriendUsername = (userInfo: ChatPreviewProps['usersInfo']) => {
@@ -71,7 +71,7 @@ const Chat = (props: ChatProps) => {
                 return (
                     <TouchableHighlight
                         key={item.docId ? item.docId : index.toString()}
-                        onPress={() => handleRedirectToMessage(item, unread)}
+                        onPress={() => handleRedirectToMessage(item)}
                         underlayColor={colors.secondary}
                         style={list_style.container}
                     >

@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions, StyleProp } from 'react-native';
 import { connect } from 'react-redux';
 import { remove_error, remove_banner } from '../services/utils/actions';
@@ -12,6 +12,12 @@ import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
 import { colors } from '../utils/styles';
+import { InvitationsDispatchActionProps } from '../services/invitations/tsTypes';
+import { FriendDispatchActionProps } from '../services/friends/tsTypes';
+import { ChatDispatchActionsProps } from '../services/chat/types';
+import { set_and_listen_invitations } from '../services/invitations/actions';
+import { set_and_listen_friends } from '../services/friends/actions';
+import { set_and_listen_messages } from '../services/chat/actions';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -20,7 +26,9 @@ interface Base {
     remove_error: () => void;
     remove_banner: () => void;
     user: RootProps['user'];
-
+    set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
+    set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
+    set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
 }
 
 const Base = (props: Base) => {
@@ -41,6 +49,29 @@ const Base = (props: Base) => {
         }
         else { return <Login /> }
     }
+
+    useEffect(() => {
+        //init and unsubscribe
+        var unsubscribeFriends: (() => void) | undefined,
+            unsubscribeInvitations: (() => void) | undefined,
+            unsubscribeChat: (() => void) | undefined;
+
+        const unsubscribeListeners = () => {
+            unsubscribeFriends && unsubscribeFriends()
+            unsubscribeInvitations && unsubscribeInvitations()
+            unsubscribeChat && unsubscribeChat()
+        }
+
+        if (props.user.uid) {
+            unsubscribeFriends = props.set_and_listen_friends();
+            unsubscribeInvitations = props.set_and_listen_invitations();
+            unsubscribeChat = props.set_and_listen_messages();
+        } else {
+            unsubscribeListeners()
+        }
+
+        return () => unsubscribeListeners()
+    }, [props.user.uid])
 
     const renderError = () => {
         const errorStyle = bannerStyles(props.utils.error.color)
@@ -133,4 +164,8 @@ const mapStateToProps = (state: RootProps) => ({
     user: state.user
 })
 
-export default connect(mapStateToProps, { remove_error, remove_banner })(Base)
+export default connect(mapStateToProps, {
+    remove_error, remove_banner, set_and_listen_invitations,
+    set_and_listen_friends,
+    set_and_listen_messages
+})(Base)

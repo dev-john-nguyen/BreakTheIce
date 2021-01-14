@@ -12,7 +12,8 @@ export const colors = {
     greyRed: '#ef4f4f',
     darkRed: '#c70039',
     darkGreen: '#16c79a',
-    lightGrey: '#eee'
+    lightGrey: '#dddddd',
+    black: '#1a1c20'
 }
 
 //font styles
@@ -123,12 +124,12 @@ export const buttonsStyles = StyleSheet.create({
         fontSize: 12,
         color: colors.primary
     },
-    button_inactive: {
+    button_disabled: {
         ...buttonBase,
-        borderColor: colors.secondary,
-        backgroundColor: colors.secondary
+        borderColor: colors.lightGrey,
+        backgroundColor: colors.lightGrey
     },
-    button_inactive_text: {
+    button_disabled_text: {
         fontSize: 12,
         color: colors.white
     },

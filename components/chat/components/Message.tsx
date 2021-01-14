@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { connect } from 'react-redux';
 import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { ProfileImg } from '../../../utils/components';
@@ -7,16 +7,16 @@ import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils
 import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
 import { ChatDb, ChatMessageDb } from '../../../utils/variables';
-import { MessageProps } from '../../../services/chat/tsTypes';
+import { MessageProps, ChatPreviewProps } from '../../../services/chat/types';
 import { RootProps } from '../../../services';
-import { set_error } from '../../../services/utils/actions';
+import { set_banner } from '../../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
     navigation: ChatStackNavigationProp;
     user: RootProps['user'];
-    set_error: UtilsDispatchActionProps['set_error']
+    set_banner: UtilsDispatchActionProps['set_banner']
 }
 
 const Message = (props: ComMessageProps) => {
@@ -43,38 +43,93 @@ const Message = (props: ComMessageProps) => {
             setMessages(messages)
         },
             err => {
-                props.set_error('Oops! Failed to get messages', 'error')
+                console.log(err)
+                props.set_banner('Oops! Failed to get messages', 'error')
                 setMessages('empty');
             }
         )
     }
 
+    const fetchChat = async () => {
+        const { user } = props;
+        const { targetUser } = props.route.params;
+
+        if (targetUser) {
+            return fireDb.collection(ChatDb)
+                .where('usersInfo', 'array-contains', { uid: user.uid, username: user.username })
+                .get()
+                .then(querySnapShot => {
+
+                    const docId = querySnapShot.docs.find(doc => {
+                        var chatFound: boolean = false
+
+                        if (doc.exists) {
+                            const { usersInfo } = doc.data() as ChatPreviewProps;
+
+                            usersInfo.forEach(userInfo => {
+                                if (userInfo.uid === targetUser.uid) {
+                                    chatFound = true
+                                }
+                            })
+                        }
+
+                        return chatFound
+                    })
+
+                    if (docId) {
+                        return docId.id
+                    }
+
+                    setMessages('empty')
+                })
+                .catch((err) => {
+                    console.log(err)
+                    props.set_banner('Oops! Something went wrong getting the chat messages.', 'error')
+                    setMessages('empty')
+                })
+        } else {
+            props.navigation.goBack()
+        }
+    }
 
     useEffect(() => {
         //route.params change remove listener and
         // const { msgDocId, targetUser } = props.route.params;
-        var unsubscribeMessages: () => void;
+        var unsubscribeMessages: () => void | undefined;
 
-        if (targetChatDocId) {
-            const { unread } = props.route.params;
+        const { targetUser, msgDocId, unread } = props.route.params;
 
+        if (msgDocId) {
             if (unread) {
                 //set message read
-                fireDb.collection(ChatDb).doc(targetChatDocId).set({ unread: false }, { merge: true })
+                fireDb.collection(ChatDb).doc(msgDocId).set({ unread: false }, { merge: true })
             }
             //check if docId can be found if not set error
-            unsubscribeMessages = dbListener(targetChatDocId)
+            unsubscribeMessages = dbListener(msgDocId)
+        } else if (targetUser) {
+            //search if message already exists between users
+            fetchChat()
+                .then((docId) => {
+                    if (docId) {
+                        unsubscribeMessages = dbListener(docId)
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         } else {
-            setMessages('empty')
-            props.navigation.setParams
+            props.set_banner('Unable to identify the target user.', 'error')
+            props.navigation.goBack()
         }
 
-        return () => unsubscribeMessages && unsubscribeMessages();
+        return () => {
+            unsubscribeMessages && unsubscribeMessages()
+        };
     }, [props.route.params, targetChatDocId])
 
     const handleSentMessage = () => {
 
-        if (messageTxt.length < 1) return props.set_error('empty', 'error')
+        if (messageTxt.length < 1) return props.set_banner('empty', 'error')
 
         Keyboard.dismiss();
 
@@ -108,7 +163,7 @@ const Message = (props: ComMessageProps) => {
             newChatId = chatRef.id;
         } else {
             //fail
-            return props.set_error("Oops! Wasn't able to find user information", 'error');
+            return props.set_banner("Oops! Wasn't able to find user information", 'error');
         }
 
         batch.set(chatRef, chatObj, { merge: true })
@@ -130,13 +185,13 @@ const Message = (props: ComMessageProps) => {
             })
             .catch((err) => {
                 console.log(err)
-                props.set_error("Sorry, wasn't able to send your message, please try again.", 'error')
+                props.set_banner("Sorry, wasn't able to send your message, please try again.", 'error')
             })
     }
 
 
-    const renderTextMsgs = () => {
-        if (!messages) return <ActivityIndicator />
+    const TextMsgs = () => {
+        if (!messages) return <ActivityIndicator size='large' color={colors.primary} style={{ flex: 1 }} />
 
         if (messages === 'empty') {
             return <View style={styles.empty}>
@@ -171,11 +226,7 @@ const Message = (props: ComMessageProps) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.profile_content}>
-                <ProfileImg friend={true} />
-                <Text style={styles.username}>Amber123</Text>
-            </View>
-            {renderTextMsgs()}
+            <TextMsgs />
             <KeyboardAvoidingView keyboardVerticalOffset={120} behavior={'padding'} style={styles.message_form}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.message_form_content}>
@@ -246,8 +297,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     messages: {
-        flex: 1,
-        marginTop: 20
+        flex: 1
     },
     message_left: {
         left: -10,
@@ -284,4 +334,4 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: RootProps) => ({
     user: state.user
 })
-export default connect(mapStateToProps, { set_error })(Message);
+export default connect(mapStateToProps, { set_banner })(Message);

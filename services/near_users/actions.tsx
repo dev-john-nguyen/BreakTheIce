@@ -1,19 +1,27 @@
-import { SET_NEAR_USERS, UPDATE_NEAR_USERS } from './actionTypes';
+import { SET_NEAR_USERS, UPDATE_NEAR_USERS, INIT_NEAR_USERS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
 import { LocationsDb, acceptedRadius } from '../../utils/variables';
-import { StateCityProps } from '../user/user.types';
+import { StateCityProps } from '../user/types';
 import { NearByUsersProps } from './tsTypes';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
 import firebase from 'firebase';
 import { SET_ERROR } from '../utils/actionTypes';
-import { cacheImage } from '../../utils/functions';
+import { set_banner } from '../utils/actions';
 
 //find near by users
-export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
-    fireDb
+export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
+
+    const { uid } = getState().user;
+
+    if (!uid) {
+        dispatch(set_banner("Failed to find your user id.", "error"))
+        return;
+    }
+
+    var nearUsersListener = fireDb
         .collection(LocationsDb)
         .doc(stateCity.state)
         .collection(stateCity.city)
@@ -101,6 +109,13 @@ export const set_and_listen_near_users = (uid: string, stateCity: StateCityProps
                 payload: 'Oops! We are having trouble retrieving near by users.'
             })
         })
+
+    dispatch({
+        type: INIT_NEAR_USERS,
+        payload: { nearUsersListener }
+    })
+
+    return nearUsersListener
 }
 
 export const validate_near_users = (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<NearByUsersProps>) => (dispatch: AppDispatch) => {

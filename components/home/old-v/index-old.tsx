@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { colors } from '../../utils/styles'
-import Maps from '../maps';
+import { colors } from '../../../utils/styles'
+import Maps from '../../maps';
 import { connect } from 'react-redux';
-import { RootProps } from '../../services';
-import { set_and_listen_user_location, go_online } from '../../services/user/actions';
-import { set_and_listen_near_users } from '../../services/near_users/actions';
-import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/types';
-import { NearUsersDispatchActionProps } from '../../services/near_users/tsTypes';
-import { HomeToChatNavProp } from '../navigation/utils';
+import { RootProps } from '../../../services';
+import { set_and_listen_user_location, go_online } from '../../../services/user/actions';
+import { set_and_listen_near_users } from '../../../services/near_users/actions';
+import { set_and_listen_invitations } from '../../../services/invitations/actions';
+import { set_and_listen_friends } from '../../../services/friends/actions';
+import { set_and_listen_messages } from '../../../services/chat/actions';
+import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../../services/user/types';
+import { NearUsersDispatchActionProps } from '../../../services/near_users/tsTypes';
+import { InvitationsDispatchActionProps } from '../../../services/invitations/tsTypes';
+import { ChatDispatchActionsProps } from '../../../services/chat/types';
+import { FriendDispatchActionProps } from '../../../services/friends/tsTypes';
+import { HomeToChatNavProp } from '../../navigation/utils';
 import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
 // @ts-ignore
 import { GEOCODER_KEY } from '@env'
-import { CustomButton } from '../../utils/components';
+import { CustomButton } from '../../../utils/components';
 // @ts-ignore
 Geocoder.init(GEOCODER_KEY);
 
@@ -22,12 +28,15 @@ interface HomeProps {
     user: UserRootStateProps;
     set_and_listen_user_location: UserDispatchActionsProps['set_and_listen_user_location'];
     set_and_listen_near_users: NearUsersDispatchActionProps['set_and_listen_near_users'];
+    set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
+    set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
+    set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
     go_online: UserDispatchActionsProps['go_online'];
 }
 
 interface CurrentLocationProps {
-    stateCity: StateCityProps | undefined;
-    location: Location.LocationObject | undefined;
+    stateCity: StateCityProps;
+    location: Location.LocationObject
 }
 
 interface ListenersProps {
@@ -40,7 +49,9 @@ interface ListenersProps {
 
 
 const Home = (props: HomeProps) => {
-    const [currentLocation, setCurrentLocation] = useState<CurrentLocationProps>({ stateCity: undefined, location: undefined })
+    const [currentLocation, setCurrentLocation] = useState<CurrentLocationProps>()
+    const [listeners, setListeners] = useState<ListenersProps>()
+
 
     const getUserstateCity = async (location: Location.LocationObject) => {
 
@@ -114,19 +125,35 @@ const Home = (props: HomeProps) => {
         })();
     }, [])
 
-    // useEffect(() => {
-    //     const { location, stateCity } = currentLocation;
+    useEffect(() => {
+        //initate and set all the listeners
+        if (currentLocation
+            && currentLocation.location
+            && currentLocation.stateCity) {
+            var unsubscribeFriends = props.set_and_listen_friends();
+            var unsubscribeInvitations = props.set_and_listen_invitations();
+            var unsubscribeNearUsers = props.set_and_listen_near_users(currentLocation.stateCity, currentLocation.location);
+            var unsubscribeChat = props.set_and_listen_messages();
+        }
 
-    //     if (location && stateCity && !props.user.offline) {
-    //         props.set_and_listen_user_location(stateCity, location);
-    //         var unsubscribeNearUsers = props.set_and_listen_near_users(stateCity, location);
-    //     }
+        return () => {
+            unsubscribeFriends && unsubscribeFriends()
+            unsubscribeNearUsers && unsubscribeNearUsers()
+            unsubscribeInvitations && unsubscribeInvitations()
+            unsubscribeChat && unsubscribeChat()
+        }
+    }, [currentLocation])
 
-    //     return () => {
-    //         unsubscribeNearUsers && unsubscribeNearUsers()
-    //     }
 
-    // }, [props.user.offline, currentLocation])
+    useEffect(() => {
+        if (currentLocation &&
+            currentLocation.location &&
+            currentLocation.stateCity
+            && !props.user.offline) {
+            props.set_and_listen_user_location(currentLocation.stateCity, currentLocation.location);
+        }
+
+    }, [props.user.offline, currentLocation])
 
 
     if (props.user.offline) {
@@ -159,5 +186,6 @@ const mapStateToProps = (state: RootProps) => ({
 })
 
 export default connect(mapStateToProps, {
-    set_and_listen_user_location, set_and_listen_near_users, go_online
+    set_and_listen_user_location, set_and_listen_near_users, set_and_listen_invitations, set_and_listen_friends,
+    set_and_listen_messages, go_online
 })(Home);

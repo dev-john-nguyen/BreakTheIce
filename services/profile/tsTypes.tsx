@@ -1,5 +1,5 @@
 import { NearByUsersProps } from '../near_users/tsTypes';
-import { UserRootStateProps } from '../user/user.types';
+import { UserRootStateProps } from '../user/types';
 
 export interface TimelineActionProp {
     type: string;

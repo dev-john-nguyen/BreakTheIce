@@ -1,7 +1,7 @@
 import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
 import { set_loading, remove_loading, set_status_bar, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps } from './user.types';
+import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps } from './types';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
 import { validate_near_users } from '../near_users/actions';
@@ -75,7 +75,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
             }
 
         } else {
-            dispatch({ type: REMOVE_USER })
+            dispatch({ type: REMOVE_USER, payload: undefined })
         }
         dispatch(remove_loading)
     });
@@ -85,7 +85,8 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
 
     //check if user is offline
     if (getState().user.offline) {
-        return dispatch(set_banner('you are offline', 'warning'))
+        dispatch(set_banner('you are offline', 'warning'))
+        return;
     }
 
 
@@ -94,10 +95,11 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
         await fireDb_init_user_location(getState().user, stateCity, location);
     } catch (e) {
         console.log(e)
-        return dispatch({
+        dispatch({
             type: SET_ERROR,
             payload: 'Something went wrong initializing your location'
         })
+        return;
     }
 
     const locationListener = await Location.watchPositionAsync({ distanceInterval: locationDistanceIntervalToUpdate }, async (newLocation) => {
@@ -292,7 +294,7 @@ export const go_offline = () => (dispatch: AppDispatch, getState: () => RootProp
 
     batch.commit()
         .then(() => {
-            dispatch({ type: GO_OFFILINE })
+            dispatch({ type: GO_OFFILINE, payload: undefined })
         })
         .catch(err => {
             console.log(err)
@@ -304,7 +306,7 @@ export const go_online = () => (dispatch: AppDispatch, getState: () => RootProps
     const { uid } = getState().user
 
     fireDb.collection(UsersDb).doc(uid).update({ offline: false })
-        .then(() => dispatch({ type: GO_ONLINE }))
+        .then(() => dispatch({ type: GO_ONLINE, payload: undefined }))
         .catch((err) => {
             console.log(err)
             dispatch(set_banner('Oops! Failed to go offline. Please try again.', 'error'))
@@ -327,4 +329,39 @@ export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => as
     await fireDb.collection(UsersDb).doc(uid).update(updatedPrivacyData);
     dispatch({ type: UPDATE_PRIVACY, payload: updatedPrivacyData });
     dispatch(set_banner('Saved', 'success'));
+}
+
+export const sign_out = () => async (dispatch: AppDispatch) => {
+    myFire.auth().signOut().then(() => {
+        dispatch(set_banner('signed out', 'success'))
+    })
+        .catch((err) => {
+            console.log(err)
+            dispatch(set_banner('Oops! Something happened trying to sign out', 'error'))
+        })
+}
+
+export const send_password_reset_email = (email: string) => (dispatch: AppDispatch) => {
+    var user = myFire.auth().currentUser;
+
+    if (!user || !user.email) {
+        dispatch(set_banner("Oops! couldn't find your email", "error"))
+        return;
+    }
+
+    if (user.email != email) {
+        console.log(email)
+        dispatch(set_banner("Email doesn't match what we have on file. Please try again.", "error"))
+        return;
+    }
+
+
+    myFire.auth().sendPasswordResetEmail(user.email)
+        .then(() => {
+            dispatch(set_banner(`Email sent to ${user?.email}. Please follow the direction to reset your password.`, 'success'))
+        })
+        .catch((err) => {
+            console.log(err)
+            dispatch(set_banner(`Failed to send email to ${user?.email}. Please try again or contact us directly.`, 'error'))
+        })
 }

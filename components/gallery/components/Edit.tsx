@@ -3,12 +3,12 @@ import { View, Image, StyleSheet, TextInput, Pressable, KeyboardAvoidingView } f
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
-import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/user.types';
+import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/types';
 import { connect } from 'react-redux';
 import * as Progress from 'react-native-progress';
 import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
-import { UserDispatchActionsProps } from '../../../services/user/user.types';
+import { UserDispatchActionsProps } from '../../../services/user/types';
 import { UtilsRootStateProps, UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { SaveSvg, MinusSvg } from '../../../utils/components';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";

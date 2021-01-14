@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FlatList, View, StyleSheet, Image, ListRenderItemInfo, Text } from 'react-native';
-import { GalleryItemProps } from '../../services/user/user.types';
+import { GalleryItemProps } from '../../services/user/types';
 import { colors } from '../../utils/styles';
 import { cacheImage } from '../../utils/functions';
 import _ from 'lodash';

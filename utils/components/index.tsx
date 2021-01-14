@@ -62,12 +62,15 @@ export const PortraitSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pres
 
 
 //buttons
-export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string, onPress: () => void, type: "primary" | "secondary" | "white_outline" | "red_outline", moreStyles?: StyleProp<any> }) => {
+export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string, onPress?: () => void, type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled", moreStyles?: StyleProp<any> }) => {
 
     const handlePressableStyles = ({ pressed }: { pressed: boolean }) => {
         var styles;
 
         switch (type) {
+            case 'disabled':
+                styles = buttonsStyles.button_disabled
+                break;
             case "secondary":
                 styles = pressed ? buttonsStyles.button_secondary_pressed : buttonsStyles.button_secondary
                 break;
@@ -87,6 +90,9 @@ export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string
     const renderText = ({ pressed }: { pressed: boolean }) => {
         var styles;
         switch (type) {
+            case 'disabled':
+                styles = buttonsStyles.button_disabled_text
+                break;
             case "secondary":
                 styles = pressed ? buttonsStyles.button_secondary_text_pressed : buttonsStyles.button_secondary_text
                 break;

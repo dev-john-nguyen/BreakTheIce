@@ -1,38 +1,47 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, Pressable, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { connect } from 'react-redux';
-import { update_profile, update_privacy } from '../../services/user/actions';
+import { update_profile, update_privacy, sign_out, send_password_reset_email } from '../../services/user/actions';
 import { colors } from '../../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils';
 import EditProfile from './components/EditProfile';
 import Privacy from './components/Privacy';
 import { RootProps } from '../../services';
-import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/user.types';
+import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
 import { set_banner } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
+import SignOut from './components/SignOut';
+import ChangePassword from './components/ChangePassword';
 
 interface SettingsProps {
     navigation: MeStackNavigationProp;
     user: UserRootStateProps;
     update_profile: UserDispatchActionsProps['update_profile'];
     update_privacy: UserDispatchActionsProps['update_privacy'];
-    set_banner: UtilsDispatchActionProps['set_banner']
+    set_banner: UtilsDispatchActionProps['set_banner'];
+    sign_out: UserDispatchActionsProps['sign_out'];
+    send_password_reset_email: UserDispatchActionsProps['send_password_reset_email']
 }
 
 enum TargetOptions {
     profile,
     privacy,
     password,
-    contacts
+    contacts,
+    signOut
 }
 
-const Settings = ({ navigation, user, update_profile, set_banner, update_privacy }: SettingsProps) => {
+const Settings = ({ navigation, user, update_profile, set_banner, update_privacy, sign_out, send_password_reset_email }: SettingsProps) => {
     const [target, setTarget] = useState<TargetOptions>(TargetOptions.profile)
 
     const RenderTarget = () => {
         switch (target) {
             case TargetOptions.privacy:
                 return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
+            case TargetOptions.password:
+                return <ChangePassword sendChangePasswordEmail={send_password_reset_email} />
+            case TargetOptions.signOut:
+                return <SignOut signout={sign_out} />
             case TargetOptions.profile:
             default:
                 return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} />
@@ -79,6 +88,17 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 >
                     <View style={styles.content}>
                         <Text style={styles.text}>Manage Contacts</Text>
+                    </View>
+                </TouchableHighlight>
+
+
+                <TouchableHighlight
+                    style={styles.item_container}
+                    onPress={() => setTarget(TargetOptions.signOut)}
+                    underlayColor={colors.secondary}
+                >
+                    <View style={styles.content}>
+                        <Text style={styles.text}>Sign Out</Text>
                     </View>
                 </TouchableHighlight>
             </View>
@@ -137,4 +157,4 @@ const mapStateToProps = (state: RootProps) => ({
     user: state.user,
 })
 
-export default connect(mapStateToProps, { update_profile, set_banner, update_privacy })(Settings);
+export default connect(mapStateToProps, { update_profile, set_banner, update_privacy, sign_out, send_password_reset_email })(Settings);

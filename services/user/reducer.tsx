@@ -1,11 +1,11 @@
 import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
-import { UserActionProps } from './user.types';
+import { UserActionProps, UserRootStateProps } from './types';
 import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
 
 
 const INITIAL_STATE = {
-    uid: null,
-    username: null,
+    uid: '',
+    username: '',
     location: {
         coords: null,
         timestamp: null
@@ -19,10 +19,13 @@ const INITIAL_STATE = {
     private: false,
     fetchFail: false,
     gallery: [],
-    timeline: []
+    timeline: [],
+    hideOnMap: false,
+    offline: false,
+    locationListener: undefined
 }
 
-export default (state = INITIAL_STATE, action: UserActionProps) => {
+export default (state: any = INITIAL_STATE, action: UserActionProps) => {
 
     switch (action.type) {
         case USER_FETCHED_FAILED:
@@ -33,9 +36,11 @@ export default (state = INITIAL_STATE, action: UserActionProps) => {
         case SET_USER:
             return action.payload;
         case REMOVE_USER:
+            if (state.locationListener) {
+                state.locationListener.remove()
+            }
             return {
-                ...state,
-                uid: null
+                ...INITIAL_STATE
             }
         case SET_LOCATION:
             return {

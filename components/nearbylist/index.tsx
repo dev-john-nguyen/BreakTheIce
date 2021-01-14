@@ -3,7 +3,7 @@ import { View, FlatList, ActivityIndicator, Text, TouchableHighlight, Pressable,
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/tsTypes';
-import { NearByListNavProp } from '../navigation/utils';
+import { HomeToChatNavProp } from '../navigation/utils';
 import { ProfilePage } from '../../utils/variables';
 import { ListContainerStyle, colors, buttonsStyles } from '../../utils/styles';
 import { ProfileImg } from '../../utils/components';
@@ -11,7 +11,7 @@ import InvitationModal from '../modal/InvitationModal';
 
 
 interface NearByListProps {
-    navigation: NearByListNavProp;
+    navigation: HomeToChatNavProp;
     nearUsers: NearUsersRootProps['nearBy'];
     nearUsersFetched: NearUsersRootProps['fetched'];
 }
@@ -43,7 +43,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
         this.props.navigation.navigate('Chat', {
             screen: 'Message',
             initial: false,
-            params: { targetUser: nearUser }
+            params: { targetUser: nearUser, title: nearUser.username }
         })
     }
 
@@ -65,8 +65,8 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
             }
 
             if (item.sentInvite) return (
-                <Pressable style={buttonsStyles.button_inactive} >
-                    <Text style={buttonsStyles.button_inactive_text}>Pending</Text>
+                <Pressable style={buttonsStyles.button_disabled} >
+                    <Text style={buttonsStyles.button_disabled_text}>Pending</Text>
                 </Pressable>
             )
 

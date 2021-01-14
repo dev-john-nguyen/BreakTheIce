@@ -3,7 +3,7 @@ import { View, StyleSheet, TextInput, Pressable, Text } from 'react-native';
 import { baseStyles, colors } from '../../../utils/styles';
 import firebase from 'firebase';
 
-const Login = () => {
+export default () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [signup, setSignup] = useState<boolean>(false);
@@ -77,5 +77,3 @@ const styles = StyleSheet.create({
         width: '80%',
     }
 })
-
-export default Login;

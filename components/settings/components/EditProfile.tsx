@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Picker, ScrollView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, ActivityIndicator } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
-import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps } from '../../../services/user/user.types';
+import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps } from '../../../services/user/types';
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { MeStackNavigationProp } from '../../navigation/utils';
 import { isEqual } from 'lodash';
@@ -91,7 +91,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
             })
             .catch((err) => {
                 console.log(err)
-                set_banner('Oops! Something went wrong updating your profile.', 'error')
+                mount && set_banner('Oops! Something went wrong updating your profile.', 'error')
             })
     }
 

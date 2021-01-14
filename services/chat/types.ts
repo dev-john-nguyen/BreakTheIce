@@ -1,6 +1,8 @@
 export interface ChatActionProps {
     type: string;
-    payload?: any;
+    payload: {
+        chatListener: () => void;
+    };
 }
 
 export interface MessageProps {
@@ -29,9 +31,10 @@ export interface ChatRootProps {
     fetched: boolean;
     ids: Array<string>;
     rooms: Array<ChatObjectProps>;
-    previews: Array<ChatPreviewProps>
+    previews: Array<ChatPreviewProps>;
+    chatListener: () => void | undefined;
 }
 
 export interface ChatDispatchActionsProps {
-    set_and_listen_messages: (uid: string) => void;
+    set_and_listen_messages: () => undefined | (() => void);
 }

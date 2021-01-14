@@ -43,7 +43,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
             if (!docData) throw 'No data exists';
 
-            const { location, name, bioShort, bioLong, stateCity, gender, age, username, gallery, showOnMap } = docData
+            const { location, name, bioShort, bioLong, stateCity, gender, age, username, gallery, hideOnMap, offline } = docData
 
             const profileData: ProfileUserProps = {
                 uid: doc.id,
@@ -58,8 +58,9 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 friend: friend ? friend : false,
                 distance: distance ? distance : 0,
                 sentInvite: sentInvite ? sentInvite : false,
-                showOnMap,
-                gallery
+                hideOnMap,
+                gallery,
+                offline
             }
             ///cache gallery images
             if (profileData.gallery.length > 0) {

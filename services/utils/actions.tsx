@@ -28,10 +28,12 @@ export const remove_error = () => ({
 })
 
 export const set_loading = {
-    type: SET_LOADING
+    type: SET_LOADING,
+    payload: undefined
 }
 
 export const remove_loading = {
-    type: REMOVE_LOADING
+    type: REMOVE_LOADING,
+    payload: undefined
 }
 

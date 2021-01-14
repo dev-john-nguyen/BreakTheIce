@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Pressable, Switch, StyleSheet } from 'react-native';
-import { UpdateUserPrivacyProps, UserRootStateProps, UserDispatchActionsProps } from '../../../services/user/user.types';
+import { UpdateUserPrivacyProps, UserRootStateProps, UserDispatchActionsProps } from '../../../services/user/types';
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { MeStackNavigationProp } from '../../navigation/utils';
 import { Feather } from '@expo/vector-icons';

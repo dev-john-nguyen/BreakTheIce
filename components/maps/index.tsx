@@ -7,10 +7,12 @@ import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { validate_near_users } from '../../services/near_users/actions';
 import { NearUsersRootProps, NearUsersDispatchActionProps, NearByUsersProps } from '../../services/near_users/tsTypes';
-import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/user.types';
-import { HomeStackNavigationProp } from '../navigation/utils';
+import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
+import { HomeStackNavigationProp, HomeToChatNavProp } from '../navigation/utils';
 import { MapProfileImg, CustomButton } from '../../utils/components';
 import { go_offline } from '../../services/user/actions';
+import Preview from './components/Preview';
+import InvitationModal from '../modal/InvitationModal';
 
 interface RegionProps {
     latitude: number;
@@ -22,10 +24,12 @@ interface RegionProps {
 interface MapStateProps {
     region: RegionProps;
     selectedNearUser: NearByUsersProps | null;
+    previewNearUser: NearByUsersProps | null;
+    sendInvite: boolean;
 }
 
 interface MapsProps {
-    navigation: HomeStackNavigationProp;
+    navigation: HomeToChatNavProp;
     nearUsers: NearUsersRootProps['nearBy'];
     nearUsersFetched: NearUsersRootProps['fetched'];
     allUsers: NearUsersRootProps['all'];
@@ -62,7 +66,9 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         // this._initLocation = false;
         this.state = {
             region: this._initRegion,
-            selectedNearUser: null
+            selectedNearUser: null,
+            previewNearUser: null,
+            sendInvite: false
         }
     }
 
@@ -71,14 +77,14 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     }
 
     handleNearUsersOnPress = (nearUsers: NearByUsersProps) => {
-        this.props.navigation.push(ProfilePage, {
+        this.props.navigation.navigate(ProfilePage, {
             profileUid: nearUsers.uid,
             title: nearUsers.username
         })
     }
 
     handleOnListViewPress = () => {
-        this.props.navigation.push(NearByListPage)
+        this.props.navigation.navigate(NearByListPage)
     }
 
     handleOnMyLocationPress = () => {
@@ -97,6 +103,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     }
 
     render() {
+
         const renderMapView = (
             <MapView
                 style={styles.map}
@@ -115,7 +122,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                                 key={nearUser.uid}
                                 coordinate={{ latitude: nearUser.location.coords.latitude, longitude: nearUser.location.coords.longitude }}
                                 style={{ width: 'auto', height: 'auto' }}
-                                onPress={(e) => this.handleNearUsersOnPress(nearUser)}
+                                onPress={(e) => this.setState({ previewNearUser: nearUser })}
                             >
                                 <MapProfileImg friend={nearUser.friend} />
                             </Marker>
@@ -125,15 +132,31 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             </MapView >
         )
 
+        const { previewNearUser, sendInvite } = this.state;
+        const { nearUsersFetched, user, go_offline, navigation } = this.props;
+
         return (
             <View style={styles.container}>
-                {this.props.nearUsersFetched && this.props.user.location ? renderMapView : <ActivityIndicator />}
+                {nearUsersFetched && user.location ? renderMapView : <ActivityIndicator />}
+
+                <InvitationModal
+                    visible={sendInvite}
+                    handleClose={() => this.setState({ sendInvite: false })}
+                    targetUser={previewNearUser}
+                />
+
+                {previewNearUser && <Preview
+                    nearUser={previewNearUser}
+                    navigation={navigation}
+                    onClose={() => this.setState({ previewNearUser: null, sendInvite: false })}
+                    onSendInvite={() => this.setState({ sendInvite: true })}
+                />}
 
                 <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} moreStyles={styles.my_location} />
 
                 <CustomButton text="List View" type='primary' onPress={this.handleOnListViewPress} moreStyles={styles.list_view} />
 
-                <CustomButton text="Go Offline" type='red_outline' onPress={this.props.go_offline} moreStyles={styles.go_offline} />
+                <CustomButton text="Go Offline" type='red_outline' onPress={go_offline} moreStyles={styles.go_offline} />
             </View>
         )
     }

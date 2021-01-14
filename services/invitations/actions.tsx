@@ -2,12 +2,13 @@ import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET
 import { SET_ERROR } from '../utils/actionTypes';
 import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './tsTypes';
-import { UserRootStateProps } from '../user/user.types';
+import { UserRootStateProps } from '../user/types';
 import { fireDb } from '../firebase';
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
 import { UPDATE_INVITE_NEAR_USER } from '../near_users/actionTypes';
 import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
+import { set_banner } from '../utils/actions';
 
 //define the structure of the invitation
 
@@ -33,8 +34,14 @@ export const send_invitation = (invitationObj: InvitationObject) => async (dispa
     })
 }
 
-export const set_and_listen_invitations = (uid: UserRootStateProps['uid']) => (dispatch: AppDispatch) => {
+export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState: () => RootProps) => {
     //only listening on inbound invitations and not outbound...
+    const { uid } = getState().user;
+
+    if (!uid) {
+        dispatch(set_banner("Failed to find your user id.", "error"))
+        return;
+    }
 
     //get all invitations that were sent
     fireDb.collection(InvitationsDb)
@@ -55,7 +62,7 @@ export const set_and_listen_invitations = (uid: UserRootStateProps['uid']) => (d
         })
 
     //get and listen to inbound invitations
-    fireDb.collection(InvitationsDb)
+    var invitationListener = fireDb.collection(InvitationsDb)
         .where("sentTo", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
         .onSnapshot((querySnapshot) => {
@@ -73,7 +80,9 @@ export const set_and_listen_invitations = (uid: UserRootStateProps['uid']) => (d
             }
         )
 
-    dispatch({ type: SET_INVITATIONS })
+    dispatch({ type: SET_INVITATIONS, payload: { invitationListener } })
+
+    return invitationListener
 }
 
 function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {

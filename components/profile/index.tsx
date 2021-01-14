@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';
 import { set_error } from '../../services/utils/actions';
 import { InvitationsRootProps } from '../../services/invitations/tsTypes';
-import { UserRootStateProps } from '../../services/user/user.types';
+import { UserRootStateProps } from '../../services/user/types';
 import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';

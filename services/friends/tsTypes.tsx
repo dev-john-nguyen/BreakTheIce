@@ -1,11 +1,14 @@
 export interface FriendsRootProps {
     users: Array<FriendObjProps>;
     fetched: boolean;
+    friendListener?: () => void;
 }
 
 export interface FriendsActionProps {
     type: string;
-    payload?: any
+    payload: {
+        friendListener: () => void
+    }
 }
 
 export interface FriendObjProps {
@@ -16,5 +19,5 @@ export interface FriendObjProps {
 }
 
 export interface FriendDispatchActionProps {
-    set_and_listen_friends: (uid: string) => Promise<any>
+    set_and_listen_friends: () => (() => void) | undefined;
 }

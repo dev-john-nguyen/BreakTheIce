@@ -8,14 +8,14 @@ import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptio
 import { send_invitation } from '../../services/invitations/actions';
 import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/tsTypes';
-import { UserRootStateProps } from '../../services/user/user.types';
+import { UserRootStateProps } from '../../services/user/types';
 import { RootProps } from '../../services';
 
 interface MyModalProps {
     visible: boolean;
     handleClose: () => void;
     send_invitation: InvitationsDispatchActionProps['send_invitation'];
-    targetUser: NearByUsersProps | undefined;
+    targetUser: NearByUsersProps | undefined | null;
     user: UserRootStateProps;
 }
 
@@ -58,7 +58,7 @@ const InviteModal = (props: MyModalProps) => {
             visible={props.visible}
             animationType='fade'
             transparent={true}
-            onRequestClose={() => props.handleClose()}
+            onRequestClose={props.handleClose}
         >
             <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

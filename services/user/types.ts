@@ -82,10 +82,12 @@ export interface UpdateUserPrivacyProps {
 }
 
 export interface UserDispatchActionsProps {
-    set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => void;
+    set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => Promise<void>;
     update_profile: (updatedProfileData: UpdateUserProfileProps) => Promise<any>;
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => void;
     go_offline: () => void;
     go_online: () => void;
+    sign_out: () => void;
+    send_password_reset_email: (email: string) => void | undefined
 }
