@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native'
+import { StyleSheet, Dimensions, StyleProp } from 'react-native'
 
 //colors
 export const colors = {
@@ -60,14 +60,15 @@ export const profileStyles = StyleSheet.create({
 })
 
 //buttons
-const buttonBase = {
+const buttonBase: StyleProp<any> = {
     borderRadius: 20,
     paddingLeft: 40,
     paddingRight: 40,
     paddingTop: 10,
     paddingBottom: 10,
     borderWidth: 2,
-    maxHeight: 40
+    maxHeight: 40,
+    alignItems: 'center',
 }
 
 export const buttonsStyles = StyleSheet.create({
@@ -75,7 +76,6 @@ export const buttonsStyles = StyleSheet.create({
         ...buttonBase,
         backgroundColor: colors.primary,
         borderColor: colors.primary,
-        alignItems: 'center'
     },
     button_primary_text: {
         color: colors.white,
@@ -85,18 +85,15 @@ export const buttonsStyles = StyleSheet.create({
         ...buttonBase,
         backgroundColor: colors.secondary,
         borderColor: colors.secondary,
-        alignItems: 'center'
     },
     button_secondary: {
         ...buttonBase,
         borderColor: colors.primary,
-        alignItems: 'center'
     },
     button_secondary_pressed: {
         ...buttonBase,
         borderColor: colors.primary,
         backgroundColor: colors.primary,
-        alignItems: 'center'
     },
     button_secondary_text: {
         fontSize: 12,
@@ -275,90 +272,3 @@ export const ListContainerStyle = (color: string, backgroundColor?: string) => S
         fontSize: 12
     },
 })
-
-
-//modal
-export const modalStyle = StyleSheet.create({
-    center_view: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: 'rgba(0, 0, 0, 0.2)',
-        height: Math.round(Dimensions.get('window').height),
-        width: Math.round(Dimensions.get('window').width)
-    },
-    modal_view: {
-        position: 'relative',
-        margin: 20,
-        backgroundColor: colors.primary,
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-        width: '70%',
-        minHeight: 300,
-        justifyContent: 'space-between'
-    },
-    text_area: {
-        backgroundColor: colors.white,
-        color: colors.primary,
-        fontSize: 12,
-        borderRadius: 20,
-        paddingLeft: 15,
-        paddingRight: 15,
-        paddingTop: 15,
-        paddingBottom: 15,
-        flex: 1,
-        margin: 20,
-        width: '100%'
-    },
-    header_text: {
-        fontSize: 22,
-        color: colors.white
-    },
-    close_button: {
-        position: 'absolute',
-        right: 10,
-        top: 10,
-    }
-})
-
-
-///not in use anymore
-export const baseStyles = StyleSheet.create({
-    button: {
-        marginTop: 5,
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#eee',
-        padding: 4
-    },
-    buttonPressed: {
-        marginTop: 5,
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#eee',
-        backgroundColor: 'green',
-        padding: 4
-    },
-    input: {
-        borderWidth: 2,
-        borderColor: '#eee',
-        padding: 4,
-        marginTop: 4
-    }
-})
-
-
-export const circleStyle = {
-    fillColor: 'rgba(238,238,238,.5)',
-    strokeWidth: 1,
-    strokeColor: 'rgba(238,238,238,.8)'
-}

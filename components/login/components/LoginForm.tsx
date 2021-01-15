@@ -1,79 +1,58 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Pressable, Text } from 'react-native';
-import { baseStyles, colors } from '../../../utils/styles';
-import firebase from 'firebase';
+import { TextInput, Text, StyleProp } from 'react-native';
+import { colors } from '../../../utils/styles';
+import { CustomButton } from '../../../utils/components';
+import { SigninDispatchActionProps } from '../../../services/signin/types';
 
-export default () => {
+interface LoginForm {
+    login_user: SigninDispatchActionProps['login_user'];
+    renderSignup: () => void;
+    styles: StyleProp<any>;
+}
+
+export default ({ login_user, renderSignup, styles }: LoginForm) => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [signup, setSignup] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleSignUp = () => {
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then((user) => {
-
-            })
-            .catch((error: any) => {
-                console.log(error)
-                var errorCode = error.code;
-                var errorMessage = error.message;
-            });
-    }
 
     const handleLogin = () => {
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .catch((error: any) => {
-                console.log(error)
-                var errorCode = error.code;
-                var errorMessage = error.message;
+        setLoading(true);
+        login_user(email, password)
+            .then(success => {
+                if (!success) {
+                    setLoading(false)
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+                setLoading(false)
             })
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <Text style={{ textAlign: 'center' }}>Welcome To LetsLink</Text>
-                <TextInput
-                    style={baseStyles.input}
-                    placeholder="email"
-                    textContentType="emailAddress"
-                    onChangeText={(text) => setEmail(text)}
-                    autoCompleteType='off'
-                    autoCapitalize='none'
-                />
-                <TextInput
-                    style={baseStyles.input}
-                    placeholder="password"
-                    onChangeText={(text) => setPassword(text)}
-                    onSubmitEditing={signup ? handleSignUp : handleLogin}
-                    autoCompleteType='password'
-                    autoCapitalize='none'
-                    secureTextEntry
-                />
-                <Pressable style={baseStyles.button} onPress={signup ? handleSignUp : handleLogin}>
-                    <Text>
-                        {signup ? 'Sign Up' : 'Login'}
-                    </Text>
-                </Pressable>
-                <Pressable onPress={() => setSignup(signup ? false : true)}>
-                    <Text style={{ textAlign: 'center' }}>{signup ? 'Login' : 'Sign Up'}</Text>
-                </Pressable>
-            </View>
-        </View>
+        <>
+            <TextInput
+                style={styles.text_input}
+                placeholder="email"
+                textContentType="emailAddress"
+                onChangeText={(text) => setEmail(text)}
+                autoCompleteType='off'
+                autoCapitalize='none'
+            />
+            <TextInput
+                style={styles.text_input}
+                placeholder="password"
+                onChangeText={(text) => setPassword(text)}
+                autoCompleteType='password'
+                autoCapitalize='none'
+                secureTextEntry
+            />
+
+            <CustomButton type='primary' text='Login' onPress={handleLogin} moreStyles={{ marginTop: 20 }} indicatorColor={loading && colors.white} />
+
+            <CustomButton type='secondary' text='Sign Up' onPress={renderSignup} moreStyles={{ marginTop: 10 }} />
+        </>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.primary,
-        justifyContent: 'center',
-        alignSelf: 'center',
-        width: '100%',
-        alignItems: 'stretch'
-    },
-    content: {
-        alignSelf: 'center',
-        width: '80%',
-    }
-})

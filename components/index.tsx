@@ -60,6 +60,7 @@ const Base = (props: Base) => {
             unsubscribeFriends && unsubscribeFriends()
             unsubscribeInvitations && unsubscribeInvitations()
             unsubscribeChat && unsubscribeChat()
+            props.user.locationListener && props.user.locationListener.remove();
         }
 
         if (props.user.uid) {
@@ -73,83 +74,62 @@ const Base = (props: Base) => {
         return () => unsubscribeListeners()
     }, [props.user.uid])
 
-    const renderError = () => {
-        const errorStyle = bannerStyles(props.utils.error.color)
-
-        return <Pressable onPress={() => props.remove_error()} style={errorStyle.errorContainer}>
-            <Text style={errorStyle.errorText}>{props.utils.error.message}</Text>
-        </Pressable>
-    }
+    const handleRemoveBanner = () => props.remove_banner()
 
     const Banner = () => {
-        const bannerStyle = errorStyles(props.utils.banner.type)
+        const styles: { container: StyleProp<any>, text: StyleProp<any> } = bannerStyles(props.utils.banner.type)
 
-        return <Pressable onPress={() => props.remove_banner()} style={bannerStyle.errorContainer}>
-            <Text style={bannerStyle.errorText}>{props.utils.banner.message}</Text>
-        </Pressable>
+        return (
+            <Pressable onPress={handleRemoveBanner} style={styles.container}>
+                <Text style={styles.text}>{props.utils.banner.message}</Text>
+            </Pressable>
+        )
     }
 
     return (
         <View style={styles.container}>
             <StatusBar style='inverted' />
-            {props.utils.error && renderError()}
-            {handleRender()}
             {props.utils.banner && <Banner />}
+            {handleRender()}
         </View>
     );
 }
 
 const bannerStyles = (type: string) => {
     var styles: StyleProp<any> = {
-        errorContainer: {
+        container: {
             position: 'absolute',
             top: 40,
             zIndex: 100,
             width: Math.round(Dimensions.get('window').width),
             padding: 10
         },
-        errorText: {
+        text: {
             textAlign: 'center',
-            fontSize: 14
+            fontSize: 14,
+            letterSpacing: .5
         }
     }
 
     switch (type) {
         case 'warning':
-            styles.backgroundColor = colors.lightRed
-            styles.color = colors.white
+            styles.container.backgroundColor = colors.lightRed
+            styles.text.color = colors.white
             break;
         case 'success':
-            styles.backgroundColor = colors.primary
-            styles.color = colors.white
+            styles.container.backgroundColor = colors.secondary
+            styles.text.color = colors.white
             break;
         case 'error':
-            styles.backgroundColor = colors.red
-            styles.color = colors.white
+            styles.container.backgroundColor = colors.red
+            styles.text.color = colors.white
             break;
         default:
-            styles.backgroundColor = colors.primary
-            styles.color = colors.white
+            styles.container.backgroundColor = colors.secondary
+            styles.text.color = colors.white
     }
-
     return styles
 }
-
-const errorStyles = (color: string) => StyleSheet.create({
-    errorContainer: {
-        position: 'absolute',
-        top: 40,
-        zIndex: 100,
-        width: Math.round(Dimensions.get('window').width),
-        padding: 10,
-        backgroundColor: color !== 'red' ? colors.quaternary : colors.red
-    },
-    errorText: {
-        color: color !== 'red' ? colors.primary : colors.white,
-        textAlign: 'center',
-        fontSize: 14
-    }
-})
 
 const styles = StyleSheet.create({
     container: {

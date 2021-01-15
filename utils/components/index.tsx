@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Pressable, StyleProp, Text } from 'react-native';
+import { View, Pressable, StyleProp, Text, ActivityIndicator } from 'react-native';
 import { profileStyles, colors, buttonsStyles } from '../styles';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg, linkSvg, settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg, minusSvg } from '../svgs';
+import { Feather } from '@expo/vector-icons';
 
 export const ProfileImg = ({ friend, fillColor }: { friend: boolean, fillColor?: string }) => (
     <View style={profileStyles.container}>
@@ -59,13 +60,25 @@ export const PortraitSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pres
 )
 
 
+export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: string, size: number, color: string, pressColor: string, onPress: () => void, style?: StyleProp<any> }) => (
+    <Pressable onPress={onPress} style={style}>
+        {({ pressed }) => <Feather name={type} size={size} color={pressed ? pressColor : color} />}
+    </Pressable>
+)
 
+interface CustomButtonProps {
+    text: string;
+    onPress?: () => void;
+    type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled";
+    moreStyles?: StyleProp<any>;
+    indicatorColor?: string | false
+}
 
 //buttons
-export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string, onPress?: () => void, type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled", moreStyles?: StyleProp<any> }) => {
+export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor }: CustomButtonProps) => {
 
-    const handlePressableStyles = ({ pressed }: { pressed: boolean }) => {
-        var styles;
+    const handlePressableStyles = ({ pressed }: { pressed: boolean }): StyleProp<any> => {
+        var styles: StyleProp<any>;
 
         switch (type) {
             case 'disabled':
@@ -88,7 +101,8 @@ export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string
     }
 
     const renderText = ({ pressed }: { pressed: boolean }) => {
-        var styles;
+        var styles: StyleProp<any>;
+
         switch (type) {
             case 'disabled':
                 styles = buttonsStyles.button_disabled_text
@@ -105,10 +119,15 @@ export const CustomButton = ({ text, onPress, type, moreStyles }: { text: string
             default:
                 styles = buttonsStyles.button_primary_text
         }
-        return <Text style={styles}>{text}</Text>
+        return (
+            <View style={{ flexDirection: 'row' }}>
+                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <Text style={styles}>{text}</Text>}
+            </View>
+        )
     }
 
     return <Pressable
+        disabled={indicatorColor ? true : false}
         onPress={onPress}
         style={handlePressableStyles}
     >

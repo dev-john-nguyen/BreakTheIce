@@ -27,50 +27,30 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                 fetchUserRes = await fetch_profile(user.uid)
             } catch (err) {
                 console.log(err);
-                dispatch({
-                    type: USER_FETCHED_FAILED,
-                    payload: "Oops! Something went wrong getting your profile."
-                })
+
+                dispatch(set_banner("Oops! Something went wrong getting your profile.", 'error'))
+
             } finally {
                 if (fetchUserRes) {
 
                     //check if profile data exists
                     if (fetchUserRes.profile) {
 
-                        //cache images
-                        fetchUserRes.profile.gallery = await cache_user_images(fetchUserRes.profile.gallery, 'cachedUrl')
+                        var { gallery, bioShort, bioLong, } = fetchUserRes.profile
 
-                        dispatch({
-                            type: SET_USER,
-                            payload: fetchUserRes.profile
-                        });
+                        //cache images
+                        gallery = await cache_user_images(gallery, 'cachedUrl')
+
+                        //set banner if profile information has not be initiated
+                        if (!bioShort || !bioLong) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
+
+                        dispatch({ type: SET_USER, payload: fetchUserRes.profile });
                     } else {
-                        dispatch({
-                            type: USER_FETCHED_FAILED,
-                            payload: "Looks like we couldn't get your profile"
-                        })
+                        dispatch(set_banner("Looks like we couldn't get your profile", 'error'))
                     }
 
-                    // //* Dont' need chatIds anymore */
-                    // //check if there are any chatIds
-                    // if (fetchUserRes.chatIds) {
-                    //     dispatch({
-                    //         type: SET_MESSAGES,
-                    //         payload: fetchUserRes.chatIds
-                    //     })
-                    // } else {
-                    //     dispatch({
-                    //         type: SET_ERROR,
-                    //         payload: "Couldn't retrieve your messages"
-                    //     })
-                    // }
-
-
                 } else {
-                    dispatch({
-                        type: USER_FETCHED_FAILED,
-                        payload: "Oops! Something went wrong getting your profile."
-                    })
+                    dispatch(set_banner("Oops! Something went wrong getting your profile.", 'error'))
                 }
             }
 
@@ -103,9 +83,6 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
     }
 
     const locationListener = await Location.watchPositionAsync({ distanceInterval: locationDistanceIntervalToUpdate }, async (newLocation) => {
-        //to allow user to go back to location region
-        // this.setState({ userLocation: newLocation })
-
         // const { user, nearUsers, allUsers } = this.props
 
         const { user, nearUsers } = getState()
@@ -350,7 +327,6 @@ export const send_password_reset_email = (email: string) => (dispatch: AppDispat
     }
 
     if (user.email != email) {
-        console.log(email)
         dispatch(set_banner("Email doesn't match what we have on file. Please try again.", "error"))
         return;
     }

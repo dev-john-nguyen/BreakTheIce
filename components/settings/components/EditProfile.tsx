@@ -30,7 +30,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
         bioShort,
         bioLong,
         age,
-        gender
+        gender: gender ? gender : 'man'
     })
 
     const [loading, setLoading] = useState(false);
@@ -51,18 +51,19 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
             }
         })
 
-        return () => { mount = false }
-    }, [loading, profileVals])
+        return () => {
+            mount = false
+            navigation.setOptions({ headerRight: undefined })
+        }
+    }, [loading, profileVals, user])
 
 
-    const handleSave = async (mount: boolean) => {
+    const handleSave = (mount: boolean) => {
         mount && setLoading(true)
 
         const { name, bioShort, bioLong, age, gender } = user;
 
         var oldVals = { name, bioShort, bioLong, age, gender }
-
-        console.log(profileVals)
 
         if (isEqual(oldVals, profileVals)) {
             if (mount) {
@@ -117,6 +118,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                             <TextInput
                                 placeholder='Short Bio'
                                 multiline
+                                maxLength={100}
                                 value={profileVals.bioShort}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, bioShort: text })}
                                 style={styles.text_input} />
@@ -130,6 +132,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                             <TextInput
                                 placeholder='Long Bio'
                                 multiline
+                                maxLength={200}
                                 value={profileVals.bioLong}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, bioLong: text })}
                                 style={styles.text_input} />
@@ -148,15 +151,15 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                             <Text style={styles.text_input_label}>Gender:</Text>
                             <Picker
                                 enabled={false}
-                                selectedValue={profileVals.gender.toLowerCase()}
+                                selectedValue={profileVals.gender}
                                 onValueChange={(itemValue) => {
                                     setProfileVals({ ...profileVals, gender: itemValue.toString() })
                                 }}
                                 style={styles.picker}
                                 itemStyle={styles.picker_item}
                             >
-                                <Picker.Item label='Men' value='men' />
-                                <Picker.Item label='Women' value='women' />
+                                <Picker.Item label='Man' value='man' />
+                                <Picker.Item label='Woman' value='woman' />
                                 <Picker.Item label="Other" value='other' />
                             </Picker>
                         </View>

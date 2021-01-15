@@ -114,19 +114,20 @@ const Home = (props: HomeProps) => {
         })();
     }, [])
 
-    // useEffect(() => {
-    //     const { location, stateCity } = currentLocation;
+    useEffect(() => {
+        const { location, stateCity } = currentLocation;
 
-    //     if (location && stateCity && !props.user.offline) {
-    //         props.set_and_listen_user_location(stateCity, location);
-    //         var unsubscribeNearUsers = props.set_and_listen_near_users(stateCity, location);
-    //     }
+        if (location && stateCity && !props.user.offline) {
+            props.set_and_listen_user_location(stateCity, location);
+            var unsubscribeNearUsers = props.set_and_listen_near_users(stateCity, location);
+        }
 
-    //     return () => {
-    //         unsubscribeNearUsers && unsubscribeNearUsers()
-    //     }
+        return () => {
+            console.log('unsub near users listener')
+            unsubscribeNearUsers && unsubscribeNearUsers()
+        }
 
-    // }, [props.user.offline, currentLocation])
+    }, [props.user.offline, currentLocation])
 
 
     if (props.user.offline) {

@@ -10,7 +10,6 @@ import { RootProps } from '../../services';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
 import { set_banner } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
-import SignOut from './components/SignOut';
 import ChangePassword from './components/ChangePassword';
 
 interface SettingsProps {
@@ -34,19 +33,19 @@ enum TargetOptions {
 const Settings = ({ navigation, user, update_profile, set_banner, update_privacy, sign_out, send_password_reset_email }: SettingsProps) => {
     const [target, setTarget] = useState<TargetOptions>(TargetOptions.profile)
 
-    const RenderTarget = () => {
+    const renderTargetComponent = () => {
         switch (target) {
             case TargetOptions.privacy:
                 return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
             case TargetOptions.password:
                 return <ChangePassword sendChangePasswordEmail={send_password_reset_email} />
-            case TargetOptions.signOut:
-                return <SignOut signout={sign_out} />
             case TargetOptions.profile:
             default:
                 return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} />
         }
     }
+
+    const handleSignOut = () => sign_out()
 
     return (
         <View style={styles.container}>
@@ -94,7 +93,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
 
                 <TouchableHighlight
                     style={styles.item_container}
-                    onPress={() => setTarget(TargetOptions.signOut)}
+                    onPress={handleSignOut}
                     underlayColor={colors.secondary}
                 >
                     <View style={styles.content}>
@@ -104,7 +103,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
             </View>
             <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1 }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <RenderTarget />
+                    {renderTargetComponent()}
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
         </View>

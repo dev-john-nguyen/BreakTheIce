@@ -140,11 +140,7 @@ export const MeStackScreen = (props: any) => {
     const { title } = props.route.params;
 
     return <MeStack.Navigator screenOptions={screenOptions}>
-        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={({ navigation }) => ({
-            headerRight: () => (<Pressable onPress={() => navigation.push('Settings')}>
-                {({ pressed }) => <SettingsSvgHeader pressed={pressed} />}
-            </Pressable>)
-        })} />
+        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} />
         <MeStack.Screen name="Friends" component={Friends} />
         <MeStack.Screen name="Profile" component={Profile}
             options={({ route }) => ({

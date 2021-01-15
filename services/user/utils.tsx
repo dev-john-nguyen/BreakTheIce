@@ -30,7 +30,6 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, st
         }
 
     } else {
-        console.log(updateUserData)
         batch.update(userRef, updateUserData)
     }
 
@@ -96,6 +95,8 @@ export const fetch_profile = async (uid: string) => {
 }
 
 export async function cache_user_images(gallery: GalleryItemProps[], uriType: 'cachedUrl' | 'nearUserUri') {
+
+    if (!gallery.length) return gallery
 
     for (let i = 0; i < gallery.length; i++) {
         var cachedUrl: string | void;

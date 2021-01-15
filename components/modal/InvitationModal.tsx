@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Modal, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { colors, buttonsStyles, modalStyle } from '../../utils/styles';
+import { View, Text, TextInput, Modal, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, Dimensions } from 'react-native';
+import { colors } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { closeSvg } from '../../utils/svgs';
 import { connect } from 'react-redux';
@@ -10,6 +10,7 @@ import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/tsTypes';
 import { UserRootStateProps } from '../../services/user/types';
 import { RootProps } from '../../services';
+import { CustomButton, Icon } from '../../utils/components';
 
 interface MyModalProps {
     visible: boolean;
@@ -22,6 +23,11 @@ interface MyModalProps {
 const InviteModal = (props: MyModalProps) => {
     const [message, setMessage] = useState<string>('');
     const [btnStatus, setBtnStatus] = useState<string>('Send');
+
+    const handleClose = () => {
+        setMessage('')
+        props.handleClose()
+    }
 
     const handleSendInvitation = async () => {
         if (message.length < 10) return console.log('not long enough bitch')
@@ -44,7 +50,8 @@ const InviteModal = (props: MyModalProps) => {
 
         await props.send_invitation(invitationContent)
             .then(() => {
-                setBtnStatus('Sent')
+                setBtnStatus('Sent');
+                setMessage('');
                 props.handleClose()
             })
             .catch((err) => {
@@ -58,16 +65,14 @@ const InviteModal = (props: MyModalProps) => {
             visible={props.visible}
             animationType='fade'
             transparent={true}
-            onRequestClose={props.handleClose}
+            onRequestClose={handleClose}
         >
             <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={modalStyle.center_view}>
-                        <View style={modalStyle.modal_view}>
-                            <Pressable style={modalStyle.close_button} onPress={() => props.handleClose()}>
-                                <SvgXml xml={closeSvg} width='20' height='20' fill={colors.white} />
-                            </Pressable>
-                            <Text style={modalStyle.header_text}>Invite</Text>
+                    <View style={styles.center_view}>
+                        <View style={styles.modal_view}>
+                            <Icon type='x' size={20} color={colors.white} pressColor={colors.secondary} onPress={handleClose} style={styles.close_button} />
+                            <Text style={styles.header_text}>Connect</Text>
                             <TextInput
                                 multiline
                                 placeholder={'100 character limit'}
@@ -76,14 +81,9 @@ const InviteModal = (props: MyModalProps) => {
                                 value={message}
                                 autoCompleteType='off'
                                 maxLength={messageMaxLen}
-                                style={modalStyle.text_area}
-                                placeholderTextColor={colors.secondary}
+                                style={styles.text_area}
                             />
-                            <Pressable onPress={handleSendInvitation} style={buttonsStyles.button_white_outline}>
-                                <Text style={buttonsStyles.button_white_outline_text}>
-                                    {btnStatus}
-                                </Text>
-                            </Pressable>
+                            <CustomButton type='white_outline' text={btnStatus} onPress={handleSendInvitation} />
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
@@ -91,6 +91,60 @@ const InviteModal = (props: MyModalProps) => {
         </Modal>
     )
 }
+
+const styles = StyleSheet.create({
+    center_view: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+        height: Math.round(Dimensions.get('window').height),
+        width: Math.round(Dimensions.get('window').width)
+    },
+    modal_view: {
+        position: 'relative',
+        margin: 20,
+        backgroundColor: colors.primary,
+        borderRadius: 5,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width: '60%',
+        maxWidth: 250,
+        minHeight: 250,
+        justifyContent: 'space-between'
+    },
+    text_area: {
+        backgroundColor: colors.white,
+        color: colors.black,
+        fontSize: 12,
+        borderRadius: 5,
+        paddingLeft: 15,
+        paddingRight: 15,
+        paddingTop: 15,
+        paddingBottom: 15,
+        flex: 1,
+        margin: 20,
+        width: '100%'
+    },
+    header_text: {
+        fontSize: 22,
+        color: colors.white,
+        letterSpacing: .5
+    },
+    close_button: {
+        position: 'absolute',
+        right: 10,
+        top: 10,
+    }
+})
 
 const mapStateToProps = (state: RootProps) => ({
     user: state.user

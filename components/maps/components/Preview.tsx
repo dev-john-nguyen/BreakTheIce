@@ -6,7 +6,7 @@ import { HomeToChatNavProp } from '../../navigation/utils';
 import { ProfileImg, CustomButton } from '../../../utils/components';
 
 interface PreviewProps {
-    nearUser: NearByUsersProps
+    nearUser: NearByUsersProps & { me: boolean }
     onSendInvite: () => void;
     navigation: HomeToChatNavProp;
     onClose?: () => void;
@@ -23,11 +23,12 @@ export default ({ nearUser, onSendInvite, onClose, navigation }: PreviewProps) =
     }
 
 
-    const ActionButton = () => {
+    const renderButton = () => {
         if (nearUser.friend) return <CustomButton type='primary' text='Message' onPress={handleMessageOnPress} />
 
         if (nearUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
 
+        if (nearUser.me) return
 
         return <CustomButton type='primary' text='Invite' onPress={onSendInvite} />
     }
@@ -47,7 +48,7 @@ export default ({ nearUser, onSendInvite, onClose, navigation }: PreviewProps) =
             <View style={list_style.content_section}>
                 <Text style={list_style.content_section_text}>{nearUser.bioShort ? nearUser.bioShort : 'nothing ...'}</Text>
                 <View style={list_style.content_section_buttons}>
-                    <ActionButton />
+                    {renderButton()}
                 </View>
             </View>
         </Pressable>

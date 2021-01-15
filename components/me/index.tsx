@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg } from '../../utils/svgs';
@@ -6,26 +6,18 @@ import { colors, buttonsStyles } from '../../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { set_error } from '../../services/utils/actions';
-import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
-import { CustomButton } from '../../utils/components';
+import { Feather } from '@expo/vector-icons';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
     user: RootProps['user'];
-    set_error: UtilsDispatchActionProps['set_error'];
 }
 
-const Me = ({ navigation, user, set_error }: MeProps) => {
+const Me = ({ navigation, user }: MeProps) => {
 
-    const baseText = (text: string | number, additionalStyle: Object) => (
-        <Text style={[styles.base_text, additionalStyle]}>
-            {text}
-        </Text>
-    )
-
-    const directToGallery = () => navigation.navigate('EditGallery')
+    const directToEditGallery = () => navigation.navigate('EditGallery')
+    const directToFriends = () => navigation.navigate('Friends')
 
     return (
         <View style={styles.container}>
@@ -33,10 +25,15 @@ const Me = ({ navigation, user, set_error }: MeProps) => {
                 <SvgXml xml={userDefaultSvg} width='100' height='100' fill={colors.primary} />
                 <View style={styles.header_content}>
                     <View style={styles.header_content_text}>
-                        {baseText(user.name, { fontSize: 24 })}
-                        {baseText(`${user.age} years old`, { fontSize: 14 })}
+                        <Text style={[styles.base_text, { fontSize: 24 }]}>
+                            {user.name}
+                        </Text>
+                        <Text style={[styles.base_text, { fontSize: 14 }]}>
+                            {user.age} years old
+                        </Text>
+
                     </View>
-                    <Pressable onPress={() => navigation.navigate('Friends')}
+                    <Pressable onPress={directToFriends}
                         style={({ pressed }) => (
                             pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
                         )}
@@ -46,9 +43,13 @@ const Me = ({ navigation, user, set_error }: MeProps) => {
                 </View>
             </View>
             <View style={styles.bio}>
-                {baseText(user.bioLong, { fontSize: 12 })}
+                <Text style={[styles.base_text, { fontSize: 12 }]}>
+                    {user.bioLong}
+                </Text>
             </View>
-            <CustomButton type='primary' text='Edit Gallery' onPress={directToGallery} />
+            <Pressable onPress={directToEditGallery} style={styles.edit_icon}>
+                {({ pressed }) => <Feather name="edit" size={24} color={pressed ? colors.secondary : colors.primary} />}
+            </Pressable>
             <Gallery gallery={user.gallery} />
         </View>
     )
@@ -64,7 +65,8 @@ const styles = StyleSheet.create({
     },
     base_text: {
         color: colors.primary,
-        fontWeight: '400'
+        fontWeight: '400',
+        letterSpacing: .2
     },
     header_section: {
         flexBasis: 'auto',
@@ -87,6 +89,11 @@ const styles = StyleSheet.create({
         flexBasis: 'auto',
         padding: 20,
 
+    },
+    edit_icon: {
+        alignSelf: 'flex-end',
+        marginBottom: 20,
+        marginRight: 40
     }
 })
 
@@ -94,4 +101,4 @@ const mapStateToProps = (state: RootProps) => ({
     user: state.user
 })
 
-export default connect(mapStateToProps, { set_error, })(Me);
+export default connect(mapStateToProps, {})(Me);

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils';
 import { colors } from '../../utils/styles';
+import { Icon } from '../../utils/components';
 
 interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
@@ -22,17 +23,32 @@ const renderTitle = (route: RouteProps['props']) => {
     } else return route.params.title;
 }
 
+const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
+    switch (route.name) {
+        case 'Home':
+            const navigateList = () => navigation.navigate('NearByList')
 
-export const screenOptions = (props: { navigation: any, route: RouteProps['props'] }) => ({
+            return <Icon type='list' size={30} color={colors.white} pressColor={colors.secondary} onPress={navigateList} style={styles.header_right} />
+        case 'Me':
+            const navigateSettings = () => navigation.navigate('Settings')
+
+            return <Icon type='settings' size={30} color={colors.white} pressColor={colors.secondary} onPress={navigateSettings} style={styles.header_right} />
+
+        default:
+            return undefined
+    }
+}
+
+export const screenOptions = ({ route, navigation }: { navigation: any, route: RouteProps['props'] }) => ({
     headerTitle: () => {
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>{renderTitle(props.route)}</Text>
+                <Text style={styles.text}>{renderTitle(route)}</Text>
                 <View style={styles.underline} />
             </View>
         )
     },
-
+    headerRight: () => renderHeaderRight(route, navigation),
     headerStyle: styles.header_style,
     headerTintColor: colors.white,
     headerTitleStyle: styles.header_tint_style,
@@ -72,5 +88,8 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
         position: 'relative',
         bottom: 5
+    },
+    header_right: {
+        marginRight: 10
     }
 })

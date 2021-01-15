@@ -9,6 +9,7 @@ import { RootProps } from '..';
 import { UPDATE_INVITE_NEAR_USER } from '../near_users/actionTypes';
 import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
 import { set_banner } from '../utils/actions';
+import { UPDATE_INVITATION_HISTORY } from '../profile/actionTypes';
 
 //define the structure of the invitation
 
@@ -28,6 +29,13 @@ export const send_invitation = (invitationObj: InvitationObject) => async (dispa
         type: UPDATE_INVITE_NEAR_USER,
         payload: invitationObj.sentTo
     })
+
+    //update profile history
+    dispatch({
+        type: UPDATE_INVITATION_HISTORY,
+        payload: { uid: invitationObj.sentTo }
+    })
+
     dispatch({
         type: SEND_INVITATION,
         payload: invitationObj

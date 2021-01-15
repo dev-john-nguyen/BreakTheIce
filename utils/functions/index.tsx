@@ -38,23 +38,6 @@ export async function cacheImage(image: string) {
             console.log(err)
             return ''
         })
-
-    // if (cachedImage) {
-    //     //image was already cached
-    //     return cachedImage
-    // } else {
-    //     //caching image
-    //     return FileSystem.downloadAsync(image, path)
-    // }
-
-    // return images.map(image => {
-    //     if (typeof image === 'string') {
-    //         console.log(image)
-    //         return Image.prefetch(image);
-    //     } else {
-    //         return Asset.fromModule(image).downloadAsync();
-    //     }
-    // });
 }
 
 

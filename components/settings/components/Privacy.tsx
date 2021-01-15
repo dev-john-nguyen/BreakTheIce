@@ -38,11 +38,14 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
             }
         })
 
-        return () => { mount = false }
-    }, [loading])
+        return () => {
+            mount = false
+            navigation.setOptions({ headerRight: undefined })
+        }
+    }, [loading, privacyVals, user])
 
 
-    const handleSave = async (mount: boolean) => {
+    const handleSave = (mount: boolean) => {
         mount && setLoading(true)
 
         const { name, bioShort, bioLong, age, gender } = user;

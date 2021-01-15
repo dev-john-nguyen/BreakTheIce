@@ -7,7 +7,7 @@ import { send_invitation } from '../../services/invitations/actions';
 import { set_error } from '../../services/utils/actions';
 import { InvitationsRootProps } from '../../services/invitations/tsTypes';
 import { UserRootStateProps } from '../../services/user/types';
-import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/tsTypes';
+import { NearUsersRootProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
 import { SvgXml } from 'react-native-svg';
@@ -88,8 +88,8 @@ const Profile = (props: ProfileProps) => {
         )
 
         if (profileUser.sentInvite) return (
-            <Pressable style={buttonsStyles.button_inactive}>
-                <Text style={buttonsStyles.button_inactive_text}>Pending</Text>
+            <Pressable style={buttonsStyles.button_disabled}>
+                <Text style={buttonsStyles.button_disabled_text}>Pending</Text>
             </Pressable>
         )
         return (
