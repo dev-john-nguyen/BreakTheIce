@@ -1,4 +1,4 @@
-import { SET_MESSAGES, SET_CHAT_PREVIEWS, SET_FETCHED } from './actionTypes';
+import { SET_MESSAGES, SET_CHAT_PREVIEWS, SET_FETCHED, RESET_CHAT } from './actionTypes';
 import { ChatActionProps, ChatRootProps } from './types';
 
 const INITIAL_STATE = {
@@ -27,6 +27,8 @@ export default (state = INITIAL_STATE, action: ChatActionProps) => {
                 fetched: true,
                 chatListener: action.payload.chatListener
             }
+        case RESET_CHAT:
+            return INITIAL_STATE
         default:
             return state;
     }

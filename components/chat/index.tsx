@@ -6,6 +6,7 @@ import { ProfileImg } from '../../utils/components';
 import { ChatScreenRouteProp, ChatStackNavigationProp } from '../navigation/utils'
 import { RootProps } from '../../services';
 import { ChatPreviewProps } from '../../services/chat/types'
+import ProfileImage from '../profile/components/ProfileImage';
 interface ChatProps {
     navigation: ChatStackNavigationProp;
     route: ChatScreenRouteProp;
@@ -23,16 +24,14 @@ const Chat = (props: ChatProps) => {
     }, [props.chat.previews])
 
     const handleRedirectToMessage = (preview: ChatPreviewProps) => {
-        props.navigation.push('Message', { msgDocId: preview.docId, unread: preview.unread, title: renderFriendUsername(preview.usersInfo) });
+        var otherUser = renderOtherUser(preview.usersInfo);
+        var title = otherUser ? otherUser.username : 'RandomUser'
+
+        props.navigation.push('Message', { msgDocId: preview.docId, unread: preview.unread, title });
     }
 
-    const renderFriendUsername = (userInfo: ChatPreviewProps['usersInfo']) => {
-        for (let i = 0; i < userInfo.length; i++) {
-            if (userInfo[i].uid !== props.user.uid) {
-                return userInfo[i].username
-            }
-        }
-        return 'UnknownUser'
+    const renderOtherUser = (userInfo: ChatPreviewProps['usersInfo']) => {
+        return userInfo.find(user => user.uid !== props.user.uid)
     }
 
     const renderDate = (date: Date) => {
@@ -66,6 +65,8 @@ const Chat = (props: ChatProps) => {
 
                 var unread = item.unread && item.recentUid !== props.user.uid;
 
+                var otherUser = renderOtherUser(item.usersInfo);
+
                 const list_style = ListContainerStyle(unread ? colors.white : colors.primary, unread ? colors.secondary : undefined)
 
                 return (
@@ -80,9 +81,9 @@ const Chat = (props: ChatProps) => {
                                 <Text style={list_style.topLeft_text}>{renderDate(item.dateCreated)}</Text>
                             </View>
                             <View style={list_style.profile_section}>
-                                <ProfileImg friend={true} fillColor={unread ? colors.white : colors.primary} />
+                                <ProfileImage friend={true} size='regular' image={otherUser?.profileImg} />
                                 <View style={list_style.profile_section_text}>
-                                    <Text style={list_style.username}>{renderFriendUsername(item.usersInfo)}</Text>
+                                    <Text style={list_style.username}>{otherUser ? otherUser.username : 'RandomUser'}</Text>
                                 </View>
                             </View>
                             <View style={list_style.content_section}>

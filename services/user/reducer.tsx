@@ -30,7 +30,7 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
     switch (action.type) {
         case USER_FETCHED_FAILED:
             return {
-                ...state,
+                ...INITIAL_STATE,
                 fetchFail: true
             }
         case SET_USER:
@@ -39,9 +39,7 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
             if (state.locationListener) {
                 state.locationListener.remove()
             }
-            return {
-                ...INITIAL_STATE
-            }
+            return INITIAL_STATE
         case SET_LOCATION:
             return {
                 ...state,

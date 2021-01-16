@@ -1,13 +1,13 @@
 import React from 'react'
-import { View, FlatList, ActivityIndicator, Text, TouchableHighlight, Pressable, StyleSheet } from 'react-native';
+import { View, FlatList, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/tsTypes';
 import { HomeToChatNavProp } from '../navigation/utils';
 import { ProfilePage } from '../../utils/variables';
-import { ListContainerStyle, colors, buttonsStyles } from '../../utils/styles';
-import { ProfileImg } from '../../utils/components';
+import { ListContainerStyle, colors } from '../../utils/styles';
 import InvitationModal from '../modal/InvitationModal';
+import Preview from './components/Preview';
 
 
 interface NearByListProps {
@@ -32,7 +32,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
         }
     }
 
-    handleNearUsersOnPress = (nearUser: NearByUsersProps) => {
+    handleDirectToProfile = (nearUser: NearByUsersProps) => {
         this.props.navigation.navigate(ProfilePage, {
             profileUid: nearUser.uid,
             title: nearUser.username
@@ -47,40 +47,16 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
         })
     }
 
+    handleSendInvite = (nearUser: NearByUsersProps) => {
+        this.setState({ sentInviteUser: nearUser, showInviteModal: true })
+    }
+
     renderFlatList = () => {
         const { nearUsers, nearUsersFetched } = this.props
+
         if (!nearUsersFetched) return <ActivityIndicator />
+
         if (nearUsers.length < 1) return <Text>No Near By Users</Text>
-
-        const renderActionButton = (item: NearByUsersProps) => {
-
-            if (item.friend) {
-                return (
-                    <Pressable style={({ pressed }) => pressed ? list_style.content_section_button_primary_pressed : list_style.content_section_button_primary}
-                        onPress={() => this.handleMessageOnPress(item)}
-                    >
-                        <Text style={list_style.content_section_button_primary_text}>Message</Text>
-                    </Pressable>)
-
-            }
-
-            if (item.sentInvite) return (
-                <Pressable style={buttonsStyles.button_disabled} >
-                    <Text style={buttonsStyles.button_disabled_text}>Pending</Text>
-                </Pressable>
-            )
-
-
-            return (
-                <Pressable style={({ pressed }) => pressed ? list_style.content_section_button_primary_pressed : list_style.content_section_button_primary}
-                    onPress={() => this.setState({ showInviteModal: true, sentInviteUser: item })}
-                >
-                    <Text style={list_style.content_section_button_primary_text}>Invite</Text>
-                </Pressable>
-            )
-
-        }
-
 
         return (
             <View style={{ flex: 1 }}>
@@ -88,54 +64,52 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                 <FlatList
                     data={this.props.nearUsers}
                     renderItem={({ item, index, separators }) => (
-                        <TouchableHighlight
-                            key={item.uid}
-                            onPress={() => this.handleNearUsersOnPress(item)}
-                            underlayColor={colors.secondary}
-                            style={list_style.container}
-                        >
-                            <View style={list_style.content}>
-                                <View style={list_style.topLeft}>
-                                    <Text style={list_style.topLeft_text}>{item.distance ? item.distance : 0} meters away</Text>
-                                </View>
-                                <View style={list_style.profile_section}>
-                                    <ProfileImg friend={item.friend} />
-                                    <View style={list_style.profile_section_text}>
-                                        <Text style={list_style.username} numberOfLines={1}>{item.username ? item.username : 'RandomUser'}</Text>
-                                        <Text style={list_style.age}>{item.age ? item.age : 0} years old</Text>
-                                    </View>
-                                </View>
-                                <View style={list_style.content_section}>
-                                    <Text style={list_style.content_section_text}>{item.bioShort ? item.bioShort : 'nothing ...'}</Text>
-                                    <View style={list_style.content_section_buttons}>
-                                        {renderActionButton(item)}
-                                    </View>
-                                </View>
-                            </View>
-                        </TouchableHighlight>
+                        <Preview
+                            nearUser={item}
+                            navigation={this.props.navigation}
+                            onAction={() => this.handleDirectToProfile(item)}
+                            onSendInvite={() => this.handleSendInvite(item)}
+                            containerStyle={styles.preview_container}
+                            containerPressStyle={styles.preview_container_pressed}
+                        />
                     )}
                     keyExtractor={(item) => item.uid}
+                    contentContainerStyle={styles.flat_list}
                 />
             </View>
         )
-
-
     }
 
     render() {
         return (
-            <View style={style.container}>
+            <View style={styles.container}>
                 {this.renderFlatList()}
             </View>
         )
     }
 }
 
-const list_style = ListContainerStyle(colors.primary);
-
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
+    },
+    flat_list: {
+        paddingBottom: 20
+    },
+    preview_container: {
+        marginTop: 20,
+        borderTopColor: colors.primary,
+        borderBottomColor: colors.primary,
+        borderBottomWidth: 1,
+        borderTopWidth: 1
+    },
+    preview_container_pressed: {
+        marginTop: 20,
+        borderTopColor: colors.primary,
+        borderBottomColor: colors.primary,
+        borderBottomWidth: 1,
+        borderTopWidth: 1,
+        backgroundColor: colors.secondary
     }
 })
 

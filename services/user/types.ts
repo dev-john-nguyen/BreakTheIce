@@ -49,6 +49,21 @@ export interface UserProfilePreviewProps {
     location: LocationObject;
     age: number;
     hideOnMap: boolean;
+    profileImg?: ProfileImgProps
+}
+
+export interface NewProfileImgProps {
+    uri: string,
+    blob: Blob,
+    updatedAt?: Date,
+    name: string,
+    cachedUrl?: string
+}
+
+export interface ProfileImgProps {
+    uri: string,
+    cachedUrl?: string,
+    updatedAt: Date
 }
 
 export interface UserRootStateProps {
@@ -61,6 +76,7 @@ export interface UserRootStateProps {
     bioLong: string;
     bioShort: string;
     gender: string;
+    profileImg?: ProfileImgProps;
     gallery: GalleryItemProps[];
     hideOnMap: boolean;
     offline: boolean;
@@ -83,7 +99,7 @@ export interface UpdateUserPrivacyProps {
 
 export interface UserDispatchActionsProps {
     set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => Promise<void>;
-    update_profile: (updatedProfileData: UpdateUserProfileProps) => Promise<any>;
+    update_profile: (updatedProfileData: UpdateUserProfileProps, profileImg: NewProfileImgProps | undefined) => Promise<any>;
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => void;
     go_offline: () => void;

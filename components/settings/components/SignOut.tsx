@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, Text } from 'react-native';
+import { View } from 'react-native';
 import { CustomButton } from '../../../utils/components';
 
 export default ({ signout }: { signout: () => void }) => {

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Picker, ScrollView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, ActivityIndicator } from 'react-native';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
-import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps } from '../../../services/user/types';
-import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
-import { MeStackNavigationProp } from '../../navigation/utils';
+import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps } from '../../../../services/user/types';
+import { UtilsDispatchActionProps } from '../../../../services/utils/tsTypes';
+import { MeStackNavigationProp } from '../../../navigation/utils';
 import { isEqual } from 'lodash';
+import EditProfileImg from './components/EditProfileImg';
 
 interface EditProfileProps {
     user: UserRootStateProps;
@@ -14,17 +15,9 @@ interface EditProfileProps {
     navigation: MeStackNavigationProp
 }
 
-interface ProfileFormProps {
-    name: string;
-    bioShort: string;
-    bioLong: string;
-    age: number;
-    gender: string;
-}
-
 const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfileProps) => {
     const { name, bioShort, bioLong, age, gender } = user;
-
+    const [imgObj, setImgObj] = useState<NewProfileImgProps | undefined>();
     const [profileVals, setProfileVals] = useState<UpdateUserProfileProps>({
         name,
         bioShort,
@@ -32,6 +25,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
         age,
         gender: gender ? gender : 'man'
     })
+
 
     const [loading, setLoading] = useState(false);
 
@@ -55,22 +49,22 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
             mount = false
             navigation.setOptions({ headerRight: undefined })
         }
-    }, [loading, profileVals, user])
+    }, [loading, profileVals, user, imgObj])
 
-
-    const handleSave = (mount: boolean) => {
-        mount && setLoading(true)
+    const handleValidation = (mount: boolean) => {
 
         const { name, bioShort, bioLong, age, gender } = user;
 
         var oldVals = { name, bioShort, bioLong, age, gender }
+
+
 
         if (isEqual(oldVals, profileVals)) {
             if (mount) {
                 set_banner('No updates found.', 'warning')
                 setLoading(false)
             }
-            return
+            return false
         }
 
         let key: keyof typeof profileVals;
@@ -81,18 +75,30 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                     set_banner('Please ensure all fields are filled out.', 'error')
                     setLoading(false)
                 }
-                return
+                return false
             }
 
         }
 
-        update_profile(profileVals)
+        return true
+    }
+
+
+    const handleSave = (mount: boolean) => {
+
+        mount && setLoading(true)
+        if (!imgObj) {
+            if (!handleValidation(mount)) return;
+        }
+
+        update_profile(profileVals, imgObj)
             .then(() => {
                 mount && setLoading(false)
             })
             .catch((err) => {
                 console.log(err)
                 mount && set_banner('Oops! Something went wrong updating your profile.', 'error')
+                mount && setLoading(false)
             })
     }
 
@@ -101,6 +107,11 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
             <KeyboardAvoidingView>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <ScrollView contentContainerStyle={styles.scrollView}>
+
+                        <View style={styles.profile_image_container}>
+                            <EditProfileImg set_banner={set_banner} imgObj={imgObj} setImgObj={setImgObj} profileImg={user.profileImg} />
+                        </View>
+
                         <View style={styles.text_input_container}>
                             <Text style={styles.text_input_label}>Name:</Text>
                             <TextInput
@@ -174,6 +185,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center'
+    },
+    profile_image_container: {
+        marginTop: 20,
+        alignSelf: 'center'
     },
     scrollView: {
         paddingBottom: 40,

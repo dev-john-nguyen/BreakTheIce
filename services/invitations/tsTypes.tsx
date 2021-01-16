@@ -35,4 +35,5 @@ export interface InvitationsDispatchActionProps {
     send_invitation: (invitationContent: InvitationObject) => Promise<any>;
     set_and_listen_invitations: () => undefined | (() => void);
     update_inviter_invitation: (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => void;
+    reset_invitations: () => void;
 }

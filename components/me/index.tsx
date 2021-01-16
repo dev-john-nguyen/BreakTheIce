@@ -1,13 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg } from '../../utils/svgs';
 import { colors, buttonsStyles } from '../../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import Gallery from '../gallery';
 import { Feather } from '@expo/vector-icons';
+import ProfileImage from '../profile/components/ProfileImage';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
@@ -22,7 +21,7 @@ const Me = ({ navigation, user }: MeProps) => {
     return (
         <View style={styles.container}>
             <View style={styles.header_section}>
-                <SvgXml xml={userDefaultSvg} width='100' height='100' fill={colors.primary} />
+                <ProfileImage image={user.profileImg} size='large' />
                 <View style={styles.header_content}>
                     <View style={styles.header_content_text}>
                         <Text style={[styles.base_text, { fontSize: 24 }]}>

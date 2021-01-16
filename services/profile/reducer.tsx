@@ -1,4 +1,4 @@
-import { INSERT_HISTORY, UPDATE_INVITATION_HISTORY } from './actionTypes';
+import { INSERT_HISTORY, UPDATE_INVITATION_HISTORY, RESET_HISTORY } from './actionTypes';
 import { TimelineActionProp, ProfileUserProps } from './tsTypes';
 
 const INITIAL_STATE = {
@@ -20,6 +20,8 @@ export default (state = INITIAL_STATE, action: TimelineActionProp) => {
                 ...state,
                 history: newHistory
             }
+        case RESET_HISTORY:
+            return INITIAL_STATE;
         default:
             return state;
     }

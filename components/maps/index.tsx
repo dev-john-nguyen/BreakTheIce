@@ -10,8 +10,10 @@ import { UserRootStateProps, UserDispatchActionsProps, UserProfilePreviewProps }
 import { HomeToChatNavProp } from '../navigation/utils';
 import { MapProfileImg, CustomButton } from '../../utils/components';
 import { go_offline } from '../../services/user/actions';
-import Preview from './components/Preview';
+import Preview from '../nearbylist/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
+import ProfileImage from '../profile/components/ProfileImage';
+import { colors } from '../../utils/styles';
 
 interface RegionProps {
     latitude: number;
@@ -23,7 +25,8 @@ interface RegionProps {
 interface MapStateProps {
     region: RegionProps;
     selectedNearUser: NearByUsersProps | null;
-    previewUser: (NearByUsersProps & { me: boolean }) | null;
+    previewUser: NearByUsersProps | null;
+    previewMe: boolean;
     sendInvite: boolean;
 }
 
@@ -38,7 +41,7 @@ interface MapsProps {
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.005;
+const LATITUDE_DELTA = 0.003;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 //location and stateCity are checked are parent element so this won't render unless those are checked
@@ -60,13 +63,10 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         this.state = {
             region: initRegion,
             selectedNearUser: null,
+            previewMe: false,
             previewUser: null,
             sendInvite: false
         }
-    }
-
-    onRegionChange = (region: RegionProps) => {
-        this.setState({ region })
     }
 
     handleNearUsersOnPress = (nearUsers: NearByUsersProps) => {
@@ -97,7 +97,8 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
 
     handleViewMe = () => {
         const { uid, username, bioShort, location, age, hideOnMap } = this.props.user;
-        const mePreview: NearByUsersProps & { me: boolean } = {
+
+        const mePreview: NearByUsersProps = {
             uid,
             username,
             bioShort,
@@ -107,11 +108,12 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             friend: false,
             distance: 0,
             sentInvite: false,
-            me: true
+            receivedInvite: false
         }
 
         this.setState({
-            previewUser: mePreview
+            previewUser: mePreview,
+            previewMe: true
         })
     }
 
@@ -142,7 +144,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                                 style={{ width: 'auto', height: 'auto' }}
                                 onPress={() => this.handleMarkerOnPress(nearUser)}
                             >
-                                <MapProfileImg friend={nearUser.friend} />
+                                <ProfileImage friend={nearUser.friend} size='small' image={nearUser.profileImg} />
                             </Marker>
                         )
                     })
@@ -150,7 +152,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             </MapView >
         )
 
-        const { previewUser, sendInvite } = this.state;
+        const { previewUser, sendInvite, previewMe } = this.state;
         const { nearUsersFetched, user, go_offline, navigation } = this.props;
 
         return (
@@ -163,12 +165,19 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                     targetUser={previewUser}
                 />
 
-                {previewUser && <Preview
-                    nearUser={previewUser}
-                    navigation={navigation}
-                    onClose={() => this.setState({ previewUser: null, sendInvite: false })}
-                    onSendInvite={() => this.setState({ sendInvite: true })}
-                />}
+                {previewUser &&
+                    <View style={styles.preview_container}>
+                        <Preview
+                            nearUser={previewUser}
+                            me={previewMe}
+                            navigation={navigation}
+                            onAction={() => this.setState({ previewUser: null, sendInvite: false })}
+                            onSendInvite={() => this.setState({ sendInvite: true })}
+                            containerStyle={styles.preview_container}
+                            containerPressStyle={{ ...styles.preview_container, backgroundColor: colors.tertiary }}
+                        />
+                    </View>
+                }
 
                 <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} moreStyles={styles.my_location} />
                 <CustomButton text='View Me' type='primary' onPress={this.handleViewMe} moreStyles={styles.view_me} />
@@ -197,6 +206,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 10,
         right: 10
+    },
+    preview_container: {
+        position: 'absolute',
+        top: 40,
+        backgroundColor: colors.secondary,
+        zIndex: 100
     }
 });
 

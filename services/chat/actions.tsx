@@ -1,4 +1,4 @@
-import { SET_CHAT_PREVIEWS, SET_FETCHED } from './actionTypes';
+import { SET_CHAT_PREVIEWS, SET_FETCHED, RESET_CHAT } from './actionTypes';
 import { fireDb } from '../firebase';
 import { AppDispatch } from '../../App';
 import { RootProps } from '../';
@@ -56,3 +56,5 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
     return chatListener
 
 }
+
+export const reset_chat = () => ({ type: RESET_CHAT, payload: undefined })

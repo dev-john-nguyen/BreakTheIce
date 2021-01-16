@@ -1,4 +1,4 @@
-import { SET_NEAR_USERS, UPDATE_NEAR_USERS, INIT_NEAR_USERS } from './actionTypes';
+import { SET_NEAR_USERS, UPDATE_NEAR_USERS, INIT_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
@@ -41,10 +41,11 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
                     location,
                     bioShort,
                     age,
-                    friend: false,
                     distance: 0,
+                    hideOnMap,
                     sentInvite: false,
-                    hideOnMap
+                    receivedInvite: false,
+                    friend: false,
                 }
 
                 //check if the coords are missing
@@ -66,32 +67,22 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
 
                 //check if the nearUser is a friend
                 var friends = getState().friends.users;
-                if (friends.length > 0) {
-                    //loop through and see if uid match then update friend bool
-                    for (let i = 0; i < friends.length; i++) {
-                        if (friends[i].uid === userData.uid) {
-                            userData.friend = true;
-                            break
-                        }
-                    }
-                }
+                userData.friend = friends.find(item => item.uid === userData.uid) ? true : false
 
                 //check if an invitation was sent to the user already
                 var invitationsOutbound = getState().invitations.outbound;
-                if (invitationsOutbound.length > 0) {
-                    for (let i = 0; i < invitationsOutbound.length; i++) {
-                        if (invitationsOutbound[i].sentTo === userData.uid) {
-                            userData.sentInvite = true;
-                            break
-                        }
-                    }
-                }
+                userData.sentInvite = invitationsOutbound.find(item => item.sentTo === userData.uid) ? true : false
 
+                //check if user sent invitation to current logged in user
+                var invitationInbound = getState().invitations.inbound;
+                userData.receivedInvite = invitationInbound.find(item => item.sentBy === userData.uid) ? true : false
 
+                //if within radius push it into nearByUsers array
                 if (distanceBetweenPoints < acceptedRadius) {
                     nearByUsers.push(userData)
                 }
 
+                //push all into allUsers
                 allUsers.push(userData)
             })
 
@@ -176,3 +167,5 @@ export const validate_near_users = (location: LocationObject, nearByUsers: Array
         }
     })
 }
+
+export const reset_near_users = () => ({ type: RESET_NEAR_USERS, payload: undefined })

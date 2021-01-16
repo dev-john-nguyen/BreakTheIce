@@ -1,3 +1,5 @@
+import { ProfileImgProps } from "../user/types";
+
 export interface ChatActionProps {
     type: string;
     payload: {
@@ -20,7 +22,7 @@ export interface ChatObjectProps {
 export type ChatPreviewProps = {
     dateCreated: Date;
     docId: string;
-    usersInfo: Array<{ uid: string, username: string }>;
+    usersInfo: Array<{ uid: string, username: string, profileImg: ProfileImgProps }>;
     recentMsg: string;
     recentUid: string;
     dateSent: Date;
@@ -37,4 +39,5 @@ export interface ChatRootProps {
 
 export interface ChatDispatchActionsProps {
     set_and_listen_messages: () => undefined | (() => void);
+    reset_chat: () => void;
 }

@@ -1,5 +1,5 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, UPDATE_INVITE_NEAR_USER, INIT_NEAR_USERS } from './actionTypes'
-import { NearUsersActionProps, NearUsersRootProps } from './tsTypes';
+import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, UPDATE_INVITE_NEAR_USER, INIT_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes'
+import { NearUsersActionProps } from './tsTypes';
 
 const INITIAL_STATE = {
     nearBy: [],
@@ -41,6 +41,8 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
                 }
             }
             return state;
+        case RESET_NEAR_USERS:
+            return INITIAL_STATE
         default:
             return state
     }

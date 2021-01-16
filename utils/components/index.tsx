@@ -60,7 +60,7 @@ export const PortraitSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pres
 )
 
 
-export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: string, size: number, color: string, pressColor: string, onPress: () => void, style?: StyleProp<any> }) => (
+export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: string, size: number, color: string, pressColor?: string, onPress?: () => void, style?: StyleProp<any> }) => (
     <Pressable onPress={onPress} style={style}>
         {({ pressed }) => <Feather name={type} size={size} color={pressed ? pressColor : color} />}
     </Pressable>

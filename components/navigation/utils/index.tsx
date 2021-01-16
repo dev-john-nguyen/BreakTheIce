@@ -55,6 +55,7 @@ export type RootBottomParamList = {
             title: string;
         }
     };
+    Invitations: undefined
 }
 
 type ProfileRouteParams = {
@@ -97,7 +98,7 @@ type MeStackParams = {
 }
 
 
-export type HomeToChatNavProp = BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp;
+export type HomeToChatNavProp = BottomTabNavigationProp<RootBottomParamList & HomeStackParams, 'Home'> & HomeStackNavigationProp;
 
 export type HomeScreenRouteProp = RouteProp<HomeStackParams, "Home" | "NearByList" | "Profile">;
 export type ProfileScreenRouteProp = RouteProp<HomeStackParams, "Profile">;

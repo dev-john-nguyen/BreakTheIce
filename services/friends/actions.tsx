@@ -1,4 +1,4 @@
-import { SET_FRIENDS, INIT_FRIENDS } from './actionTypes';
+import { SET_FRIENDS, INIT_FRIENDS, RESET_FRIENDS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { FriendsDb, FriendsUsersDb } from '../../utils/variables';
@@ -54,3 +54,5 @@ export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: ()
 
     return friendListener
 }
+
+export const reset_friends = () => ({ type: RESET_FRIENDS, payload: undefined })

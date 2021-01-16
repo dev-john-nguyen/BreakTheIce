@@ -10,13 +10,13 @@ import { UserRootStateProps } from '../../services/user/types';
 import { NearUsersRootProps } from '../../services/near_users/tsTypes';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
-import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg } from '../../utils/svgs';
 import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, ProfileUserProps } from '../../services/profile/tsTypes';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
+import ProfileImage from './components/ProfileImage';
+import { CustomButton } from '../../utils/components';
 
 interface ProfileProps {
     navigation: HomeStackNavigationProp;
@@ -65,7 +65,6 @@ const Profile = (props: ProfileProps) => {
 
     }, [props.route, props.outboundInvitations])
 
-
     if (notFound) return (<View><Text>Not Found</Text></View>)
 
     if (!profileUser) return (<View><ActivityIndicator /></View>)
@@ -92,6 +91,14 @@ const Profile = (props: ProfileProps) => {
                 <Text style={buttonsStyles.button_disabled_text}>Pending</Text>
             </Pressable>
         )
+
+        if (profileUser.receivedInvite) return (
+            <View style={styles.invitation_buttons}>
+                <CustomButton type='primary' text='Accept' />
+                <CustomButton type='secondary' text='Deny' moreStyles={{ marginLeft: 5 }} />
+            </View>
+        )
+
         return (
             <Pressable onPress={() => setShowModalInvite(true)}
                 style={({ pressed }) => (
@@ -111,7 +118,7 @@ const Profile = (props: ProfileProps) => {
                 handleClose={() => setShowModalInvite(false)}
             />
             <View style={styles.header_section}>
-                <SvgXml xml={userDefaultSvg} width='100' height='100' fill={colors.primary} />
+                <ProfileImage image={profileUser.profileImg} size='large' />
                 <View style={styles.header_content}>
                     <View style={styles.header_content_text}>
                         {baseText(profileUser.name, { fontSize: 24 })}
@@ -166,8 +173,10 @@ const styles = StyleSheet.create({
     invite_modal: {
         flex: 1,
         backgroundColor: 'green'
+    },
+    invitation_buttons: {
+        flexDirection: 'row'
     }
-
 })
 
 

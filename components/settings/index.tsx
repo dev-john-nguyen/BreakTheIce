@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out, send_password_reset_email } from '../../services/user/actions';
 import { colors } from '../../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils';
-import EditProfile from './components/EditProfile';
+import EditProfile from './components/editprofile';
 import Privacy from './components/Privacy';
 import { RootProps } from '../../services';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';

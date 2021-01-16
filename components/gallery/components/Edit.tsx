@@ -10,7 +10,6 @@ import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
 import { UserDispatchActionsProps } from '../../../services/user/types';
 import { UtilsRootStateProps, UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
-import { SaveSvg, MinusSvg } from '../../../utils/components';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { AutoId } from '../../../utils/functions';
 import _ from 'lodash'

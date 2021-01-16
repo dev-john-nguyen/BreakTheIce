@@ -1,4 +1,4 @@
-import { INSERT_HISTORY } from './actionTypes';
+import { INSERT_HISTORY, RESET_HISTORY } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { UsersDb } from '../../utils/variables';
@@ -31,7 +31,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
 
     if (profilePreviewData) {
-        var { friend, sentInvite, distance } = profilePreviewData
+        var { friend, sentInvite, distance, receivedInvite } = profilePreviewData
     }
 
     //check to see if the profileObj is empty... if it is fetch it from server
@@ -43,7 +43,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
             if (!docData) throw 'No data exists';
 
-            const { location, name, bioShort, bioLong, stateCity, gender, age, username, gallery, hideOnMap, offline } = docData
+            const { location, name, bioShort, bioLong, stateCity, gender, age, username, gallery, hideOnMap, offline, profileImg } = docData
 
             const profileData: ProfileUserProps = {
                 uid: doc.id,
@@ -55,16 +55,24 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 stateCity,
                 gender,
                 age,
+                hideOnMap,
+                gallery,
+                offline,
+                profileImg,
+                receivedInvite: receivedInvite ? receivedInvite : false,
                 friend: friend ? friend : false,
                 distance: distance ? distance : 0,
                 sentInvite: sentInvite ? sentInvite : false,
-                hideOnMap,
-                gallery,
-                offline
             }
             ///cache gallery images
             if (profileData.gallery.length > 0) {
                 await cache_user_images(profileData.gallery, 'nearUserUri')
+            }
+
+            //cache profile image
+            if (profileData.profileImg) {
+                let cachedUrl = await cacheImage(profileData.profileImg.uri)
+                profileData.profileImg.cachedUrl = cachedUrl;
             }
 
             dispatch({
@@ -76,3 +84,5 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
         })
 }
+
+export const reset_history = () => ({ type: RESET_HISTORY, payload: undefined })

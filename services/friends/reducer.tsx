@@ -1,4 +1,4 @@
-import { SET_FRIENDS, INIT_FRIENDS } from './actionTypes';
+import { SET_FRIENDS, INIT_FRIENDS, RESET_FRIENDS } from './actionTypes';
 import { FriendsActionProps } from './tsTypes';
 const INITIAL_STATE = {
     users: [],
@@ -18,6 +18,8 @@ export default (state = INITIAL_STATE, action: FriendsActionProps) => {
                 fetched: true,
                 friendListener: action.payload.friendListener
             }
+        case RESET_FRIENDS:
+            return INITIAL_STATE
         default:
             return state;
     }

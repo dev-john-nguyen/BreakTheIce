@@ -20,4 +20,5 @@ export interface FriendObjProps {
 
 export interface FriendDispatchActionProps {
     set_and_listen_friends: () => (() => void) | undefined;
+    reset_friends: () => void;
 }

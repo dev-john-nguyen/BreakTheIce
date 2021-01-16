@@ -84,7 +84,8 @@ export const fetch_profile = async (uid: string) => {
                     location: data.location ? data.location : null,
                     hideOnMap: data.hideOnMap ? data.hideOnMap : false,
                     gallery: data.gallery ? data.gallery : [],
-                    offline: data.offline === undefined ? false : data.offline
+                    offline: data.offline === undefined ? false : data.offline,
+                    profileImg: data.profileImg
                 }
 
                 return { profile: profileObj }

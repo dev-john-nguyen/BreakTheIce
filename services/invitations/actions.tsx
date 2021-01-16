@@ -1,8 +1,7 @@
-import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET_INVITATIONS } from './actionTypes';
+import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET_INVITATIONS, RESET_INVITATIONS } from './actionTypes';
 import { SET_ERROR } from '../utils/actionTypes';
 import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './tsTypes';
-import { UserRootStateProps } from '../user/types';
 import { fireDb } from '../firebase';
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
@@ -162,3 +161,5 @@ export const update_inviter_invitation = (invitationObj: InvitationObject, updat
 
     //Don't need to dipatch because the inbound listener will catch it ... hopefully
 }
+
+export const reset_invitations = () => ({ type: RESET_INVITATIONS, payload: undefined })

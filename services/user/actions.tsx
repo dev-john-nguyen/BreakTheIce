@@ -1,16 +1,21 @@
 import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
 import { set_loading, remove_loading, set_status_bar, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps } from './types';
+import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps } from './types';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
-import { validate_near_users } from '../near_users/actions';
+import { validate_near_users, reset_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
 import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, LocationsUsersDb, LocationsDb, UsersDb } from '../../utils/variables'
 import { SET_ERROR } from '../utils/actionTypes';
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
+import { cacheImage } from '../../utils/functions';
+import { reset_chat } from '../chat/actions';
+import { reset_friends } from '../friends/actions';
+import { reset_invitations } from '../invitations/actions';
+import { reset_history } from '../profile/actions';
 
 // import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
 // const baseUrl = 'http://localhost:5050';
@@ -36,10 +41,18 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                     //check if profile data exists
                     if (fetchUserRes.profile) {
 
-                        var { gallery, bioShort, bioLong, } = fetchUserRes.profile
+                        var { gallery, bioShort, bioLong, profileImg } = fetchUserRes.profile
 
-                        //cache images
+                        //cache gallery images
                         gallery = await cache_user_images(gallery, 'cachedUrl')
+
+                        //cache profile image
+                        if (profileImg) {
+                            let cacheResult = await cacheImage(profileImg.uri);
+                            if (cacheResult) {
+                                profileImg.cachedUrl = cacheResult
+                            }
+                        }
 
                         //set banner if profile information has not be initiated
                         if (!bioShort || !bioLong) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
@@ -56,6 +69,11 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
 
         } else {
             dispatch({ type: REMOVE_USER, payload: undefined })
+            dispatch(reset_chat())
+            dispatch(reset_friends())
+            dispatch(reset_invitations())
+            dispatch(reset_history())
+            dispatch(reset_near_users())
         }
         dispatch(remove_loading)
     });
@@ -290,12 +308,49 @@ export const go_online = () => (dispatch: AppDispatch, getState: () => RootProps
         })
 }
 
-export const update_profile = (updatedProfileVals: UpdateUserProfileProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const update_profile = (updatedProfileVals: UpdateUserProfileProps, profileImg: NewProfileImgProps | undefined) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
     const { uid } = getState().user;
 
-    await fireDb.collection(UsersDb).doc(uid).update(updatedProfileVals);
-    dispatch({ type: UPDATE_PROFILE, payload: updatedProfileVals });
+    var newProfileImg: ProfileImgProps | undefined;
+
+    if (profileImg) {
+        //upload new image
+        var path: string = `${uid}/profile/${profileImg.name}`;
+
+        var newProfileImgUri = await fireStorage.ref().child(path).put(profileImg.blob)
+            .then(async (snapshot) => {
+                return await snapshot.ref.getDownloadURL()
+                    .then((downloadURL) => {
+                        return downloadURL
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        dispatch(set_banner("Oops! Looks like we failed to retrieve the uploaded image. Try uploading again", 'error'))
+                    })
+            })
+            .catch((err) => {
+                console.log(err)
+                dispatch(set_banner('Oops! Something went wrong uploading your new profile image.', 'error'))
+            })
+
+        if (newProfileImgUri) {
+            newProfileImg = {
+                uri: newProfileImgUri,
+                updatedAt: new Date()
+            }
+        }
+    }
+
+    const initProfileVals = {
+        ...updatedProfileVals,
+        profileImg: newProfileImg ? newProfileImg : null
+    }
+
+    await fireDb.collection(UsersDb).doc(uid).update(initProfileVals);
+
+    dispatch({ type: UPDATE_PROFILE, payload: initProfileVals });
+
     dispatch(set_banner('Saved', 'success'));
 }
 

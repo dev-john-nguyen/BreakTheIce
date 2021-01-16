@@ -62,8 +62,8 @@ export const profileStyles = StyleSheet.create({
 //buttons
 const buttonBase: StyleProp<any> = {
     borderRadius: 20,
-    paddingLeft: 40,
-    paddingRight: 40,
+    paddingLeft: 30,
+    paddingRight: 30,
     paddingTop: 10,
     paddingBottom: 10,
     borderWidth: 2,
