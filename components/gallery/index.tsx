@@ -4,7 +4,7 @@ import { GalleryItemProps } from '../../services/user/types';
 import { colors } from '../../utils/styles';
 import { cacheImage } from '../../utils/functions';
 import _ from 'lodash';
-import { NearByUsersProps } from '../../services/near_users/tsTypes';
+import { NearByUsersProps } from '../../services/near_users/types';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];

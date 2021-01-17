@@ -1,6 +1,6 @@
 import { fireDb } from '../firebase';
 import { LocationsDb, UsersDb } from '../../utils/variables';
-import { StateCityProps, UserRootStateProps, GalleryItemProps, UserProfilePreviewProps } from './types';
+import { StateCityProps, UserRootStateProps, GalleryItemProps, UserProfilePreviewProps, ProfileImgProps } from './types';
 import { LocationObject } from 'expo-location';
 import { cacheImage } from '../../utils/functions';
 
@@ -38,13 +38,20 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, st
 
     const LocationRef = fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(userData.uid)
 
+    //don't want to send the cacheduri
+    const profileImg: ProfileImgProps | undefined = userData.profileImg && {
+        uri: userData.profileImg.uri,
+        updatedAt: userData.profileImg.updatedAt
+    }
+
     const profilePreview: UserProfilePreviewProps = {
         uid: userData.uid,
         username: userData.username,
         location: location,
         bioShort: userData.bioShort,
         age: userData.age,
-        hideOnMap: userData.hideOnMap
+        hideOnMap: userData.hideOnMap,
+        profileImg: profileImg
     }
 
     batch.set(LocationRef, profilePreview)

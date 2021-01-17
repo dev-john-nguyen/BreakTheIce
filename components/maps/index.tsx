@@ -1,19 +1,21 @@
 import React from 'react';
 import MapView, { Marker, Region } from 'react-native-maps';
-import { StyleSheet, View, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { ProfilePage } from '../../utils/variables';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { validate_near_users } from '../../services/near_users/actions';
-import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/tsTypes';
-import { UserRootStateProps, UserDispatchActionsProps, UserProfilePreviewProps } from '../../services/user/types';
+import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/types';
+import { UserRootStateProps } from '../../services/user/types';
 import { HomeToChatNavProp } from '../navigation/utils';
-import { MapProfileImg, CustomButton } from '../../utils/components';
+import { CustomButton } from '../../utils/components';
 import { go_offline } from '../../services/user/actions';
-import Preview from '../nearbylist/components/Preview';
+import Preview from '../components/Preview';
 import InvitationModal from '../modal/InvitationModal';
-import ProfileImage from '../profile/components/ProfileImage';
+import ProfileImage from '../components/ProfileImage';
 import { colors } from '../../utils/styles';
+import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
+import { update_invitation } from '../../services/invitations/actions';
 
 interface RegionProps {
     latitude: number;
@@ -36,7 +38,7 @@ interface MapsProps {
     nearUsersFetched: NearUsersRootProps['fetched'];
     allUsers: NearUsersRootProps['all'];
     user: UserRootStateProps;
-    go_offline: UserDispatchActionsProps['go_offline'];
+    update_invitation: InvitationsDispatchActionProps['update_invitation']
 }
 
 const { width, height } = Dimensions.get('window');
@@ -96,10 +98,11 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     }
 
     handleViewMe = () => {
-        const { uid, username, bioShort, location, age, hideOnMap } = this.props.user;
+        const { uid, username, bioShort, location, age, hideOnMap, profileImg } = this.props.user;
 
         const mePreview: NearByUsersProps = {
             uid,
+            profileImg,
             username,
             bioShort,
             location,
@@ -118,8 +121,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     }
 
     handleMarkerOnPress = (nearUser: NearByUsersProps) => {
-        const previewUser = { ...nearUser, me: false }
-        this.setState({ previewUser })
+        this.setState({ previewUser: nearUser })
     }
 
     render() {
@@ -153,7 +155,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         )
 
         const { previewUser, sendInvite, previewMe } = this.state;
-        const { nearUsersFetched, user, go_offline, navigation } = this.props;
+        const { nearUsersFetched, user, navigation, update_invitation } = this.props;
 
         return (
             <View style={styles.container}>
@@ -175,6 +177,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             onSendInvite={() => this.setState({ sendInvite: true })}
                             containerStyle={styles.preview_container}
                             containerPressStyle={{ ...styles.preview_container, backgroundColor: colors.tertiary }}
+                            onInvitationUpdate={update_invitation}
                         />
                     </View>
                 }
@@ -222,4 +225,4 @@ const mapStateToProps = (state: RootProps) => ({
     allUsers: state.nearUsers.all
 })
 
-export default connect(mapStateToProps, { validate_near_users, go_offline })(Maps);
+export default connect(mapStateToProps, { validate_near_users, go_offline, update_invitation })(Maps);

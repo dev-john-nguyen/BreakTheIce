@@ -349,6 +349,9 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, profi
 
     await fireDb.collection(UsersDb).doc(uid).update(initProfileVals);
 
+    //cache profile img
+    initProfileVals.profileImg && cacheImage(initProfileVals.profileImg.uri)
+
     dispatch({ type: UPDATE_PROFILE, payload: initProfileVals });
 
     dispatch(set_banner('Saved', 'success'));

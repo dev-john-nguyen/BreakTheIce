@@ -10,7 +10,7 @@ import { set_and_listen_invitations } from '../../../services/invitations/action
 import { set_and_listen_friends } from '../../../services/friends/actions';
 import { set_and_listen_messages } from '../../../services/chat/actions';
 import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../../services/user/types';
-import { NearUsersDispatchActionProps } from '../../../services/near_users/tsTypes';
+import { NearUsersDispatchActionProps } from '../../../services/near_users/types';
 import { InvitationsDispatchActionProps } from '../../../services/invitations/tsTypes';
 import { ChatDispatchActionsProps } from '../../../services/chat/types';
 import { FriendDispatchActionProps } from '../../../services/friends/tsTypes';

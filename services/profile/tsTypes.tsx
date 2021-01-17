@@ -1,9 +1,14 @@
-import { NearByUsersProps } from '../near_users/tsTypes';
+import { NearByUsersProps } from '../near_users/types';
 import { UserRootStateProps } from '../user/types';
+import { InvitationStatusOptions } from '../invitations/tsTypes';
 
-export interface TimelineActionProp {
+export interface ProfileActionProps {
     type: string;
-    payload: any;
+    // payload: {
+    //     uid: string,
+    //     status: InvitationStatusOptions
+    // };
+    payload: any
 }
 
 export interface TimelineLocationProps {

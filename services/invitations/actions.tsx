@@ -1,44 +1,39 @@
 import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET_INVITATIONS, RESET_INVITATIONS } from './actionTypes';
-import { SET_ERROR } from '../utils/actionTypes';
 import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './tsTypes';
 import { fireDb } from '../firebase';
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
-import { UPDATE_INVITE_NEAR_USER } from '../near_users/actionTypes';
+import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER } from '../near_users/actionTypes';
 import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
 import { set_banner } from '../utils/actions';
-import { UPDATE_INVITATION_HISTORY } from '../profile/actionTypes';
+import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
+import { handleInvitations, handle_invitation_status } from './utils';
 
 //define the structure of the invitation
 
-export const send_invitation = (invitationObj: InvitationObject) => async (dispatch: AppDispatch) => {
+export const send_invitation = (invitationObj: Omit<InvitationObject, 'docId'>) => async (dispatch: AppDispatch) => {
     try {
         await fireDb.collection(InvitationsDb).add(invitationObj)
     } catch (e) {
         console.log(e)
-        return dispatch({
-            type: SET_ERROR,
-            payload: "Oops! Something went wrong sending your invitation."
-        })
+        dispatch(set_banner("Oops! Something went wrong sending your invitation.", 'error'))
+        return
     }
 
     //will need to update the near user of which the invitation was sent
     dispatch({
-        type: UPDATE_INVITE_NEAR_USER,
-        payload: invitationObj.sentTo
+        type: SENT_INVITE_NEAR_USER,
+        payload: { uid: invitationObj.sentTo }
     })
 
     //update profile history
     dispatch({
-        type: UPDATE_INVITATION_HISTORY,
+        type: SENT_INVITE_PROFILE_HISTORY,
         payload: { uid: invitationObj.sentTo }
     })
 
-    dispatch({
-        type: SEND_INVITATION,
-        payload: invitationObj
-    })
+    dispatch({ type: SEND_INVITATION, payload: invitationObj })
 }
 
 export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState: () => RootProps) => {
@@ -62,10 +57,7 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
         })
         .catch(err => {
             console.log(err);
-            dispatch({
-                type: SET_ERROR,
-                payload: "Oops! Couldn't get invitations that you sent"
-            })
+            dispatch(set_banner("Oops! Couldn't get invitations that you sent", 'error'))
         })
 
     //get and listen to inbound invitations
@@ -80,10 +72,7 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
         },
             err => {
                 console.log(err)
-                dispatch({
-                    type: SET_ERROR,
-                    payload: "Oops! Couldn't get your invitations"
-                })
+                dispatch(set_banner("Oops! Couldn't get your invitations", 'error'))
             }
         )
 
@@ -92,37 +81,7 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
     return invitationListener
 }
 
-function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
-
-    var invitations: Array<InvitationObject> = [];
-
-    querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-        if (doc.exists) {
-            const invitationDoc = doc.data()
-
-            if (invitationDoc) {
-                const { message, createdAt, updatedAt, status, sentBy, sentTo, sentByAge, sentByUsername } = invitationDoc;
-
-                var invitationObj: InvitationObject = {
-                    docId: doc.id,
-                    sentByAge,
-                    sentByUsername,
-                    sentBy,
-                    sentTo,
-                    createdAt: createdAt.toDate(),
-                    updatedAt: updatedAt.toDate(),
-                    message,
-                    status
-                }
-                invitations.push(invitationObj)
-            }
-        }
-    })
-
-    return invitations;
-}
-
-export const update_inviter_invitation = (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const update_invitation_from_invitations = (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
     const user = getState().user;
 
     var batch = fireDb.batch();
@@ -153,11 +112,38 @@ export const update_inviter_invitation = (invitationObj: InvitationObject, updat
         await batch.commit()
     } catch (err) {
         console.log(err)
-        return dispatch({
-            type: SET_ERROR,
-            payload: "Oops! Something went wrong updated your request"
-        })
+        dispatch(set_banner("Oops! Something went wrong updated your request", 'error'))
+        return;
     }
+
+    //Don't need to dipatch because the inbound listener will catch it ... hopefully
+}
+
+export const update_invitation = (inviterUid: string, status: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    if (!inviterUid) return;
+
+    const { invitations, user } = getState()
+
+    const { inbound } = invitations
+
+    var invitationToUpdate = inbound.find(invitation => invitation.sentBy === inviterUid)
+
+    if (!invitationToUpdate) {
+        dispatch(set_banner('Looks like we are unable to find the invitation to update.', 'error'))
+        return;
+    }
+
+    try {
+        await handle_invitation_status(invitationToUpdate, status, user)
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner('Oops! Something went wrong trying to update the status of the invitation', 'error'))
+        return;
+    }
+
+    dispatch({ type: UPDATE_INVITE_STATUS_NEAR_USER, payload: { uid: inviterUid, status } })
+
+    dispatch({ type: UPDATE_INVITE_STATUS_PROFILE_HISTORY, payload: { uid: inviterUid, status } })
 
     //Don't need to dipatch because the inbound listener will catch it ... hopefully
 }

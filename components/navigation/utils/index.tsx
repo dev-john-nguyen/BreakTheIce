@@ -15,7 +15,7 @@ import EditGallery from '../../gallery/components/Edit';
 import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/types';
 import { SettingsSvgHeader } from '../../../utils/components';
-import { NearByUsersProps } from '../../../services/near_users/tsTypes';
+import { NearByUsersProps } from '../../../services/near_users/types';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 export enum InvitationScreenOptions {

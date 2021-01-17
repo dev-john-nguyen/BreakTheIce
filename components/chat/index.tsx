@@ -6,7 +6,7 @@ import { ProfileImg } from '../../utils/components';
 import { ChatScreenRouteProp, ChatStackNavigationProp } from '../navigation/utils'
 import { RootProps } from '../../services';
 import { ChatPreviewProps } from '../../services/chat/types'
-import ProfileImage from '../profile/components/ProfileImage';
+import ProfileImage from '../components/ProfileImage';
 interface ChatProps {
     navigation: ChatStackNavigationProp;
     route: ChatScreenRouteProp;

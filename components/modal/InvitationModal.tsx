@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions } from '../../services/invitations/tsTypes';
 import { send_invitation } from '../../services/invitations/actions';
 import { messageMaxLen } from '../../utils/variables';
-import { NearByUsersProps } from '../../services/near_users/tsTypes';
+import { NearByUsersProps } from '../../services/near_users/types';
 import { UserRootStateProps } from '../../services/user/types';
 import { RootProps } from '../../services';
 import { CustomButton, Icon } from '../../utils/components';
@@ -37,7 +37,7 @@ const InviteModal = (props: MyModalProps) => {
 
         setBtnStatus('Sending...')
 
-        const invitationContent: InvitationObject = {
+        const invitationContent: Omit<InvitationObject, 'docId'> = {
             sentBy: props.user.uid,
             sentByAge: props.user.age,
             sentByUsername: props.user.username,

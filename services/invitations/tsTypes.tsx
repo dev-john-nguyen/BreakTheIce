@@ -1,5 +1,4 @@
 
-import { UserRootStateProps } from '../user/types';
 
 export interface InvitationsActionProps {
     type: string;
@@ -20,7 +19,7 @@ export enum InvitationStatusOptions {
 }
 
 export interface InvitationObject {
-    docId?: string,
+    docId: string,
     sentBy: string,
     sentByUsername: string,
     sentByAge: number,
@@ -32,8 +31,9 @@ export interface InvitationObject {
 }
 
 export interface InvitationsDispatchActionProps {
-    send_invitation: (invitationContent: InvitationObject) => Promise<any>;
+    send_invitation: (invitationContent: Omit<InvitationObject, 'docId'>) => Promise<any>;
     set_and_listen_invitations: () => undefined | (() => void);
-    update_inviter_invitation: (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => void;
+    update_invitation_from_invitations: (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => void;
+    update_invitation: (inviterUid: string, status: InvitationStatusOptions) => Promise<void>;
     reset_invitations: () => void;
 }

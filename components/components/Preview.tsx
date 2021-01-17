@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, StyleProp, Dimensions } from 'react-native';
-import { NearByUsersProps } from '../../../services/near_users/tsTypes';
-import { ListContainerStyle, colors } from '../../../utils/styles';
-import { HomeToChatNavProp } from '../../navigation/utils';
-import { CustomButton } from '../../../utils/components';
-import ProfileImage from '../../profile/components/ProfileImage';
+import { NearByUsersProps } from '../../services/near_users/types';
+import { colors } from '../../utils/styles';
+import { HomeToChatNavProp } from '../navigation/utils';
+import { CustomButton } from '../../utils/components';
+import ProfileImage from './ProfileImage';
+import RespondButton from './RespondButton';
+import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
 
 interface PreviewProps {
     nearUser: NearByUsersProps,
@@ -14,9 +16,11 @@ interface PreviewProps {
     onAction?: () => void;
     containerStyle: StyleProp<any>;
     containerPressStyle: StyleProp<any>;
+    onInvitationUpdate: InvitationsDispatchActionProps['update_invitation'];
 }
 
-export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, containerPressStyle }: PreviewProps) => {
+export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, containerPressStyle, onInvitationUpdate }: PreviewProps) => {
+    const [respondLoading, setRespondLoading] = useState<boolean>(false);
 
     const handleMessageOnPress = () => {
         navigation.navigate('Chat', {
@@ -34,8 +38,8 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
         })
     }
 
-    const handleDirectToInvitations = () => {
-        navigation.navigate('Invitations')
+    const handleInvitationUpdate = async (status: InvitationStatusOptions) => {
+        return onInvitationUpdate(nearUser.uid, status)
     }
 
 
@@ -44,7 +48,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
 
         if (nearUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
 
-        if (nearUser.receivedInvite) return <CustomButton text='Respond' type='secondary' onPress={handleDirectToInvitations} />
+        if (nearUser.receivedInvite) return <RespondButton setLoading={setRespondLoading} loading={respondLoading} handleInvitationUpdate={handleInvitationUpdate} />
 
         if (me) return <CustomButton type='primary' text='Close' onPress={onAction} />
 

@@ -1,4 +1,7 @@
 import * as FileSystem from 'expo-file-system'
+import { NearByUsersProps } from '../../services/near_users/types';
+import { InvitationStatusOptions } from '../../services/invitations/tsTypes';
+import { ProfileUserProps } from '../../services/profile/tsTypes';
 
 export class AutoId {
     static newId(len?: number): string {
@@ -49,4 +52,27 @@ export function hashCode(string: string) {
         hash |= 0; // Convert to 32bit integer
     }
     return hash.toString();
+}
+
+interface ItemsProps {
+    receivedInvite: Boolean,
+    friend: Boolean,
+    sentInvite: Boolean,
+    uid: string
+}
+export function update_nearBy(items: any, uid: string, status?: InvitationStatusOptions) {
+    return items.map((user: ItemsProps) => {
+        if (user.uid === uid) {
+            if (status) {
+                user.receivedInvite = false;
+                if (status === InvitationStatusOptions.accepted) {
+                    user.friend = true
+                }
+            } else {
+                user.sentInvite = true;
+            }
+        }
+        return user;
+    })
+
 }

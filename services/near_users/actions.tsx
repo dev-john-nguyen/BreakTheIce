@@ -4,12 +4,13 @@ import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
 import { LocationsDb, acceptedRadius } from '../../utils/variables';
 import { StateCityProps } from '../user/types';
-import { NearByUsersProps } from './tsTypes';
+import { NearByUsersProps } from './types';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
 import firebase from 'firebase';
 import { SET_ERROR } from '../utils/actionTypes';
 import { set_banner } from '../utils/actions';
+import { cacheImage } from '../../utils/functions';
 
 //find near by users
 export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
@@ -31,9 +32,9 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
             var nearByUsers: Array<NearByUsersProps> = [];
             var allUsers: Array<NearByUsersProps> = [];
 
-            querySnapshot.docs.forEach((doc) => {
+            querySnapshot.docs.forEach(async (doc) => {
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                const { username, location, bioShort, age, hideOnMap } = doc.data()
+                const { username, location, bioShort, age, hideOnMap, profileImg } = doc.data()
 
                 var userData: NearByUsersProps = {
                     uid: doc.id,
@@ -43,6 +44,7 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
                     age,
                     distance: 0,
                     hideOnMap,
+                    profileImg,
                     sentInvite: false,
                     receivedInvite: false,
                     friend: false,
@@ -65,20 +67,26 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
                 //update distance key
                 userData.distance = distanceBetweenPoints;
 
-                //check if the nearUser is a friend
-                var friends = getState().friends.users;
-                userData.friend = friends.find(item => item.uid === userData.uid) ? true : false
-
-                //check if an invitation was sent to the user already
-                var invitationsOutbound = getState().invitations.outbound;
-                userData.sentInvite = invitationsOutbound.find(item => item.sentTo === userData.uid) ? true : false
-
-                //check if user sent invitation to current logged in user
-                var invitationInbound = getState().invitations.inbound;
-                userData.receivedInvite = invitationInbound.find(item => item.sentBy === userData.uid) ? true : false
-
                 //if within radius push it into nearByUsers array
                 if (distanceBetweenPoints < acceptedRadius) {
+
+                    //check if the nearUser is a friend
+                    var friends = getState().friends.users;
+                    userData.friend = friends.find(item => item.uid === userData.uid) ? true : false
+
+                    //check if an invitation was sent to the user already
+                    var invitationsOutbound = getState().invitations.outbound;
+                    userData.sentInvite = invitationsOutbound.find(item => item.sentTo === userData.uid) ? true : false
+
+                    //check if user sent invitation to current logged in user
+                    var invitationInbound = getState().invitations.inbound;
+                    userData.receivedInvite = invitationInbound.find(item => item.sentBy === userData.uid) ? true : false
+
+                    //init profile image includign caching image
+                    if (userData.profileImg) {
+                        userData.profileImg.cachedUrl = await cacheImage(userData.profileImg.uri)
+                    }
+
                     nearByUsers.push(userData)
                 }
 

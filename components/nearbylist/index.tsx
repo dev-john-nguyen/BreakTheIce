@@ -2,18 +2,21 @@ import React from 'react'
 import { View, FlatList, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/tsTypes';
+import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils';
 import { ProfilePage } from '../../utils/variables';
-import { ListContainerStyle, colors } from '../../utils/styles';
+import { colors } from '../../utils/styles';
 import InvitationModal from '../modal/InvitationModal';
-import Preview from './components/Preview';
+import Preview from '../components/Preview';
+import { update_invitation } from '../../services/invitations/actions';
+import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
 
 
 interface NearByListProps {
     navigation: HomeToChatNavProp;
     nearUsers: NearUsersRootProps['nearBy'];
     nearUsersFetched: NearUsersRootProps['fetched'];
+    update_invitation: InvitationsDispatchActionProps['update_invitation']
 }
 
 interface NearByListStateProps {
@@ -52,7 +55,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
     }
 
     renderFlatList = () => {
-        const { nearUsers, nearUsersFetched } = this.props
+        const { nearUsers, nearUsersFetched, update_invitation } = this.props
 
         if (!nearUsersFetched) return <ActivityIndicator />
 
@@ -69,6 +72,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                             navigation={this.props.navigation}
                             onAction={() => this.handleDirectToProfile(item)}
                             onSendInvite={() => this.handleSendInvite(item)}
+                            onInvitationUpdate={update_invitation}
                             containerStyle={styles.preview_container}
                             containerPressStyle={styles.preview_container_pressed}
                         />
@@ -118,4 +122,4 @@ const mapStateToProps = (state: RootProps) => ({
     nearUsersFetched: state.nearUsers.fetched
 })
 
-export default connect(mapStateToProps, {})(NearByList);
+export default connect(mapStateToProps, { update_invitation })(NearByList);

@@ -3,11 +3,11 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-nati
 import { ProfileScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
 import { colors, buttonsStyles } from '../../utils/styles';
 import { connect } from 'react-redux';
-import { send_invitation } from '../../services/invitations/actions';
+import { send_invitation, update_invitation } from '../../services/invitations/actions';
 import { set_error } from '../../services/utils/actions';
-import { InvitationsRootProps } from '../../services/invitations/tsTypes';
+import { InvitationsRootProps, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
 import { UserRootStateProps } from '../../services/user/types';
-import { NearUsersRootProps } from '../../services/near_users/tsTypes';
+import { NearUsersRootProps } from '../../services/near_users/types';
 import { FriendsRootProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
 import InvitationModal from '../modal/InvitationModal';
@@ -15,8 +15,8 @@ import { set_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, ProfileUserProps } from '../../services/profile/tsTypes';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
-import ProfileImage from './components/ProfileImage';
-import { CustomButton } from '../../utils/components';
+import ProfileImage from '../components/ProfileImage';
+import RespondButton from '../components/RespondButton';
 
 interface ProfileProps {
     navigation: HomeStackNavigationProp;
@@ -27,6 +27,7 @@ interface ProfileProps {
     friends: FriendsRootProps['users'];
     outboundInvitations: InvitationsRootProps['outbound'];
     set_current_profile: ProfileDispatchActionProps['set_current_profile'];
+    update_invitation: InvitationsDispatchActionProps['update_invitation']
 }
 
 //Summary
@@ -35,6 +36,7 @@ const Profile = (props: ProfileProps) => {
     const [profileUser, setProfileUser] = useState<ProfileUserProps>();
     const [notFound, setNotFound] = useState<boolean>(false);
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
+    const [inviteStatusLoading, setInviteStatusLoading] = useState<boolean>(false);
 
     useEffect(() => {
         //set redux state profile
@@ -65,17 +67,15 @@ const Profile = (props: ProfileProps) => {
 
     }, [props.route, props.outboundInvitations])
 
-    if (notFound) return (<View><Text>Not Found</Text></View>)
+    const handleInvitationUpdate = async (status: InvitationStatusOptions) => {
+        if (!profileUser) return;
 
-    if (!profileUser) return (<View><ActivityIndicator /></View>)
-
-    const baseText = (text: string | number, additionalStyle: Object) => (
-        <Text style={[styles.base_text, additionalStyle]}>
-            {text}
-        </Text>
-    )
+        return await props.update_invitation(profileUser.uid, status)
+    }
 
     const renderHeaderContentButton = () => {
+        if (!profileUser) return;
+
         if (profileUser.friend) return (
             <Pressable onPress={() => console.log('direct to message')}
                 style={({ pressed }) => (
@@ -92,12 +92,10 @@ const Profile = (props: ProfileProps) => {
             </Pressable>
         )
 
-        if (profileUser.receivedInvite) return (
-            <View style={styles.invitation_buttons}>
-                <CustomButton type='primary' text='Accept' />
-                <CustomButton type='secondary' text='Deny' moreStyles={{ marginLeft: 5 }} />
-            </View>
-        )
+        if (profileUser.receivedInvite) return <RespondButton handleInvitationUpdate={handleInvitationUpdate}
+            setLoading={setInviteStatusLoading}
+            loading={inviteStatusLoading}
+        />
 
         return (
             <Pressable onPress={() => setShowModalInvite(true)}
@@ -109,6 +107,16 @@ const Profile = (props: ProfileProps) => {
             </Pressable>
         )
     }
+
+    const baseText = (text: string | number, additionalStyle: Object) => (
+        <Text style={[styles.base_text, additionalStyle]}>
+            {text}
+        </Text>
+    )
+
+    if (notFound) return (<View><Text>Not Found</Text></View>)
+
+    if (!profileUser) return (<View><ActivityIndicator /></View>)
 
     return (
         <View style={styles.container}>
@@ -149,7 +157,8 @@ const styles = StyleSheet.create({
     header_section: {
         flexBasis: 'auto',
         alignItems: "center",
-        padding: 20,
+        marginLeft: 10,
+        marginRight: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
         height: '20%'
@@ -158,6 +167,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
+        marginLeft: 10
     },
     header_content_text: {
         marginBottom: 10,
@@ -165,7 +175,10 @@ const styles = StyleSheet.create({
     },
     bio: {
         flexBasis: 'auto',
-        padding: 20,
+        marginTop: 20,
+        marginBottom: 20,
+        marginLeft: 10,
+        marginRight: 10
     },
     bioText: {
         fontSize: 12
@@ -187,4 +200,4 @@ const mapStateToProps = (state: RootProps) => ({
     nearUsers: state.nearUsers.all
 })
 
-export default connect(mapStateToProps, { send_invitation, set_error, set_current_profile })(Profile);
+export default connect(mapStateToProps, { send_invitation, set_error, set_current_profile, update_invitation })(Profile);

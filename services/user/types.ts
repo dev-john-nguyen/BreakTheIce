@@ -49,7 +49,7 @@ export interface UserProfilePreviewProps {
     location: LocationObject;
     age: number;
     hideOnMap: boolean;
-    profileImg?: ProfileImgProps
+    profileImg: ProfileImgProps | undefined;
 }
 
 export interface NewProfileImgProps {
@@ -76,7 +76,7 @@ export interface UserRootStateProps {
     bioLong: string;
     bioShort: string;
     gender: string;
-    profileImg?: ProfileImgProps;
+    profileImg: ProfileImgProps | undefined;
     gallery: GalleryItemProps[];
     hideOnMap: boolean;
     offline: boolean;

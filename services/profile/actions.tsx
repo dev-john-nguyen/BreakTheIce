@@ -4,7 +4,7 @@ import { fireDb } from '../firebase';
 import { UsersDb } from '../../utils/variables';
 import { ProfileUserProps } from './tsTypes';
 import { RootProps } from '..';
-import { NearByUsersProps } from '../near_users/tsTypes';
+import { NearByUsersProps } from '../near_users/types';
 import _ from 'lodash';
 import { cacheImage } from '../../utils/functions';
 import { cache_user_images } from '../user/utils';

@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import Gallery from '../gallery';
 import { Feather } from '@expo/vector-icons';
-import ProfileImage from '../profile/components/ProfileImage';
+import ProfileImage from '../components/ProfileImage';
 
 interface MeProps {
     navigation: MeStackNavigationProp;

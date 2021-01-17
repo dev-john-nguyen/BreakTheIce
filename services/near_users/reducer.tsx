@@ -1,5 +1,7 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, UPDATE_INVITE_NEAR_USER, INIT_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes'
-import { NearUsersActionProps } from './tsTypes';
+import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, INIT_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes'
+import { NearUsersActionProps, NearByUsersProps } from './types';
+import { InvitationStatusOptions } from '../invitations/tsTypes';
+import { update_nearBy } from '../../utils/functions';
 
 const INITIAL_STATE = {
     nearBy: [],
@@ -31,16 +33,16 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
                 ...state,
                 nearBy: action.payload.nearBy
             }
-        case UPDATE_INVITE_NEAR_USER:
-            //find the nearUser in nearBy and update sentInvite to true
-            //??? What will happen if the user is in the all state? 
-            for (let i = 0; i < state.nearBy.length; i++) {
-                if (action.payload === state.nearBy[i].uid) {
-                    state.nearBy[i].sentInvite = true
-                    break;
-                }
+        case UPDATE_INVITE_STATUS_NEAR_USER:
+            return {
+                ...state,
+                nearBy: update_nearBy(state.nearBy, action.payload.uid, action.payload.status)
             }
-            return state;
+        case SENT_INVITE_NEAR_USER:
+            return {
+                ...state,
+                nearBy: update_nearBy(state.nearBy, action.payload.uid)
+            }
         case RESET_NEAR_USERS:
             return INITIAL_STATE
         default:

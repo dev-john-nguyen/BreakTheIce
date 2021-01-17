@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { InvitationsStackNavigationProp } from '../navigation/utils';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
-import { update_inviter_invitation } from '../../services/invitations/actions';
+import { update_invitation_from_invitations } from '../../services/invitations/actions';
 import { colors, emptyStyles } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { userDefaultSvg, linkSvg } from '../../utils/svgs';
@@ -13,7 +13,7 @@ import { CustomButton } from '../../utils/components';
 interface Invitations {
     navigation: InvitationsStackNavigationProp;
     invitation: InvitationsRootProps;
-    update_inviter_invitation: InvitationsDispatchActionProps['update_inviter_invitation']
+    update_invitation_from_invitations: InvitationsDispatchActionProps['update_invitation_from_invitations']
 }
 
 class Invitations extends React.Component<Invitations> {
@@ -29,7 +29,7 @@ class Invitations extends React.Component<Invitations> {
     }
 
     handleOnStatusUpdatePress = (inviterObj: InvitationObject, updatedStatus: InvitationObject['status']) => {
-        this.props.update_inviter_invitation(inviterObj, updatedStatus);
+        this.props.update_invitation_from_invitations(inviterObj, updatedStatus);
     }
 
     render() {
@@ -170,4 +170,4 @@ const mapStateToProps = (state: RootProps) => ({
     invitation: state.invitations
 })
 
-export default connect(mapStateToProps, { update_inviter_invitation })(Invitations);
+export default connect(mapStateToProps, { update_invitation_from_invitations })(Invitations);

@@ -8,7 +8,7 @@ import { hashCode } from '../../../../../utils/functions';
 import { galleryImgSizeLimit } from '../../../../../utils/variables';
 import { ProfileImg, Icon } from '../../../../../utils/components';
 import { colors } from '../../../../../utils/styles';
-import ProfileImage from '../../../../profile/components/ProfileImage';
+import ProfileImage from '../../../../components/ProfileImage';
 
 interface EditProfileImage {
     set_banner: UtilsDispatchActionProps['set_banner'];

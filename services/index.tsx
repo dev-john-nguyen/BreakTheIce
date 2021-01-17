@@ -7,7 +7,7 @@ import friendsReducer from './friends/reducer';
 import chatReducer from './chat/reducer';
 import profileReducer from './profile/reducer';
 
-import { NearUsersRootProps } from './near_users/tsTypes';
+import { NearUsersRootProps } from './near_users/types';
 import { UtilsRootStateProps } from './utils/tsTypes';
 import { UserRootStateProps } from './user/types';
 import { InvitationsRootProps } from './invitations/tsTypes';

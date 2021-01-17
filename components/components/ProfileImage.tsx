@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, StyleProp } from 'react-native';
-import { ProfileImgProps, NewProfileImgProps } from '../../../services/user/types';
+import { View, StyleSheet, StyleProp, Pressable } from 'react-native';
+import { ProfileImgProps, NewProfileImgProps } from '../../services/user/types';
 import { FontAwesome } from '@expo/vector-icons';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../utils/styles';
 import { Image } from 'react-native';
-import { Icon } from '../../../utils/components';
+import { Icon } from '../../utils/components';
 
 interface ProfileImageProp {
     image: ProfileImgProps | undefined | NewProfileImgProps;
@@ -37,7 +37,6 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
             return <Image
                 source={{ uri: image.cachedUrl ? image.cachedUrl : image.uri, cache: 'force-cache' }}
                 style={styles.image}
-                onProgress={onImagePress}
             />
         }
 
@@ -45,15 +44,14 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
             name="user-circle-o"
             color={colors.primary}
             style={styles.icon}
-            onPress={onImagePress}
         />
     }
 
     return (
-        <View style={styles.container}>
+        <Pressable style={styles.container} onPress={onImagePress}>
             {renderImage()}
             {friend && <Icon type='link' size={iconSize} color={colors.primary} style={styles.friend} />}
-        </View>
+        </Pressable>
     )
 }
 
@@ -108,13 +106,13 @@ const smallStyles = StyleSheet.create({
         right: -2,
     },
     icon: {
-        width: 20,
-        height: 20,
-        fontSize: 20
+        width: 25,
+        height: 25,
+        fontSize: 25
     },
     image: {
-        width: 10,
-        height: 10,
+        width: 25,
+        height: 25,
         ...baseStyles.image
     }
 })
