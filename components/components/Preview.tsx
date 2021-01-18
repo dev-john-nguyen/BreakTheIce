@@ -50,7 +50,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
 
         if (nearUser.receivedInvite) return <RespondButton setLoading={setRespondLoading} loading={respondLoading} handleInvitationUpdate={handleInvitationUpdate} />
 
-        if (me) return <CustomButton type='primary' text='Close' onPress={onAction} />
+        if (me && !nearUser.sentInvite) return <CustomButton type='primary' text='Close' onPress={onAction} />
 
         return <CustomButton type='primary' text='Invite' onPress={onSendInvite} />
     }

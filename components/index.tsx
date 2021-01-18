@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions, StyleProp } from 'react-native';
+import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions, StyleProp, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
 import { remove_error, remove_banner } from '../services/utils/actions';
 import { UtilsRootStateProps } from '../services/utils/tsTypes';
@@ -87,11 +87,14 @@ const Base = (props: Base) => {
     }
 
     return (
-        <View style={styles.container}>
-            <StatusBar style='inverted' />
-            {props.utils.banner && <Banner />}
-            {handleRender()}
-        </View>
+        <>
+            <ImageBackground source={require('../utils/ice.jpg')} style={styles.background_image} />
+            <View style={styles.container}>
+                <StatusBar style='dark' />
+                {props.utils.banner && <Banner />}
+                {handleRender()}
+            </View>
+        </>
     );
 }
 
@@ -102,7 +105,8 @@ const bannerStyles = (type: string) => {
             top: 40,
             zIndex: 100,
             width: Math.round(Dimensions.get('window').width),
-            padding: 10
+            padding: 10,
+
         },
         text: {
             textAlign: 'center',
@@ -136,6 +140,13 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'stretch',
         justifyContent: 'space-between',
+        position: 'relative',
+        opacity: .95
+    },
+    background_image: {
+        position: 'absolute',
+        width: Math.round(Dimensions.get('window').width),
+        height: Math.round(Dimensions.get('window').height),
     }
 });
 

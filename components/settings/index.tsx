@@ -71,12 +71,12 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 </TouchableHighlight>
 
                 <TouchableHighlight
-                    style={styles.item_container}
+                    style={[styles.item_container, target === TargetOptions.password && styles.active]}
                     onPress={() => setTarget(TargetOptions.password)}
                     underlayColor={colors.secondary}
                 >
                     <View style={styles.content}>
-                        <Text style={styles.text}>Change Password</Text>
+                        <Text style={[styles.text, target === TargetOptions.password && styles.active_text]}>Change Password</Text>
                     </View>
                 </TouchableHighlight>
 

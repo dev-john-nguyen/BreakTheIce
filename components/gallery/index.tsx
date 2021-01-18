@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     gallery_container: {
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(40,223,153,.5)',
+        borderColor: `rgba(${colors.primary_rgb},.5)`,
         borderRadius: 5,
         shadowColor: "#000",
         shadowOffset: {
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         shadowRadius: 1.41,
 
         elevation: 2,
-        backgroundColor: '#eee'
+        backgroundColor: colors.white
     },
     gallery_image: {
         width: '100%',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     gallery_text: {
-        color: colors.darkGreen,
+        color: colors.primary,
         fontSize: 12,
         alignSelf: 'flex-start',
         fontWeight: "400",

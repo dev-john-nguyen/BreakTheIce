@@ -20,6 +20,12 @@ const Me = ({ navigation, user }: MeProps) => {
 
     return (
         <View style={styles.container}>
+            <View style={styles.username_section}>
+                <View style={styles.username_container}>
+                    <Text style={styles.username_text}>{user.username}</Text>
+                    <View style={styles.username_underline} />
+                </View>
+            </View>
             <View style={styles.header_section}>
                 <ProfileImage image={user.profileImg} size='large' />
                 <View style={styles.header_content}>
@@ -61,6 +67,32 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         paddingBottom: 0,
         padding: 10
+    },
+    username_section: {
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+    username_container: {
+        position: 'relative'
+    },
+    username_text: {
+        fontWeight: 'bold',
+        fontSize: 25,
+        letterSpacing: 2,
+        position: 'relative',
+        bottom: 5,
+        color: colors.primary
+    },
+    username_underline: {
+        position: 'absolute',
+        backgroundColor: colors.primary,
+        opacity: .5,
+        height: 15,
+        borderRadius: 20,
+        bottom: 3,
+        alignSelf: 'center',
+        width: '120%'
     },
     base_text: {
         color: colors.primary,

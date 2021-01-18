@@ -1,12 +1,25 @@
 import { StyleSheet, Dimensions, StyleProp } from 'react-native'
 
+//green colors
+
+//blue colors
+
 //colors
 export const colors = {
-    primary: '#28DF99',
-    secondary: '#99F3BD',
-    tertiary: '#d2f6c5',
-    quaternary: '#f6f7d4',
+    // primary: '#28DF99',
+    // secondary: '#99F3BD',
+    // tertiary: '#d2f6c5',
+    // quaternary: '#f6f7d4',
+    primary: '#26baee',
+    primary_rgb: '38, 186, 238',
+    secondary: '#9fe8fa',
+    secondary_rgb: '159, 232, 250',
+    tertiary: '#73d2f3',
+    lightWhite: '#fff4e0',
+    lightWhite_rgb: '255, 244, 244',
+
     white: '#ffffff',
+    white_rgb: '255,255,255',
     red: '#ff4646',
     lightRed: '#ff8585',
     greyRed: '#ef4f4f',
@@ -15,6 +28,7 @@ export const colors = {
     lightGrey: '#dddddd',
     black: '#1a1c20'
 }
+
 
 //font styles
 export const fontStyles = StyleSheet.create({

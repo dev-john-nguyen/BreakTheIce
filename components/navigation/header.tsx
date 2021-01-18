@@ -28,11 +28,11 @@ const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
         case 'Home':
             const navigateList = () => navigation.navigate('NearByList')
 
-            return <Icon type='list' size={30} color={colors.white} pressColor={colors.secondary} onPress={navigateList} style={styles.header_right} />
+            return <Icon type='list' size={30} color={colors.primary} pressColor={colors.secondary} onPress={navigateList} style={styles.header_right} />
         case 'Me':
             const navigateSettings = () => navigation.navigate('Settings')
 
-            return <Icon type='settings' size={30} color={colors.white} pressColor={colors.secondary} onPress={navigateSettings} style={styles.header_right} />
+            return <Icon type='settings' size={30} color={colors.primary} pressColor={colors.secondary} onPress={navigateSettings} style={styles.header_right} />
 
         default:
             return undefined
@@ -40,19 +40,25 @@ const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
 }
 
 export const screenOptions = ({ route, navigation }: { navigation: any, route: RouteProps['props'] }) => ({
-    headerTitle: () => {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.text}>{renderTitle(route)}</Text>
-                <View style={styles.underline} />
-            </View>
-        )
-    },
+    // headerTitle: () => {
+    //     return (
+    //         <View style={styles.container}>
+    //             <Text style={styles.text}>{renderTitle(route)}</Text>
+    //             <View style={styles.underline} />
+    //         </View>
+    //     )
+    // },
+    headerTitle: '',
     headerRight: () => renderHeaderRight(route, navigation),
     headerStyle: styles.header_style,
     headerTintColor: colors.white,
     headerTitleStyle: styles.header_tint_style,
-    headerBackTitleVisible: false
+    headerBackTitleVisible: false,
+    headerTransparent: true,
+    cardStyle: {
+        backgroundColor: colors.white,
+        paddingTop: 45
+    }
 }
 )
 
@@ -66,11 +72,11 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
         position: 'relative',
         bottom: 5,
-        color: colors.white
+        color: colors.primary
     },
     underline: {
         position: 'absolute',
-        backgroundColor: colors.white,
+        backgroundColor: colors.primary,
         opacity: .5,
         height: 15,
         borderRadius: 20,
@@ -79,8 +85,9 @@ const styles = StyleSheet.create({
         width: '120%'
     },
     header_style: {
-        backgroundColor: colors.primary,
-        height: 110
+        backgroundColor: colors.white,
+        borderBottomColor: colors.primary,
+        borderBottomWidth: 1
     },
     header_tint_style: {
         fontWeight: 'bold',

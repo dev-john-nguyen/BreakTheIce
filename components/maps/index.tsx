@@ -198,11 +198,13 @@ const styles = StyleSheet.create({
     },
     map: {
         width: Dimensions.get('window').width,
-        flex: 1
+        height: Dimensions.get('window').height,
+        position: 'relative',
+        bottom: 60,
     },
     my_location: {
         position: 'absolute',
-        top: 10,
+        top: 5,
         alignSelf: 'center',
     },
     view_me: {

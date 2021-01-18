@@ -27,11 +27,11 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
         navigation.setOptions({
             headerRight: () => {
                 if (loading) {
-                    return <ActivityIndicator size='small' color={colors.white} style={{ marginRight: 20 }} />
+                    return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 20 }} />
                 } else {
                     return (
                         <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 20 }}>
-                            {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.white} />}
+                            {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
                         </Pressable >
                     )
                 }
@@ -102,6 +102,7 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        marginTop: 40,
         margin: 20
     },
     content_container: {

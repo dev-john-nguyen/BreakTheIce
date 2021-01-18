@@ -34,11 +34,11 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
         navigation.setOptions({
             headerRight: () => {
                 if (loading) {
-                    return <ActivityIndicator size='small' color={colors.white} style={{ marginRight: 30 }} />
+                    return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 30 }} />
                 } else {
                     return (
                         <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 20 }}>
-                            {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.white} />}
+                            {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
                         </Pressable >
                     )
                 }
@@ -184,7 +184,8 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 20
     },
     profile_image_container: {
         marginTop: 20,

@@ -18,23 +18,23 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
         switch (name) {
             case bottomTabsHome:
                 return (
-                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
                 )
             case bottomTabInvitations:
                 return (
-                    <SvgXml xml={invitationSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                    <SvgXml xml={invitationSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
                 )
             case bottomTabChat:
                 return (
-                    <SvgXml xml={messageSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                    <SvgXml xml={messageSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
                 )
             case bottomTabsProfile:
                 return (
-                    <SvgXml xml={profileSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                    <SvgXml xml={profileSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
                 )
             default:
                 return (
-                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.white} style={styles.svg} />
+                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
                 )
         }
     }
@@ -97,7 +97,8 @@ const styles = StyleSheet.create({
         position: 'relative',
         display: 'flex',
         flexDirection: 'row',
-        backgroundColor: colors.primary,
+        backgroundColor: colors.white,
+        // backgroundColor: 'rgba(255, 244, 224, .9)',
         alignItems: 'center'
     },
     svg: {
@@ -106,10 +107,10 @@ const styles = StyleSheet.create({
         bottom: 10
     },
     text_style: {
-        color: colors.white
+        color: colors.secondary
     },
     text_style_focused: {
-        color: colors.secondary
+        color: colors.primary
     }
 })
 

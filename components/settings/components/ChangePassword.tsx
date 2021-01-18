@@ -32,6 +32,7 @@ export default ({ sendChangePasswordEmail }: { sendChangePasswordEmail: (email: 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        marginTop: 30,
         margin: 20
     },
     text_input_container: {
