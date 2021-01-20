@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions, StyleProp, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
-import { remove_error, remove_banner } from '../services/utils/actions';
+import { remove_banner } from '../services/utils/actions';
 import { UtilsRootStateProps } from '../services/utils/tsTypes';
 import Login from './login';
 import BottomNav from './navigation/BottomNav';
@@ -18,6 +18,7 @@ import { ChatDispatchActionsProps } from '../services/chat/types';
 import { set_and_listen_invitations } from '../services/invitations/actions';
 import { set_and_listen_friends } from '../services/friends/actions';
 import { set_and_listen_messages } from '../services/chat/actions';
+import { FlatList } from 'react-native-gesture-handler';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -76,22 +77,30 @@ const Base = (props: Base) => {
 
     const handleRemoveBanner = () => props.remove_banner()
 
-    const Banner = () => {
-        const styles: { container: StyleProp<any>, text: StyleProp<any> } = bannerStyles(props.utils.banner.type)
+    const Banner = () => (
+        <Pressable onPress={handleRemoveBanner} style={styles.banner_container}>
+            <FlatList
+                data={props.utils.banner}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => {
+                    const styles = bannerStyles(item.type)
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.text}>{item.message}</Text>
+                        </View>
+                    )
+                }}
+            />
+        </Pressable>
 
-        return (
-            <Pressable onPress={handleRemoveBanner} style={styles.container}>
-                <Text style={styles.text}>{props.utils.banner.message}</Text>
-            </Pressable>
-        )
-    }
+    )
 
     return (
         <>
             <ImageBackground source={require('../utils/ice.jpg')} style={styles.background_image} />
             <View style={styles.container}>
                 <StatusBar style='dark' />
-                {props.utils.banner && <Banner />}
+                {props.utils.banner.length > 0 && <Banner />}
                 {handleRender()}
             </View>
         </>
@@ -99,29 +108,26 @@ const Base = (props: Base) => {
 }
 
 const bannerStyles = (type: string) => {
-    var styles: StyleProp<any> = {
-        container: {
-            position: 'absolute',
-            top: 40,
-            zIndex: 100,
-            width: Math.round(Dimensions.get('window').width),
-            padding: 10,
+    interface StylesProps {
+        container: StyleProp<any>
+        text: StyleProp<any>
+    }
 
+    var styles: StylesProps = {
+        container: {
+            padding: 10
         },
         text: {
             textAlign: 'center',
             fontSize: 14,
-            letterSpacing: .5
+            letterSpacing: .5,
+            textTransform: 'capitalize'
         }
     }
 
     switch (type) {
         case 'warning':
-            styles.container.backgroundColor = colors.lightRed
-            styles.text.color = colors.white
-            break;
-        case 'success':
-            styles.container.backgroundColor = colors.secondary
+            styles.container.backgroundColor = colors.yellow
             styles.text.color = colors.white
             break;
         case 'error':
@@ -129,7 +135,7 @@ const bannerStyles = (type: string) => {
             styles.text.color = colors.white
             break;
         default:
-            styles.container.backgroundColor = colors.secondary
+            styles.container.backgroundColor = colors.green
             styles.text.color = colors.white
     }
     return styles
@@ -147,6 +153,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: Math.round(Dimensions.get('window').width),
         height: Math.round(Dimensions.get('window').height),
+    },
+    banner_container: {
+        position: 'absolute',
+        top: 40,
+        zIndex: 100,
+        width: Math.round(Dimensions.get('window').width)
     }
 });
 
@@ -156,7 +168,7 @@ const mapStateToProps = (state: RootProps) => ({
 })
 
 export default connect(mapStateToProps, {
-    remove_error, remove_banner, set_and_listen_invitations,
+    remove_banner, set_and_listen_invitations,
     set_and_listen_friends,
     set_and_listen_messages
 })(Base)

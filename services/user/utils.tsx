@@ -39,7 +39,7 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, st
     const LocationRef = fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(userData.uid)
 
     //don't want to send the cacheduri
-    const profileImg: ProfileImgProps | undefined = userData.profileImg && {
+    const profileImg: ProfileImgProps | null = userData.profileImg && {
         uri: userData.profileImg.uri,
         updatedAt: userData.profileImg.updatedAt
     }
@@ -92,7 +92,7 @@ export const fetch_profile = async (uid: string) => {
                     hideOnMap: data.hideOnMap ? data.hideOnMap : false,
                     gallery: data.gallery ? data.gallery : [],
                     offline: data.offline === undefined ? false : data.offline,
-                    profileImg: data.profileImg
+                    profileImg: data.profileImg ? data.profileImg : null
                 }
 
                 return { profile: profileObj }

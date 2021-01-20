@@ -1,23 +1,9 @@
 import React from 'react';
 import { View, Pressable, StyleProp, Text, ActivityIndicator } from 'react-native';
-import { profileStyles, colors, buttonsStyles } from '../styles';
+import { colors, button_styles, underline_header_styles } from '../styles';
 import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg, linkSvg, settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg, minusSvg } from '../svgs';
+import { settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg, minusSvg } from '../svgs';
 import { Feather } from '@expo/vector-icons';
-
-export const ProfileImg = ({ friend, fillColor }: { friend: boolean, fillColor?: string }) => (
-    <View style={profileStyles.container}>
-        <SvgXml xml={userDefaultSvg} width='50' height='50' fill={fillColor ? fillColor : colors.primary} />
-        {friend && <SvgXml xml={linkSvg} width='12' height='12' fill={fillColor ? fillColor : colors.primary} style={profileStyles.friend} />}
-    </View>
-)
-
-export const MapProfileImg = ({ friend }: { friend: boolean }) => (
-    <View style={profileStyles.container}>
-        <SvgXml xml={userDefaultSvg} width='25' height='25' fill={colors.primary} />
-        {friend && <SvgXml xml={linkSvg} width='10' height='10' fill={colors.primary} style={profileStyles.friend_small} />}
-    </View>
-)
 
 export const SettingsSvgHeader = ({ pressed }: { pressed: boolean }) => (
     <SvgXml xml={settingSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white}
@@ -71,66 +57,35 @@ interface CustomButtonProps {
     onPress?: () => void;
     type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled";
     moreStyles?: StyleProp<any>;
-    indicatorColor?: string | false
+    indicatorColor?: string | false;
+    size?: 'small' | 'regular'
 }
 
 //buttons
-export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor }: CustomButtonProps) => {
+export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, size }: CustomButtonProps) => {
 
-    const handlePressableStyles = ({ pressed }: { pressed: boolean }): StyleProp<any> => {
-        var styles: StyleProp<any>;
+    const { pressed, unpressed } = button_styles(size, type)
 
-        switch (type) {
-            case 'disabled':
-                styles = buttonsStyles.button_disabled
-                break;
-            case "secondary":
-                styles = pressed ? buttonsStyles.button_secondary_pressed : buttonsStyles.button_secondary
-                break;
-            case "white_outline":
-                styles = pressed ? buttonsStyles.button_white_outline_pressed : buttonsStyles.button_white_outline
-                break;
-            case "red_outline":
-                styles = pressed ? buttonsStyles.button_red_outline : buttonsStyles.button_red_outline_pressed
-                break;
-            default:
-                styles = pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
-        }
-
-        return [styles, moreStyles]
-    }
-
-    const renderText = ({ pressed }: { pressed: boolean }) => {
-        var styles: StyleProp<any>;
-
-        switch (type) {
-            case 'disabled':
-                styles = buttonsStyles.button_disabled_text
-                break;
-            case "secondary":
-                styles = pressed ? buttonsStyles.button_secondary_text_pressed : buttonsStyles.button_secondary_text
-                break;
-            case "white_outline":
-                styles = pressed ? buttonsStyles.button_white_outline_text_pressed : buttonsStyles.button_white_outline_text
-                break;
-            case "red_outline":
-                styles = pressed ? buttonsStyles.button_red_outline_text : buttonsStyles.button_red_outline_text_pressed
-                break;
-            default:
-                styles = buttonsStyles.button_primary_text
-        }
-        return (
-            <View style={{ flexDirection: 'row' }}>
-                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <Text style={styles}>{text}</Text>}
-            </View>
-        )
-    }
+    const handlePressableStyle = (props: { pressed: boolean }) => [props.pressed ? pressed.button : unpressed.button, moreStyles]
 
     return <Pressable
         disabled={indicatorColor ? true : false}
         onPress={onPress}
-        style={handlePressableStyles}
+        style={handlePressableStyle}
     >
-        {renderText}
+        {(props) => (
+            <View style={{ flexDirection: 'row' }}>
+                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <Text style={props.pressed ? pressed.text : unpressed.text}>{text}</Text>}
+            </View>
+        )}
     </Pressable>
 }
+
+export const UnderlineHeader = ({ text, styles }: { text: string, styles?: StyleProp<any> }) => (
+    <View style={[underline_header_styles.section, styles]}>
+        <View style={underline_header_styles.container}>
+            <Text style={underline_header_styles.text}>{text}</Text>
+            <View style={underline_header_styles.underline} />
+        </View>
+    </View>
+)

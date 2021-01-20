@@ -51,13 +51,12 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
     headerTitle: '',
     headerRight: () => renderHeaderRight(route, navigation),
     headerStyle: styles.header_style,
-    headerTintColor: colors.white,
+    headerTintColor: colors.primary,
     headerTitleStyle: styles.header_tint_style,
     headerBackTitleVisible: false,
-    headerTransparent: true,
+    headerTransparent: false,
     cardStyle: {
-        backgroundColor: colors.white,
-        paddingTop: 45
+        backgroundColor: colors.white
     }
 }
 )
@@ -87,7 +86,7 @@ const styles = StyleSheet.create({
     header_style: {
         backgroundColor: colors.white,
         borderBottomColor: colors.primary,
-        borderBottomWidth: 1
+        borderBottomWidth: .1
     },
     header_tint_style: {
         fontWeight: 'bold',

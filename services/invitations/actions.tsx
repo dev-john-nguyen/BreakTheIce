@@ -5,7 +5,6 @@ import { fireDb } from '../firebase';
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
 import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER } from '../near_users/actionTypes';
-import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from '@firebase/firestore-types'
 import { set_banner } from '../utils/actions';
 import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
 import { handleInvitations, handle_invitation_status } from './utils';
@@ -24,13 +23,13 @@ export const send_invitation = (invitationObj: Omit<InvitationObject, 'docId'>) 
     //will need to update the near user of which the invitation was sent
     dispatch({
         type: SENT_INVITE_NEAR_USER,
-        payload: { uid: invitationObj.sentTo }
+        payload: { uid: invitationObj.sentTo.uid }
     })
 
     //update profile history
     dispatch({
         type: SENT_INVITE_PROFILE_HISTORY,
-        payload: { uid: invitationObj.sentTo }
+        payload: { uid: invitationObj.sentTo.uid }
     })
 
     dispatch({ type: SEND_INVITATION, payload: invitationObj })
@@ -47,7 +46,8 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
 
     //get all invitations that were sent
     fireDb.collection(InvitationsDb)
-        .where("sentBy", "==", uid)
+        .where("sentBy.uid", "==", uid)
+        .where('status', '==', InvitationStatusOptions.pending)
         .get()
         .then((querySnapshot) => {
             dispatch({
@@ -62,7 +62,7 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
 
     //get and listen to inbound invitations
     var invitationListener = fireDb.collection(InvitationsDb)
-        .where("sentTo", "==", uid)
+        .where("sentTo.uid", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
         .onSnapshot((querySnapshot) => {
             dispatch({
@@ -91,16 +91,16 @@ export const update_invitation_from_invitations = (invitationObj: InvitationObje
 
     //if accepted then create new friend
     if (updatedStatus === InvitationStatusOptions.accepted) {
-        const InviteeRef = fireDb.collection(FriendsDb).doc(invitationObj.sentBy).collection(FriendsUsersDb).doc(user.uid);
+        const InviteeRef = fireDb.collection(FriendsDb).doc(invitationObj.sentBy.uid).collection(FriendsUsersDb).doc(user.uid);
         batch.set(InviteeRef, {
             username: user.username,
             dateUpdated: new Date(),
             dateCreated: new Date(),
             active: true
         })
-        const InviterRef = fireDb.collection(FriendsDb).doc(user.uid).collection(FriendsUsersDb).doc(invitationObj.sentBy);
+        const InviterRef = fireDb.collection(FriendsDb).doc(user.uid).collection(FriendsUsersDb).doc(invitationObj.sentBy.uid);
         batch.set(InviterRef, {
-            username: invitationObj.sentByUsername,
+            username: invitationObj.sentBy.username,
             dateUpdated: new Date(),
             dateCreated: new Date(),
             active: true
@@ -126,7 +126,7 @@ export const update_invitation = (inviterUid: string, status: InvitationObject['
 
     const { inbound } = invitations
 
-    var invitationToUpdate = inbound.find(invitation => invitation.sentBy === inviterUid)
+    var invitationToUpdate = inbound.find(invitation => invitation.sentBy.uid === inviterUid)
 
     if (!invitationToUpdate) {
         dispatch(set_banner('Looks like we are unable to find the invitation to update.', 'error'))

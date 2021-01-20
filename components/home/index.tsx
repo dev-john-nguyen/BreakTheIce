@@ -23,6 +23,8 @@ interface HomeProps {
     set_and_listen_user_location: UserDispatchActionsProps['set_and_listen_user_location'];
     set_and_listen_near_users: NearUsersDispatchActionProps['set_and_listen_near_users'];
     go_online: UserDispatchActionsProps['go_online'];
+    invitationFetched: boolean;
+    friendsFetched: boolean;
 }
 
 interface CurrentLocationProps {
@@ -116,8 +118,11 @@ const Home = (props: HomeProps) => {
 
     useEffect(() => {
         const { location, stateCity } = currentLocation;
+        const { user, friendsFetched, invitationFetched } = props;
 
-        if (location && stateCity && !props.user.offline) {
+        //need to have inviations and friends in state before setting listener so near users
+        //listener has access
+        if (location && stateCity && !user.offline && invitationFetched && friendsFetched) {
             props.set_and_listen_user_location(stateCity, location);
             var unsubscribeNearUsers = props.set_and_listen_near_users(stateCity, location);
         }
@@ -127,7 +132,7 @@ const Home = (props: HomeProps) => {
             unsubscribeNearUsers && unsubscribeNearUsers()
         }
 
-    }, [props.user.offline, currentLocation])
+    }, [props.user.offline, currentLocation, props.invitationFetched, props.friendsFetched])
 
 
     if (props.user.offline) {
@@ -157,6 +162,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: RootProps) => ({
     user: state.user,
+    invitationFetched: state.invitations.fetched,
+    friendsFetched: state.friends.fetched
 })
 
 export default connect(mapStateToProps, {

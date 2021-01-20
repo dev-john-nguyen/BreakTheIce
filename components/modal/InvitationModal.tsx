@@ -4,7 +4,7 @@ import { colors } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { closeSvg } from '../../utils/svgs';
 import { connect } from 'react-redux';
-import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions } from '../../services/invitations/tsTypes';
+import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationUserInfo } from '../../services/invitations/tsTypes';
 import { send_invitation } from '../../services/invitations/actions';
 import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/types';
@@ -22,7 +22,7 @@ interface MyModalProps {
 
 const InviteModal = (props: MyModalProps) => {
     const [message, setMessage] = useState<string>('');
-    const [btnStatus, setBtnStatus] = useState<string>('Send');
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleClose = () => {
         setMessage('')
@@ -35,13 +35,37 @@ const InviteModal = (props: MyModalProps) => {
         if (!props.targetUser.uid || !props.user.uid) return console.log('not able to get uid');
         //init invitation object
 
-        setBtnStatus('Sending...')
+        setLoading(true)
+
+        const { targetUser, user } = props;
+
+        const userProfileImg = user.profileImg ? {
+            uri: user.profileImg.uri,
+            updatedAt: user.profileImg.updatedAt
+        } : null
+
+        const sentBy: InvitationUserInfo = {
+            uid: user.uid,
+            age: user.age,
+            username: user.username,
+            profileImg: userProfileImg
+        }
+
+        const targetProfileImg = targetUser.profileImg ? {
+            uri: targetUser.profileImg.uri,
+            updatedAt: targetUser.profileImg.updatedAt
+        } : null
+
+        const sentTo: InvitationUserInfo = {
+            uid: targetUser.uid,
+            age: targetUser.age,
+            username: targetUser.username,
+            profileImg: targetProfileImg
+        }
 
         const invitationContent: Omit<InvitationObject, 'docId'> = {
-            sentBy: props.user.uid,
-            sentByAge: props.user.age,
-            sentByUsername: props.user.username,
-            sentTo: props.targetUser.uid,
+            sentBy,
+            sentTo,
             message: message,
             status: InvitationStatusOptions.pending,
             createdAt: new Date(),
@@ -50,13 +74,13 @@ const InviteModal = (props: MyModalProps) => {
 
         await props.send_invitation(invitationContent)
             .then(() => {
-                setBtnStatus('Sent');
+                setLoading(false)
                 setMessage('');
                 props.handleClose()
             })
             .catch((err) => {
                 console.log(err)
-                setBtnStatus('Failed')
+                setLoading(false)
             })
     }
 
@@ -72,7 +96,7 @@ const InviteModal = (props: MyModalProps) => {
                     <View style={styles.center_view}>
                         <View style={styles.modal_view}>
                             <Icon type='x' size={20} color={colors.white} pressColor={colors.secondary} onPress={handleClose} style={styles.close_button} />
-                            <Text style={styles.header_text}>Connect</Text>
+                            <Text style={styles.header_text}>Be Icy</Text>
                             <TextInput
                                 multiline
                                 placeholder={'100 character limit'}
@@ -83,7 +107,7 @@ const InviteModal = (props: MyModalProps) => {
                                 maxLength={messageMaxLen}
                                 style={styles.text_area}
                             />
-                            <CustomButton type='white_outline' text={btnStatus} onPress={handleSendInvitation} />
+                            <CustomButton type='white_outline' text='Send' onPress={handleSendInvitation} indicatorColor={loading && colors.white} />
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
@@ -137,6 +161,7 @@ const styles = StyleSheet.create({
     header_text: {
         fontSize: 22,
         color: colors.white,
+        fontWeight: '500',
         letterSpacing: .5
     },
     close_button: {

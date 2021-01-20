@@ -184,11 +184,9 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        marginTop: 20
+        alignItems: 'center'
     },
     profile_image_container: {
-        marginTop: 20,
         alignSelf: 'center'
     },
     scrollView: {

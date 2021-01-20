@@ -1,5 +1,5 @@
 import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
-import { set_loading, remove_loading, set_status_bar, set_banner } from '../utils/actions';
+import { set_loading, remove_loading, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
 import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps } from './types';
 import { LocationObject } from 'expo-location';
@@ -8,7 +8,6 @@ import { validate_near_users, reset_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
 import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, LocationsUsersDb, LocationsDb, UsersDb } from '../../utils/variables'
-import { SET_ERROR } from '../utils/actionTypes';
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
 import { cacheImage } from '../../utils/functions';
@@ -93,10 +92,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
         await fireDb_init_user_location(getState().user, stateCity, location);
     } catch (e) {
         console.log(e)
-        dispatch({
-            type: SET_ERROR,
-            payload: 'Something went wrong initializing your location'
-        })
+        dispatch(set_banner('Something went wrong initializing your location', 'error'))
         return;
     }
 
@@ -122,10 +118,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
             await fireDb_update_user_location(user.uid, user.stateCity, newLocation);
         } catch (e) {
             console.log(e)
-            dispatch({
-                type: SET_ERROR,
-                payload: 'Oops! Failed to update your location'
-            })
+            dispatch(set_banner('Oops! Failed to update your location', 'error'))
         }
 
         dispatch({
@@ -152,7 +145,8 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
 export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
     if (newGallery.length > 5) {
-        return dispatch(set_banner('Exceeds the maxium number of images of 5.', 'error'))
+        dispatch(set_banner('Exceeds the maxium number of images of 5.', 'error'))
+        return;
     }
 
     const uid = getState().user.uid;
@@ -180,12 +174,24 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
             var newUpdatedAt: Date = new Date();
             var uploadTask = fireStorage.ref().child(path).put(blob)
 
-            try {
-                await image_task_listener(uploadTask, dispatch, i, newGallery.length)
-                    .then((genUrl: string) => gallery.push({ url: genUrl, description, updatedAt: newUpdatedAt, id, name }))
-            } catch (e) {
-                dispatch(set_banner(e, 'error'))
-            }
+            await uploadTask
+                .then(async (snapshot) => {
+                    await snapshot.ref.getDownloadURL()
+                        .then(downloadURL => {
+                            gallery.push({ url: downloadURL, description, updatedAt: newUpdatedAt, id, name })
+                        })
+                })
+                .catch((err) => {
+                    console.log(err)
+                    dispatch(set_banner('Error occured uploading image number' + (i + 1), 'error'))
+                })
+
+            // try {
+            //     await image_task_listener(uploadTask, dispatch, i, newGallery.length)
+            //         .then((genUrl: string) => gallery.push({ url: genUrl, description, updatedAt: newUpdatedAt, id, name }))
+            // } catch (e) {
+            //     dispatch(set_banner(e, 'error'))
+            // }
         } else {
             if (url && updatedAt) {
                 gallery.push({ url, description, updatedAt, id, name })
@@ -193,7 +199,7 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         }
     }
 
-    fireDb.collection(UsersDb).doc(uid).set({
+    await fireDb.collection(UsersDb).doc(uid).set({
         gallery: gallery
     }, { merge: true })
         .then(async () => {
@@ -206,69 +212,11 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
                 payload: { gallery: cachedGallery }
             });
 
-            dispatch(set_status_bar(0));
             dispatch(set_banner('Gallery successfully updated!', 'success'));
         })
         .catch(err => {
-            return dispatch({
-                type: SET_ERROR,
-                payload: 'No images saved'
-            })
+            dispatch(set_banner('Images failed to save', 'error'));
         })
-}
-
-async function image_task_listener(uploadTask: firebase.storage.UploadTask, dispatch: AppDispatch, index: number, galleryLen: number): Promise<string> {
-
-    return new Promise(function (resolve, reject) {
-        // Listen for state changes, errors, and completion of the upload.
-        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-            function (snapshot) {
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                var uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
-
-                var progress = (uploadProgress + index) / galleryLen
-
-                dispatch(set_status_bar(progress))
-
-                switch (snapshot.state) {
-                    case firebase.storage.TaskState.PAUSED: // or 'paused'
-                        dispatch(set_banner('Imaged paused', 'warning'))
-                        break;
-                    case firebase.storage.TaskState.RUNNING: // or 'running'
-                        break;
-                }
-            }, function (error) {
-                console.log(error)
-
-                // A full list of error codes is available at
-                // https://firebase.google.com/docs/storage/web/handle-errors
-                var errMsg: string = '';
-
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        // User doesn't have permission to access the object
-                        errMsg = "Permission denied. You don't have access."
-                        break;
-
-                    case 'storage/canceled':
-                        // User canceled the upload
-                        errMsg = "The upload was cancelled."
-                        break;
-
-                    default:
-                        errMsg = 'Unexpected error occurred. Please try again.'
-                }
-
-                reject(errMsg)
-
-            }, function () {
-                // Upload completed successfully, now we can get the download URL
-                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                    resolve(downloadURL)
-                });
-
-            });
-    })
 }
 
 export const go_offline = () => (dispatch: AppDispatch, getState: () => RootProps) => {

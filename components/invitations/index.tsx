@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, FlatList, TouchableHighlight, Text, StyleSheet, Pressable } from 'react-native';
+import { View, FlatList, TouchableHighlight, Text, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { InvitationsStackNavigationProp } from '../navigation/utils';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
 import { update_invitation_from_invitations } from '../../services/invitations/actions';
-import { colors, emptyStyles } from '../../utils/styles';
+import { colors } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
-import { userDefaultSvg, linkSvg } from '../../utils/svgs';
-import { CustomButton } from '../../utils/components';
+import { userDefaultSvg } from '../../utils/svgs';
+import { CustomButton, UnderlineHeader } from '../../utils/components';
 
 interface Invitations {
     navigation: InvitationsStackNavigationProp;
@@ -23,8 +23,8 @@ class Invitations extends React.Component<Invitations> {
 
     handleInvitationOnPress = (inviterObj: InvitationObject) => {
         this.props.navigation.push('Profile', {
-            profileUid: inviterObj.sentBy,
-            title: inviterObj.sentByUsername
+            profileUid: inviterObj.sentBy.uid,
+            title: inviterObj.sentBy.username
         })
     }
 
@@ -38,7 +38,7 @@ class Invitations extends React.Component<Invitations> {
         }
 
         const renderInvitationList = () => {
-            if (!this.props.invitation.inbound || this.props.invitation.inbound.length < 1) return <View style={emptyStyles.container}><Text style={emptyStyles.text}>No Invitations</Text></View>;
+            if (!this.props.invitation.inbound || this.props.invitation.inbound.length < 1) return <UnderlineHeader text='No Invitations Found' styles={{ marginTop: 20 }} />;
 
             return <FlatList
                 data={this.props.invitation.inbound}
@@ -55,8 +55,8 @@ class Invitations extends React.Component<Invitations> {
                             <View style={styles.profile_section}>
                                 <SvgXml xml={userDefaultSvg} width='50' height='50' fill={colors.primary} />
                                 <View style={styles.profile_section_text}>
-                                    <Text style={styles.username}>{item.sentByUsername ? item.sentByUsername : 'UnknownUser'}</Text>
-                                    <Text style={styles.age}>{item.sentByAge ? item.sentByAge : 0} years old</Text>
+                                    <Text style={styles.username}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
+                                    <Text style={styles.age}>{item.sentBy.age ? item.sentBy.age : 0} years old</Text>
                                 </View>
                             </View>
                             <View style={styles.content_section}>
@@ -88,11 +88,10 @@ class Invitations extends React.Component<Invitations> {
 
 const styles = StyleSheet.create({
     container: {
-        borderBottomWidth: 2,
-        borderTopWidth: 2,
+        borderBottomWidth: 1,
+        borderTopWidth: 1,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
-        marginTop: 20,
         position: 'relative',
     },
     content: {

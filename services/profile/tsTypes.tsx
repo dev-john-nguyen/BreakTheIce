@@ -11,39 +11,11 @@ export interface ProfileActionProps {
     payload: any
 }
 
-export interface TimelineLocationProps {
-    docId: string
-    country: string | undefined,
-    city: string,
-    state: string | undefined,
-    comment: string,
-    startAt: Date,
-    endAt?: Date,
-    createdAt: Date,
-    updatedAt: Date,
-    placesVisited: PlaceProp[] | undefined
-}
-
-export interface PlaceProp {
-    id: string,
-    coordinate: {
-        latitude: number,
-        longitude: number
-    },
-    name: string,
-    comment: string,
-    removed?: boolean
-}
-
 
 export interface ProfileUserProps extends UserRootStateProps, NearByUsersProps { }
 
 export interface ProfileRootProps {
     history: ProfileUserProps[];
-}
-
-export interface TimelineRootProps {
-    history: TimelineLocationProps[]
 }
 
 export interface TimelineDispatchActionProps {

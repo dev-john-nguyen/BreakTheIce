@@ -124,6 +124,12 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         this.setState({ previewUser: nearUser })
     }
 
+    handleOnActionPress = () => this.setState({
+        previewUser: null,
+        sendInvite: false,
+        previewMe: false
+    })
+
     render() {
 
         const renderMapView = (
@@ -173,7 +179,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             nearUser={previewUser}
                             me={previewMe}
                             navigation={navigation}
-                            onAction={() => this.setState({ previewUser: null, sendInvite: false })}
+                            onAction={this.handleOnActionPress}
                             onSendInvite={() => this.setState({ sendInvite: true })}
                             containerStyle={styles.preview_container}
                             containerPressStyle={{ ...styles.preview_container, backgroundColor: colors.tertiary }}
@@ -199,12 +205,10 @@ const styles = StyleSheet.create({
     map: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
-        position: 'relative',
-        bottom: 60,
     },
     my_location: {
         position: 'absolute',
-        top: 5,
+        top: 10,
         alignSelf: 'center',
     },
     view_me: {

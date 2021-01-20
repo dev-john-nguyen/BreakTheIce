@@ -5,6 +5,7 @@ import { colors } from '../../utils/styles';
 import { SvgXml } from 'react-native-svg';
 import { profileSvg, searchSvg, invitationSvg, messageSvg } from '../../utils/svgs';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
+import { Icon } from '../../utils/components';
 
 const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const focusedOptions = descriptors[state.routes[state.index].key].options;
@@ -18,7 +19,7 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
         switch (name) {
             case bottomTabsHome:
                 return (
-                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
+                    <Icon type="search" size={24} color={colors.white} />
                 )
             case bottomTabInvitations:
                 return (
@@ -65,27 +66,33 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
                     }
                 };
 
-                const onLongPress = () => {
-                    navigation.emit({
-                        type: 'tabLongPress',
-                        target: route.key,
-                    });
-                };
+                // const onLongPress = () => {
+                //     navigation.emit({
+                //         type: 'tabLongPress',
+                //         target: route.key,
+                //     });
+                // };
 
-                return (
-                    <TouchableOpacity
-                        key={index}
-                        accessibilityRole="button"
-                        accessibilityState={isFocused ? { selected: true } : {}}
-                        accessibilityLabel={options.tabBarAccessibilityLabel}
-                        testID={options.tabBarTestID}
-                        onPress={onPress}
-                        onLongPress={onLongPress}
-                        style={{ flex: 1 }}
-                    >
-                        {renderSvgs(route.name, isFocused)}
-                    </TouchableOpacity>
-                );
+                var type: string;
+
+                switch (route.name) {
+                    case bottomTabsHome:
+                        type = 'search'
+                        break;
+                    case bottomTabInvitations:
+                        type = 'mail'
+                        break;
+                    case bottomTabChat:
+                        type = 'inbox'
+                        break;
+                    case bottomTabsProfile:
+                        type = 'user'
+                        break;
+                    default:
+                        type = 'search'
+                }
+
+                return <Icon key={index} type={type} size={35} color={isFocused ? colors.secondary : colors.primary} pressColor={colors.tertiary} onPress={onPress} />
             })}
         </View>
     );
@@ -98,8 +105,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         backgroundColor: colors.white,
-        // backgroundColor: 'rgba(255, 244, 224, .9)',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-evenly'
     },
     svg: {
         alignSelf: 'center',

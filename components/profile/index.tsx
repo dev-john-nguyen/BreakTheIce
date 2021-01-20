@@ -1,33 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import { ProfileScreenRouteProp, HomeStackNavigationProp } from '../navigation/utils';
-import { colors, buttonsStyles } from '../../utils/styles';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation/utils';
+import { colors } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation, update_invitation } from '../../services/invitations/actions';
-import { set_error } from '../../services/utils/actions';
 import { InvitationsRootProps, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
 import { UserRootStateProps } from '../../services/user/types';
 import { NearUsersRootProps } from '../../services/near_users/types';
-import { FriendsRootProps } from '../../services/friends/tsTypes';
+import { FriendsRootProps, FriendDispatchActionProps } from '../../services/friends/tsTypes';
 import { RootProps } from '../../services';
 import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile } from '../../services/profile/actions';
-import { ProfileDispatchActionProps, ProfileUserProps } from '../../services/profile/tsTypes';
+import { ProfileDispatchActionProps, ProfileUserProps, ProfileRootProps } from '../../services/profile/tsTypes';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
 import ProfileImage from '../components/ProfileImage';
 import RespondButton from '../components/RespondButton';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import ProfileHeaderRight from './components/ProfileHeaderRight';
+import { unfriend_user } from '../../services/friends/actions';
+import { set_banner } from '../../services/utils/actions';
+import { CustomButton } from '../../utils/components';
 
 interface ProfileProps {
-    navigation: HomeStackNavigationProp;
+    navigation: BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp
     route: ProfileScreenRouteProp;
-    set_error: UtilsDispatchActionProps['set_error']
     user: UserRootStateProps;
     nearUsers: NearUsersRootProps['all'];
     friends: FriendsRootProps['users'];
+    profile: ProfileRootProps;
     outboundInvitations: InvitationsRootProps['outbound'];
     set_current_profile: ProfileDispatchActionProps['set_current_profile'];
-    update_invitation: InvitationsDispatchActionProps['update_invitation']
+    update_invitation: InvitationsDispatchActionProps['update_invitation'];
+    unfriend_user: FriendDispatchActionProps['unfriend_user'];
+    set_banner: UtilsDispatchActionProps['set_banner'];
 }
 
 //Summary
@@ -38,10 +44,22 @@ const Profile = (props: ProfileProps) => {
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
     const [inviteStatusLoading, setInviteStatusLoading] = useState<boolean>(false);
 
+
+    useLayoutEffect(() => {
+        props.navigation.setOptions({
+            headerRight: () => <ProfileHeaderRight handleUnfriendUser={handleUnfriendUser} block_user={() => console.log('blocking..')} />
+        })
+    }, [profileUser, props.unfriend_user])
+
+    const handleUnfriendUser = async () => {
+        if (!profileUser) return
+        return await props.unfriend_user(profileUser.uid)
+    }
+
     useEffect(() => {
         //set redux state profile
         if (!props.route.params || !props.route.params.profileUid) {
-            props.set_error('User id not found!', 'error')
+            props.set_banner("Sorry, couldn't find the user information.", 'error')
             props.navigation.goBack()
             return;
         }
@@ -65,7 +83,7 @@ const Profile = (props: ProfileProps) => {
         //note: the fetched profile should have updated redux near_users state
         return () => { mount = false };
 
-    }, [props.route, props.outboundInvitations])
+    }, [props.route, props.outboundInvitations, props.profile.history])
 
     const handleInvitationUpdate = async (status: InvitationStatusOptions) => {
         if (!profileUser) return;
@@ -73,39 +91,37 @@ const Profile = (props: ProfileProps) => {
         return await props.update_invitation(profileUser.uid, status)
     }
 
+    const directToMessage = () => {
+        if (!profileUser) return;
+
+        const { uid, username } = profileUser;
+
+        const targetUser = { uid, username }
+
+        props.navigation.navigate('Chat', {
+            screen: 'Message',
+            initial: false,
+            params: {
+                targetUser,
+                title: targetUser.username
+            }
+        })
+    }
+
     const renderHeaderContentButton = () => {
         if (!profileUser) return;
 
-        if (profileUser.friend) return (
-            <Pressable onPress={() => console.log('direct to message')}
-                style={({ pressed }) => (
-                    pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
-                )}
-            >
-                <Text style={buttonsStyles.button_primary_text}>Message</Text>
-            </Pressable>
-        )
+        if (profileUser.friend) return <CustomButton onPress={directToMessage} text='Message' type='primary' />
 
-        if (profileUser.sentInvite) return (
-            <Pressable style={buttonsStyles.button_disabled}>
-                <Text style={buttonsStyles.button_disabled_text}>Pending</Text>
-            </Pressable>
-        )
+        if (profileUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
 
         if (profileUser.receivedInvite) return <RespondButton handleInvitationUpdate={handleInvitationUpdate}
             setLoading={setInviteStatusLoading}
             loading={inviteStatusLoading}
         />
 
-        return (
-            <Pressable onPress={() => setShowModalInvite(true)}
-                style={({ pressed }) => (
-                    pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
-                )}
-            >
-                <Text style={buttonsStyles.button_primary_text}>Invite</Text>
-            </Pressable>
-        )
+        return <CustomButton onPress={() => setShowModalInvite(true)} text='Invite' type='primary' />
+
     }
 
     const baseText = (text: string | number, additionalStyle: Object) => (
@@ -197,7 +213,8 @@ const mapStateToProps = (state: RootProps) => ({
     outboundInvitations: state.invitations.outbound,
     user: state.user,
     friends: state.friends.users,
-    nearUsers: state.nearUsers.all
+    nearUsers: state.nearUsers.all,
+    profile: state.profile
 })
 
-export default connect(mapStateToProps, { send_invitation, set_error, set_current_profile, update_invitation })(Profile);
+export default connect(mapStateToProps, { send_invitation, set_current_profile, update_invitation, unfriend_user, set_banner })(Profile);

@@ -102,7 +102,6 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 40,
         margin: 20
     },
     content_container: {

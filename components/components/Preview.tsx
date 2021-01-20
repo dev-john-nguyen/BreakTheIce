@@ -26,7 +26,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
         navigation.navigate('Chat', {
             screen: 'Message',
             initial: false,
-            params: { targetUser: nearUser, title: nearUser.username }
+            params: { targetUser: { uid: nearUser.uid, username: nearUser.username }, title: nearUser.username }
         })
     }
 

@@ -8,7 +8,6 @@ import { NearByUsersProps } from './types';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
 import firebase from 'firebase';
-import { SET_ERROR } from '../utils/actionTypes';
 import { set_banner } from '../utils/actions';
 import { cacheImage } from '../../utils/functions';
 
@@ -76,11 +75,12 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
 
                     //check if an invitation was sent to the user already
                     var invitationsOutbound = getState().invitations.outbound;
-                    userData.sentInvite = invitationsOutbound.find(item => item.sentTo === userData.uid) ? true : false
+                    userData.sentInvite = invitationsOutbound.find(item => item.sentTo.uid === userData.uid) ? true : false
 
                     //check if user sent invitation to current logged in user
                     var invitationInbound = getState().invitations.inbound;
-                    userData.receivedInvite = invitationInbound.find(item => item.sentBy === userData.uid) ? true : false
+
+                    userData.receivedInvite = invitationInbound.find(item => item.sentBy.uid === userData.uid) ? true : false
 
                     //init profile image includign caching image
                     if (userData.profileImg) {
@@ -103,10 +103,7 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
             })
         }, err => {
             console.log(err)
-            dispatch({
-                type: SET_ERROR,
-                payload: 'Oops! We are having trouble retrieving near by users.'
-            })
+            dispatch(set_banner('Oops! We are having trouble retrieving near by users.', 'error'))
         })
 
     dispatch({
@@ -174,6 +171,10 @@ export const validate_near_users = (location: LocationObject, nearByUsers: Array
             all: allUsers
         }
     })
+}
+
+export const block_user = () => (dispatch: AppDispatch) => {
+
 }
 
 export const reset_near_users = () => ({ type: RESET_NEAR_USERS, payload: undefined })

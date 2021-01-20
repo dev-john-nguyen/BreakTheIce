@@ -1,14 +1,13 @@
+import { ProfileImgProps } from "../user/types";
+
 export interface FriendsRootProps {
     users: Array<FriendObjProps>;
     fetched: boolean;
-    friendListener?: () => void;
 }
 
 export interface FriendsActionProps {
     type: string;
-    payload: {
-        friendListener: () => void
-    }
+    payload: any
 }
 
 export interface FriendObjProps {
@@ -16,9 +15,11 @@ export interface FriendObjProps {
     active: boolean;
     uid: string;
     username: string;
+    profileImg: ProfileImgProps;
 }
 
 export interface FriendDispatchActionProps {
     set_and_listen_friends: () => (() => void) | undefined;
+    unfriend_user: (friendUid: string) => Promise<undefined | void>
     reset_friends: () => void;
 }

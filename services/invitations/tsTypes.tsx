@@ -1,3 +1,4 @@
+import { ProfileImgProps } from "../user/types";
 
 
 export interface InvitationsActionProps {
@@ -18,12 +19,17 @@ export enum InvitationStatusOptions {
     denied = 'denied'
 }
 
+export interface InvitationUserInfo {
+    uid: string;
+    username: string;
+    age: number;
+    profileImg: ProfileImgProps | null;
+}
+
 export interface InvitationObject {
     docId: string,
-    sentBy: string,
-    sentByUsername: string,
-    sentByAge: number,
-    sentTo: string,
+    sentBy: InvitationUserInfo
+    sentTo: InvitationUserInfo,
     createdAt: Date,
     updatedAt: Date,
     message: string,

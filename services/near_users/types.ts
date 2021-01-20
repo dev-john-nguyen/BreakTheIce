@@ -1,6 +1,5 @@
 import { LocationObject } from 'expo-location';
 import { StateCityProps, UserRootStateProps, UserProfilePreviewProps } from '../user/types';
-import { TimelineLocationProps } from '../profile/tsTypes';
 import { InvitationStatusOptions } from '../invitations/tsTypes';
 
 export interface NearUsersActionProps {
@@ -8,7 +7,6 @@ export interface NearUsersActionProps {
     payload: {
         uid: string,
         status: InvitationStatusOptions,
-        timeline: TimelineLocationProps[]
         nearBy: Array<NearByUsersProps>;
         all: Array<NearByUsersProps>;
         nearUsersListener: () => void;

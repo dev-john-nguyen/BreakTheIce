@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { colors, buttonsStyles } from '../../utils/styles';
+import { colors } from '../../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import Gallery from '../gallery';
 import { Feather } from '@expo/vector-icons';
 import ProfileImage from '../components/ProfileImage';
+import { CustomButton } from '../../utils/components';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
@@ -20,12 +21,6 @@ const Me = ({ navigation, user }: MeProps) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.username_section}>
-                <View style={styles.username_container}>
-                    <Text style={styles.username_text}>{user.username}</Text>
-                    <View style={styles.username_underline} />
-                </View>
-            </View>
             <View style={styles.header_section}>
                 <ProfileImage image={user.profileImg} size='large' />
                 <View style={styles.header_content}>
@@ -38,13 +33,7 @@ const Me = ({ navigation, user }: MeProps) => {
                         </Text>
 
                     </View>
-                    <Pressable onPress={directToFriends}
-                        style={({ pressed }) => (
-                            pressed ? buttonsStyles.button_primary_pressed : buttonsStyles.button_primary
-                        )}
-                    >
-                        <Text style={buttonsStyles.button_primary_text}>Friends</Text>
-                    </Pressable>
+                    <CustomButton onPress={directToFriends} text='Friends' type='primary' />
                 </View>
             </View>
             <View style={styles.bio}>
@@ -67,32 +56,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         paddingBottom: 0,
         padding: 10
-    },
-    username_section: {
-        justifyContent: 'center',
-        alignSelf: 'center',
-        marginBottom: 20,
-    },
-    username_container: {
-        position: 'relative'
-    },
-    username_text: {
-        fontWeight: 'bold',
-        fontSize: 25,
-        letterSpacing: 2,
-        position: 'relative',
-        bottom: 5,
-        color: colors.primary
-    },
-    username_underline: {
-        position: 'absolute',
-        backgroundColor: colors.primary,
-        opacity: .5,
-        height: 15,
-        borderRadius: 20,
-        bottom: 3,
-        alignSelf: 'center',
-        width: '120%'
     },
     base_text: {
         color: colors.primary,

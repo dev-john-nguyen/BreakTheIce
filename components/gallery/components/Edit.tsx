@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode, useLayoutEffect } from 'react';
-import { View, Image, StyleSheet, TextInput, Pressable, KeyboardAvoidingView } from 'react-native';
+import { View, Image, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
@@ -18,41 +18,40 @@ import { set_banner } from '../../../services/utils/actions';
 import { Feather } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { hashCode } from '../../../utils/functions';
+import { Icon } from '../../../utils/components';
 
 //Summary
 //image limit will be set to 10000000 byte = 10mb
 //need to lower the size
 interface UploadImageProps {
     save_gallery: UserDispatchActionsProps['save_gallery'];
-    statusBar: UtilsRootStateProps['statusBar'];
     gallery: UserRootStateProps['gallery'];
     navigation: MeStackNavigationProp;
     set_banner: UtilsDispatchActionProps['set_banner'];
 }
 
-const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner }: UploadImageProps) => {
+const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadImageProps) => {
     const [imgObjs, setImgObjs] = useState<NewGalleryItemProps[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <View style={{ flexDirection: 'row', right: statusBar ? 5 : 20 }}>
-                    {statusBar ?
-                        <Progress.Bar progress={statusBar} color={colors.white} width={120} /> :
+                <View style={{ flexDirection: 'row', right: loading ? 30 : 20 }}>
+                    {loading ?
+                        <ActivityIndicator size='small' color={colors.primary} /> :
                         <>
                             <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
-                                {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.white} />}
+                                {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
                             </Pressable >
-                            <Pressable onPress={handleSaveGallery}>
-                                {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.white} />}
-                            </Pressable >
+                            <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
                         </>
                     }
                 </View>
 
             )
         })
-    })
+    }, [loading, imgObjs])
 
     useEffect(() => {
         (async () => {
@@ -71,6 +70,30 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
         })()
 
     }, [gallery])
+
+    const handleSaveGallery = () => {
+        //allow description to be empty
+        //check if any changes were made
+
+        if (_.isEqual(imgObjs, gallery)) {
+            return set_banner('Looks like there were no changes found.', 'warning');
+        }
+
+        imgObjs.forEach((item, index) => {
+            if ((!item.url && !item.blob) || !item.id) {
+                return set_banner(`Oops! Looks like image #${index + 1} did not load correctly. Please try to remove and upload again.`, 'error')
+            }
+        })
+
+        setLoading(true)
+
+        save_gallery(imgObjs)
+            .then(() => setLoading(false))
+            .catch((err) => {
+                console.log(err)
+                setLoading(false)
+            })
+    }
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -138,23 +161,6 @@ const UploadImage = ({ save_gallery, statusBar, gallery, navigation, set_banner 
         }
 
         setImgObjs([...imgObjs])
-    }
-
-    const handleSaveGallery = () => {
-        //allow description to be empty
-        //check if any changes were made
-
-        if (_.isEqual(imgObjs, gallery)) {
-            return set_banner('Looks like there were no changes found.', 'warning');
-        }
-
-        imgObjs.forEach((item, index) => {
-            if ((!item.url && !item.blob) || !item.id) {
-                return set_banner(`Oops! Looks like image #${index + 1} did not load correctly. Please try to remove and upload again.`, 'error')
-            }
-        })
-
-        save_gallery(imgObjs)
     }
 
     const renderItem = ({ item, index, drag, isActive }: RenderItemParams<NewGalleryItemProps>): ReactNode => (

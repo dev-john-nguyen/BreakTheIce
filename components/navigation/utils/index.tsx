@@ -51,7 +51,7 @@ export type RootBottomParamList = {
         screen: 'Message',
         initial?: boolean;
         params: {
-            targetUser: NearByUsersProps;
+            targetUser: { uid: string, username: string };
             title: string;
         }
     };
@@ -67,7 +67,7 @@ type ProfileRouteParams = {
     }
 }
 
-type HomeStackParams = {
+export type HomeStackParams = {
     Home: undefined,
     NearByList: undefined,
     Profile: ProfileRouteParams
@@ -82,8 +82,8 @@ export type ChatStackParams = {
     Chat: undefined,
     Message: {
         msgDocId: ChatPreviewProps['docId'],
-        unread: boolean,
-        targetUser?: NearByUsersProps,
+        setRead: boolean,
+        targetUser?: { uid: string, username: string },
         title?: string
     },
     Profile: ProfileRouteParams
@@ -98,10 +98,13 @@ type MeStackParams = {
 }
 
 
+export type HomeAllNavigationProp = BottomTabNavigationProp<RootBottomParamList & HomeStackParams, 'Profile'> & HomeStackNavigationProp
+
 export type HomeToChatNavProp = BottomTabNavigationProp<RootBottomParamList & HomeStackParams, 'Home'> & HomeStackNavigationProp;
 
 export type HomeScreenRouteProp = RouteProp<HomeStackParams, "Home" | "NearByList" | "Profile">;
 export type ProfileScreenRouteProp = RouteProp<HomeStackParams, "Profile">;
+
 export type HomeStackNavigationProp = StackNavigationProp<HomeStackParams>;
 
 export type InvitationsScreenRouteProp = RouteProp<InvitationsStackParams, "Invitations" | "Profile">

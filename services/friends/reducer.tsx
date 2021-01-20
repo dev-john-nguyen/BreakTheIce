@@ -2,8 +2,7 @@ import { SET_FRIENDS, INIT_FRIENDS, RESET_FRIENDS } from './actionTypes';
 import { FriendsActionProps } from './tsTypes';
 const INITIAL_STATE = {
     users: [],
-    fetched: false,
-    friendListener: undefined
+    fetched: false
 }
 
 export default (state = INITIAL_STATE, action: FriendsActionProps) => {
@@ -15,8 +14,7 @@ export default (state = INITIAL_STATE, action: FriendsActionProps) => {
         case INIT_FRIENDS:
             return {
                 ...state,
-                fetched: true,
-                friendListener: action.payload.friendListener
+                fetched: true
             }
         case RESET_FRIENDS:
             return INITIAL_STATE

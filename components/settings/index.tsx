@@ -101,7 +101,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                     </View>
                 </TouchableHighlight>
             </View>
-            <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1 }}>
+            <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1, marginTop: 10 }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     {renderTargetComponent()}
                 </TouchableWithoutFeedback>
@@ -128,10 +128,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: colors.white
     },
-    target_content: {
-        flex: 1,
-        marginTop: 10
-    },
     item_container: {
         borderBottomColor: colors.primary,
         borderBottomWidth: 1,
@@ -141,7 +137,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         position: 'relative',
         alignItems: 'center',
-        marginTop: 20
+        marginBottom: 20
     },
     content: {
         alignItems: 'center'

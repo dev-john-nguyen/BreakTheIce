@@ -40,4 +40,5 @@ export interface ChatRootProps {
 export interface ChatDispatchActionsProps {
     set_and_listen_messages: () => undefined | (() => void);
     reset_chat: () => void;
+    delete_chat: (docId: string) => void;
 }

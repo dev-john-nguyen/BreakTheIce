@@ -3,7 +3,6 @@ import { fireDb } from '../firebase';
 import { AppDispatch } from '../../App';
 import { RootProps } from '../';
 import { ChatDb } from '../../utils/variables';
-import { SET_ERROR } from '../utils/actionTypes';
 import { ChatPreviewProps } from './types';
 import { set_banner } from '../utils/actions';
 
@@ -41,11 +40,7 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
     },
         err => {
             console.log(err);
-            dispatch({
-                type: SET_ERROR,
-                payload: 'Oops! We had trouble retrieving your messages.'
-            })
-
+            dispatch(set_banner('Oops! We had trouble retrieving your messages', 'error'));
             return false;
         }
     )
@@ -55,6 +50,24 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
 
     return chatListener
 
+}
+
+export const delete_chat = (docId: string) => (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid } = getState().user;
+
+    if (!docId) {
+        dispatch(set_banner("Couldn't find chat id to remove", "error"))
+        return;
+    }
+
+    fireDb.collection(ChatDb).doc(docId).delete()
+        .then(() => {
+            console.log('successfully deleted')
+        })
+        .catch(err => {
+            console.log(err)
+            dispatch(set_banner('Oops! Looks like we are having trouble removing the chat.', 'error'))
+        })
 }
 
 export const reset_chat = () => ({ type: RESET_CHAT, payload: undefined })

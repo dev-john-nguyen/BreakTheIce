@@ -1,5 +1,4 @@
 import { LocationObject } from 'expo-location';
-import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
 
 export interface UserActionProps {
     type: string;
@@ -7,9 +6,7 @@ export interface UserActionProps {
         uid: string,
         location: LocationObject,
         stateCity: StateCityProps,
-        placesVisited: PlaceProp[],
         timelineLocDocId: string,
-        timelineLocObj: TimelineLocationProps,
         gallery: GalleryItemProps[],
         locationListener: { remove: () => void }
     }
@@ -49,7 +46,7 @@ export interface UserProfilePreviewProps {
     location: LocationObject;
     age: number;
     hideOnMap: boolean;
-    profileImg: ProfileImgProps | undefined;
+    profileImg: ProfileImgProps | null;
 }
 
 export interface NewProfileImgProps {
@@ -76,7 +73,7 @@ export interface UserRootStateProps {
     bioLong: string;
     bioShort: string;
     gender: string;
-    profileImg: ProfileImgProps | undefined;
+    profileImg: ProfileImgProps | null;
     gallery: GalleryItemProps[];
     hideOnMap: boolean;
     offline: boolean;
@@ -101,7 +98,7 @@ export interface UserDispatchActionsProps {
     set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => Promise<void>;
     update_profile: (updatedProfileData: UpdateUserProfileProps, profileImg: NewProfileImgProps | undefined) => Promise<any>;
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
-    save_gallery: (newGallery: NewGalleryItemProps[]) => void;
+    save_gallery: (newGallery: NewGalleryItemProps[]) => Promise<void | undefined>;
     go_offline: () => void;
     go_online: () => void;
     sign_out: () => void;

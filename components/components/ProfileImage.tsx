@@ -7,7 +7,7 @@ import { Image } from 'react-native';
 import { Icon } from '../../utils/components';
 
 interface ProfileImageProp {
-    image: ProfileImgProps | undefined | NewProfileImgProps;
+    image: ProfileImgProps | NewProfileImgProps | null;
     friend?: Boolean;
     size: 'small' | 'regular' | 'large';
     onImagePress?: () => void;
@@ -126,13 +126,13 @@ const regularStyles = StyleSheet.create({
         right: -5,
     },
     icon: {
-        width: 50,
-        height: 50,
-        fontSize: 50
+        width: 40,
+        height: 40,
+        fontSize: 40
     },
     image: {
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         ...baseStyles.image
     }
 })

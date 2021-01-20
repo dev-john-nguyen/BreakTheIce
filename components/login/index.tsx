@@ -6,6 +6,7 @@ import { login_user, signup_user } from '../../services/signin/actions';
 import SignUpForm from './components/SignUpForm';
 import LoginForm from './components/LoginForm';
 import { SigninDispatchActionProps } from '../../services/signin/types';
+import { UnderlineHeader } from '../../utils/components';
 
 interface LoginForm {
     login_user: SigninDispatchActionProps['login_user']
@@ -23,7 +24,7 @@ const Login = ({ login_user, signup_user }: LoginForm) => {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.header_text}>Break The Ice</Text>
+                <UnderlineHeader text='Break The Ice' />
                 {signup ?
                     <SignUpForm signup_user={signup_user} renderLogin={renderLogin} styles={styles} /> :
                     <LoginForm login_user={login_user} renderSignup={renderSignup} styles={styles} />
@@ -39,7 +40,9 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         width: '100%',
-        alignItems: 'stretch'
+        alignItems: 'stretch',
+        backgroundColor: colors.white,
+        opacity: .90
     },
     header_text: {
         fontSize: 20,

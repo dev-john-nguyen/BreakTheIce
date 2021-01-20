@@ -1,32 +1,44 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { ProfileImg } from '../../../utils/components';
-import { colors, buttonsStyles } from '../../../utils/styles';
+import { colors } from '../../../utils/styles';
 import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils';
 import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
 import { ChatDb, ChatMessageDb } from '../../../utils/variables';
-import { MessageProps, ChatPreviewProps } from '../../../services/chat/types';
+import { MessageProps, ChatPreviewProps, ChatRootProps } from '../../../services/chat/types';
 import { RootProps } from '../../../services';
 import { set_banner } from '../../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
+import { CustomButton } from '../../../utils/components';
+import { handleUpdateUnread, searchReduxChat } from '../utils';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
     navigation: ChatStackNavigationProp;
     user: RootProps['user'];
-    set_banner: UtilsDispatchActionProps['set_banner']
+    set_banner: UtilsDispatchActionProps['set_banner'];
+    chatPreviews: ChatRootProps['previews'];
 }
 
-const Message = (props: ComMessageProps) => {
-    const { msgDocId } = props.route.params;
+export interface TargetUserProps {
+    uid: string;
+    username: string;
+}
+
+const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessageProps) => {
+    const { msgDocId } = route.params;
     const [messages, setMessages] = useState<MessageProps[] | 'empty'>();
     const [messageTxt, setMessageTxt] = useState<string>('');
     const [targetChatDocId, setTargetChatDocId] = useState<string | undefined>(msgDocId)
 
 
-    const dbListener = (msgDocId: string) => {
+    const initChatListener = (msgDocId: string, setRead: boolean) => {
+        if (setRead) {
+            //set message read
+            fireDb.collection(ChatDb).doc(msgDocId).set({ unread: false }, { merge: true })
+        }
+
         return fireDb.collection(ChatDb).doc(msgDocId).collection(ChatMessageDb).onSnapshot((querySnapshot) => {
             var messages: MessageProps[] = [];
 
@@ -44,92 +56,115 @@ const Message = (props: ComMessageProps) => {
         },
             err => {
                 console.log(err)
-                props.set_banner('Oops! Failed to get messages', 'error')
+                set_banner('Oops! Failed to get messages', 'error')
                 setMessages('empty');
             }
         )
     }
 
-    const fetchChat = async () => {
-        const { user } = props;
-        const { targetUser } = props.route.params;
+    const fetchDbChat = async (targetUser: TargetUserProps) => {
+        return fireDb.collection(ChatDb)
+            .where('usersInfo', 'array-contains', { uid: user.uid, username: user.username })
+            .get()
+            .then(querySnapShot => {
+                const { docs } = querySnapShot;
 
-        if (targetUser) {
-            return fireDb.collection(ChatDb)
-                .where('usersInfo', 'array-contains', { uid: user.uid, username: user.username })
-                .get()
-                .then(querySnapShot => {
+                const chatDoc = docs.find(doc => {
+                    var chatFound: boolean = false
+                    if (doc.exists) {
+                        const { usersInfo } = doc.data() as ChatPreviewProps;
 
-                    const docId = querySnapShot.docs.find(doc => {
-                        var chatFound: boolean = false
-
-                        if (doc.exists) {
-                            const { usersInfo } = doc.data() as ChatPreviewProps;
-
-                            usersInfo.forEach(userInfo => {
-                                if (userInfo.uid === targetUser.uid) {
-                                    chatFound = true
-                                }
-                            })
-                        }
-
-                        return chatFound
-                    })
-
-                    if (docId) {
-                        return docId.id
+                        usersInfo.forEach(userInfo => {
+                            if (userInfo.uid === targetUser.uid) {
+                                chatFound = true
+                            }
+                        })
                     }
 
-                    setMessages('empty')
+                    if (chatFound) {
+                        return doc
+                    }
                 })
-                .catch((err) => {
-                    console.log(err)
-                    props.set_banner('Oops! Something went wrong getting the chat messages.', 'error')
-                    setMessages('empty')
-                })
-        } else {
-            props.navigation.goBack()
-        }
+
+                if (chatDoc) {
+
+                    const { unread, recentUid } = chatDoc.data() as ChatPreviewProps;
+
+                    handleUpdateUnread(chatDoc.id, unread, recentUid, user.uid)
+
+                    return { docId: chatDoc.id }
+                }
+
+                setMessages('empty')
+            })
+            .catch((err) => {
+                console.log(err)
+                set_banner('Oops! Something went wrong getting the chat messages.', 'error')
+                setMessages('empty')
+            })
+
     }
 
-    useEffect(() => {
-        //route.params change remove listener and
-        // const { msgDocId, targetUser } = props.route.params;
-        var unsubscribeMessages: () => void | undefined;
+    const fetchChat = async (targetUser: TargetUserProps) => {
+        var docId: string | undefined;
 
-        const { targetUser, msgDocId, unread } = props.route.params;
+        const foundChat = searchReduxChat(targetUser, chatPreviews);
 
-        if (msgDocId) {
-            if (unread) {
-                //set message read
-                fireDb.collection(ChatDb).doc(msgDocId).set({ unread: false }, { merge: true })
-            }
-            //check if docId can be found if not set error
-            unsubscribeMessages = dbListener(msgDocId)
-        } else if (targetUser) {
-            //search if message already exists between users
-            fetchChat()
-                .then((docId) => {
-                    if (docId) {
-                        unsubscribeMessages = dbListener(docId)
-                    }
-                })
+        if (!foundChat) {
+            const fetchedDocId = await fetchDbChat(targetUser)
                 .catch(err => {
                     console.log(err)
                 })
+
+            if (!fetchedDocId) {
+                setMessages('empty')
+                return;
+            }
+
+            docId = fetchedDocId.docId;
         } else {
-            props.set_banner('Unable to identify the target user.', 'error')
-            props.navigation.goBack()
+            docId = foundChat.docId
+            const { unread, recentUid } = foundChat
+            handleUpdateUnread(docId, unread, recentUid, user.uid)
+        }
+
+        setTargetChatDocId(docId);
+
+        return initChatListener(docId, false)
+    }
+
+    useEffect(() => {
+        let isMounted = true;
+
+        var unsubscribeMessages: () => void | undefined;
+
+        const { targetUser, msgDocId, setRead } = route.params;
+
+        if (msgDocId) {
+            //check if docId can be found if not set error and setread if true
+            unsubscribeMessages = initChatListener(msgDocId, setRead)
+        } else if (targetUser) {
+
+            fetchChat(targetUser)
+                .then((chatListener) => {
+                    if (chatListener) {
+                        unsubscribeMessages = chatListener
+                    }
+                })
+
+        } else {
+            set_banner('Unable to identify the target user.', 'error')
+            navigation.goBack()
         }
 
         return () => {
             unsubscribeMessages && unsubscribeMessages()
         };
-    }, [props.route.params, targetChatDocId])
+    }, [route.params, targetChatDocId])
 
     const handleSentMessage = () => {
 
-        if (messageTxt.length < 1) return props.set_banner('empty', 'error')
+        if (messageTxt.length < 1) return set_banner('Say something cool.', 'warning')
 
         Keyboard.dismiss();
 
@@ -143,27 +178,27 @@ const Message = (props: ComMessageProps) => {
             recentMsg: messageTxt,
             dateSent: new Date(),
             unread: true,
-            recentUid: props.user.uid
+            recentUid: user.uid
         }
         var newChatId: string;
 
         if (targetChatDocId) {
             //listener was set so targetChatDocId
             chatRef = fireDb.collection(ChatDb).doc(targetChatDocId);
-        } else if (props.route.params.targetUser) {
+        } else if (route.params.targetUser) {
             //listener or targetChatDocId 
             chatRef = fireDb.collection(ChatDb).doc();
 
-            const { targetUser } = props.route.params;
+            const { targetUser } = route.params;
 
             chatObj.dateCreated = new Date();
-            chatObj.usersInfo = [{ username: targetUser.username, uid: targetUser.uid }, { username: props.user.username, uid: props.user.uid }]
+            chatObj.usersInfo = [{ username: targetUser.username, uid: targetUser.uid }, { username: user.username, uid: user.uid }]
 
             //set new targetChatDocId and this will eventually set the listener
             newChatId = chatRef.id;
         } else {
             //fail
-            return props.set_banner("Oops! Wasn't able to find user information", 'error');
+            return set_banner("Oops! Wasn't able to find user information", 'error');
         }
 
         batch.set(chatRef, chatObj, { merge: true })
@@ -171,7 +206,7 @@ const Message = (props: ComMessageProps) => {
         var newMsgRef = chatRef.collection(ChatMessageDb).doc();
 
         batch.set(newMsgRef, {
-            sentBy: props.user.uid,
+            sentBy: user.uid,
             sentAt: new Date(),
             message: messageTxt
         }
@@ -185,7 +220,7 @@ const Message = (props: ComMessageProps) => {
             })
             .catch((err) => {
                 console.log(err)
-                props.set_banner("Sorry, wasn't able to send your message, please try again.", 'error')
+                set_banner("Sorry, wasn't able to send your message, please try again.", 'error')
             })
     }
 
@@ -205,7 +240,7 @@ const Message = (props: ComMessageProps) => {
             inverted
             initialNumToRender={10}
             renderItem={({ item, index, separators }) => {
-                if (item.sentBy === props.user.uid) {
+                if (item.sentBy === user.uid) {
                     return (
                         <View key={item.docId} style={styles.message_right}>
                             <Text style={styles.message_right_text}>{item.message}</Text>
@@ -237,10 +272,7 @@ const Message = (props: ComMessageProps) => {
                                 value={messageTxt}
                                 multiline />
                         </ScrollView>
-                        <Pressable style={({ pressed }) => pressed ? buttonsStyles.button_white_outline_pressed : buttonsStyles.button_white_outline} onPress={handleSentMessage}
-                        >
-                            {({ pressed }) => <Text style={pressed ? buttonsStyles.button_white_outline_text_pressed : buttonsStyles.button_white_outline_text}>Send</Text>}
-                        </Pressable>
+                        <CustomButton type='primary' onPress={handleSentMessage} text='Send' />
                     </View>
                 </ TouchableWithoutFeedback>
             </KeyboardAvoidingView>
@@ -250,7 +282,8 @@ const Message = (props: ComMessageProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        marginTop: 20
     },
     empty: {
         flex: 1,
@@ -332,6 +365,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (state: RootProps) => ({
-    user: state.user
+    user: state.user,
+    chatPreviews: state.chat.previews
 })
 export default connect(mapStateToProps, { set_banner })(Message);
