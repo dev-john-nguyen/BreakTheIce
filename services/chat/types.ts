@@ -22,11 +22,14 @@ export interface ChatObjectProps {
 export type ChatPreviewProps = {
     dateCreated: Date;
     docId: string;
-    usersInfo: Array<{ uid: string, username: string, profileImg: ProfileImgProps }>;
+    usersInfo: Array<{ uid: string, username: string }>;
     recentMsg: string;
     recentUid: string;
     dateSent: Date;
     unread: boolean;
+    profileImgs: {
+        [uid: string]: ProfileImgProps
+    }
 }
 
 export interface ChatRootProps {

@@ -15,7 +15,7 @@ export interface FriendObjProps {
     active: boolean;
     uid: string;
     username: string;
-    profileImg: ProfileImgProps;
+    profileImg: ProfileImgProps | null;
 }
 
 export interface FriendDispatchActionProps {

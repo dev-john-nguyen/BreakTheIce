@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Modal, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TextInput, Modal, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, Dimensions } from 'react-native';
 import { colors } from '../../utils/styles';
-import { SvgXml } from 'react-native-svg';
-import { closeSvg } from '../../utils/svgs';
 import { connect } from 'react-redux';
-import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationUserInfo } from '../../services/invitations/tsTypes';
+import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationUserInfo } from '../../services/invitations/types';
 import { send_invitation } from '../../services/invitations/actions';
 import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/types';

@@ -1,7 +1,5 @@
 import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
-import { UserActionProps, UserRootStateProps } from './types';
-import { TimelineLocationProps, PlaceProp } from '../profile/tsTypes';
-
+import { UserActionProps } from './types';
 
 const INITIAL_STATE = {
     uid: '',
@@ -84,16 +82,4 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
         default:
             return state;
     }
-}
-
-function update_timeline(timeline: TimelineLocationProps[], { timelineLocDocId, placesVisited }: { timelineLocDocId: string, placesVisited: PlaceProp[] }) {
-
-    for (let i = 0; i < timeline.length; i++) {
-        if (timeline[i].docId == timelineLocDocId) {
-            timeline[i].placesVisited = placesVisited
-            break;
-        }
-    }
-
-    return [...timeline]
 }

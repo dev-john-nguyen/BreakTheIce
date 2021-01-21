@@ -7,14 +7,14 @@ import { RootProps } from '../../services';
 import { validate_near_users } from '../../services/near_users/actions';
 import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/types';
 import { UserRootStateProps } from '../../services/user/types';
-import { HomeToChatNavProp } from '../navigation/utils';
+import { HomeToChatNavProp } from '../navigation/utils/types';
 import { CustomButton } from '../../utils/components';
 import { go_offline } from '../../services/user/actions';
-import Preview from '../components/Preview';
+import Preview from '../../utils/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
-import ProfileImage from '../components/ProfileImage';
+import ProfileImage from '../../utils/components/ProfileImage';
 import { colors } from '../../utils/styles';
-import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
+import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { update_invitation } from '../../services/invitations/actions';
 
 interface RegionProps {
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     },
     my_location: {
         position: 'absolute',
-        top: 10,
+        top: 50,
         alignSelf: 'center',
     },
     view_me: {

@@ -1,11 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../../utils/styles';
-import { SvgXml } from 'react-native-svg';
-import { profileSvg, searchSvg, invitationSvg, messageSvg } from '../../utils/svgs';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
-import { Icon } from '../../utils/components';
+import { FontAwesome } from '@expo/vector-icons';
 
 const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const focusedOptions = descriptors[state.routes[state.index].key].options;
@@ -13,33 +11,6 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
     if (focusedOptions.tabBarVisible === false) {
         return null;
     }
-
-    const renderSvgs = (name: string, isFocused: boolean) => {
-        const widthHeight = '30';
-        switch (name) {
-            case bottomTabsHome:
-                return (
-                    <Icon type="search" size={24} color={colors.white} />
-                )
-            case bottomTabInvitations:
-                return (
-                    <SvgXml xml={invitationSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
-                )
-            case bottomTabChat:
-                return (
-                    <SvgXml xml={messageSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
-                )
-            case bottomTabsProfile:
-                return (
-                    <SvgXml xml={profileSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
-                )
-            default:
-                return (
-                    <SvgXml xml={searchSvg} width={widthHeight} height={widthHeight} fill={isFocused ? colors.secondary : colors.primary} style={styles.svg} />
-                )
-        }
-    }
-
 
     return (
         <View style={styles.container}>
@@ -74,13 +45,15 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
                 // };
 
                 var type: string;
-
+                var size = 32;
                 switch (route.name) {
                     case bottomTabsHome:
                         type = 'search'
+                        size = 29
                         break;
                     case bottomTabInvitations:
-                        type = 'mail'
+                        type = 'envelope'
+                        size = 29
                         break;
                     case bottomTabChat:
                         type = 'inbox'
@@ -92,7 +65,7 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
                         type = 'search'
                 }
 
-                return <Icon key={index} type={type} size={35} color={isFocused ? colors.secondary : colors.primary} pressColor={colors.tertiary} onPress={onPress} />
+                return <FontAwesome key={index} name={type} size={size} color={isFocused ? colors.tertiary : colors.primary} pressColor={colors.secondary} onPress={onPress} />
             })}
         </View>
     );

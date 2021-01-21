@@ -1,8 +1,8 @@
 import { INSERT_HISTORY, RESET_HISTORY } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
-import { UsersDb } from '../../utils/variables';
-import { ProfileUserProps } from './tsTypes';
+import { UsersDb, FriendsDb } from '../../utils/variables';
+import { ProfileUserProps } from './types';
 import { RootProps } from '..';
 import { NearByUsersProps } from '../near_users/types';
 import _ from 'lodash';
@@ -29,13 +29,20 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
         return user.uid === profileUid
     })
 
+    var friend = false;
 
     if (profilePreviewData) {
-        var { friend, sentInvite, distance, receivedInvite } = profilePreviewData
+        var { sentInvite, distance, receivedInvite } = profilePreviewData
+        friend = profilePreviewData.friend
+    } else {
+        //search friends list
+        var friend = _.findIndex(getState().friends.users, (friend) => {
+            return friend.uid === profileUid
+        }) ? true : false
     }
 
     //check to see if the profileObj is empty... if it is fetch it from server
-    return await fireDb.collection(UsersDb).doc(profileUid).get()
+    const profileData = await fireDb.collection(UsersDb).doc(profileUid).get()
         .then(async (doc) => {
             if (!doc.exists) throw 'No data exists';
 
@@ -83,6 +90,23 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
             return profileData
 
         })
+
+    if (profileData.friend && profileData.profileImg) {
+        //update friend profile picture
+        const { uid } = getState().user;
+
+        const { uri } = profileData.profileImg;
+
+        fireDb.collection(FriendsDb).doc(uid).collection(UsersDb).doc(profileData.uid).update({ profileImg: { uri, updatedAt: new Date() } })
+            .then(() => {
+                console.log('updated friend profile img')
+            })
+            .then((err) => {
+                console.log(err)
+            })
+    }
+
+    return profileData;
 }
 
 export const reset_history = () => ({ type: RESET_HISTORY, payload: undefined })

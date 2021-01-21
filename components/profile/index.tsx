@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation/utils';
+import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation/utils/types';
 import { colors } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation, update_invitation } from '../../services/invitations/actions';
-import { InvitationsRootProps, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/tsTypes';
+import { InvitationsRootProps, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/types';
 import { UserRootStateProps } from '../../services/user/types';
 import { NearUsersRootProps } from '../../services/near_users/types';
-import { FriendsRootProps, FriendDispatchActionProps } from '../../services/friends/tsTypes';
+import { FriendsRootProps, FriendDispatchActionProps } from '../../services/friends/types';
 import { RootProps } from '../../services';
 import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile } from '../../services/profile/actions';
-import { ProfileDispatchActionProps, ProfileUserProps, ProfileRootProps } from '../../services/profile/tsTypes';
+import { ProfileDispatchActionProps, ProfileUserProps, ProfileRootProps } from '../../services/profile/types';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import Gallery from '../gallery';
-import ProfileImage from '../components/ProfileImage';
-import RespondButton from '../components/RespondButton';
+import ProfileImage from '../../utils/components/ProfileImage';
+import RespondButton from '../../utils/components/RespondButton';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import ProfileHeaderRight from './components/ProfileHeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
@@ -94,9 +94,9 @@ const Profile = (props: ProfileProps) => {
     const directToMessage = () => {
         if (!profileUser) return;
 
-        const { uid, username } = profileUser;
+        const { uid, username, profileImg } = profileUser;
 
-        const targetUser = { uid, username }
+        const targetUser = { uid, username, profileImg }
 
         props.navigation.navigate('Chat', {
             screen: 'Message',

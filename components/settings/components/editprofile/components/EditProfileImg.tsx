@@ -6,13 +6,13 @@ import { UtilsDispatchActionProps } from '../../../../../services/utils/tsTypes'
 import { ProfileImgProps, NewProfileImgProps } from '../../../../../services/user/types';
 import { hashCode } from '../../../../../utils/functions';
 import { galleryImgSizeLimit } from '../../../../../utils/variables';
-import { ProfileImg, Icon } from '../../../../../utils/components';
+import { Icon } from '../../../../../utils/components';
 import { colors } from '../../../../../utils/styles';
-import ProfileImage from '../../../../components/ProfileImage';
+import ProfileImage from '../../../../../utils/components/ProfileImage';
 
 interface EditProfileImage {
     set_banner: UtilsDispatchActionProps['set_banner'];
-    profileImg: ProfileImgProps | undefined;
+    profileImg: ProfileImgProps | null;
     imgObj?: NewProfileImgProps;
     setImgObj: (imgObj: NewProfileImgProps) => void;
 }
@@ -82,7 +82,7 @@ export default ({ set_banner, profileImg, imgObj, setImgObj }: EditProfileImage)
 
     return (
         <>
-            <ProfileImage image={imgObj ? imgObj : profileImg} size='regular' />
+            <ProfileImage image={imgObj ? imgObj : profileImg} size='large' />
             <Icon size={10} type="edit" color={colors.primary} pressColor={colors.secondary} onPress={pickImage} />
         </>
     )

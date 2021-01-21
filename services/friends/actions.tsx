@@ -2,11 +2,12 @@ import { SET_FRIENDS, INIT_FRIENDS, RESET_FRIENDS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { FriendsDb, FriendsUsersDb } from '../../utils/variables';
-import { FriendObjProps } from './tsTypes';
+import { FriendObjProps } from './types';
 import { RootProps } from '..';
 import { set_banner } from '../utils/actions';
 import { UNFRIEND_USER } from '../near_users/actionTypes';
 import { UPDATE_UNFRIEND_PROFILE } from '../profile/actionTypes';
+import { cacheImage } from '../../utils/functions';
 
 export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: () => RootProps) => {
     const { uid } = getState().user;
@@ -16,26 +17,38 @@ export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: ()
         return;
     }
 
-    const friendListener = fireDb.collection(FriendsDb).doc(uid).collection(FriendsUsersDb).where('active', '==', true).onSnapshot((querySnapShot) => {
+    const friendListener = fireDb.collection(FriendsDb).doc(uid).collection(FriendsUsersDb).where('active', '==', true).onSnapshot(async (querySnapShot) => {
         //prepare friendsArr
-        var friendsArr: Array<FriendObjProps> = [];
+        var friendsArr: FriendObjProps[] = [];
 
-        querySnapShot.docs.forEach((doc) => {
+        for (let i = 0; i < querySnapShot.docs.length; i++) {
+            const doc = querySnapShot.docs[i];
+
             if (doc.exists) {
                 const friend = doc.data()
 
                 if (friend) {
-
-                    friendsArr.push({
+                    var newFriend: FriendObjProps = {
                         uid: doc.id,
                         dateCreated: friend.dateCreated,
                         active: friend.active,
-                        username: friend.username
-                    })
+                        username: friend.username,
+                        profileImg: null
+                    }
 
+                    if (friend.profileImg) {
+                        const cachedUrl = await cacheImage(friend.profileImg.uri);
+                        newFriend.profileImg = {
+                            ...friend.profileImg,
+                            cachedUrl
+                        }
+                    }
+
+                    friendsArr.push(newFriend)
                 }
             }
-        })
+        }
+
         dispatch({
             type: SET_FRIENDS,
             payload: friendsArr

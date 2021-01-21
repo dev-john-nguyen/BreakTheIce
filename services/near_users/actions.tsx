@@ -26,12 +26,16 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
         .doc(stateCity.state)
         .collection(stateCity.city)
         .where(firebase.firestore.FieldPath.documentId(), "!=", uid)
-        .onSnapshot(function (querySnapshot) {
+        .onSnapshot(async (querySnapshot) => {
 
             var nearByUsers: Array<NearByUsersProps> = [];
             var allUsers: Array<NearByUsersProps> = [];
 
-            querySnapshot.docs.forEach(async (doc) => {
+            for (let i = 0; i < querySnapshot.docs.length; i++) {
+                const doc = querySnapshot.docs[i]
+
+                if (!doc.exists) continue;
+
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
                 const { username, location, bioShort, age, hideOnMap, profileImg } = doc.data()
 
@@ -92,7 +96,8 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
 
                 //push all into allUsers
                 allUsers.push(userData)
-            })
+
+            }
 
             dispatch({
                 type: SET_NEAR_USERS,
@@ -105,11 +110,6 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
             console.log(err)
             dispatch(set_banner('Oops! We are having trouble retrieving near by users.', 'error'))
         })
-
-    dispatch({
-        type: INIT_NEAR_USERS,
-        payload: { nearUsersListener }
-    })
 
     return nearUsersListener
 }

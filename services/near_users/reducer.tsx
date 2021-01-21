@@ -1,13 +1,11 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, INIT_NEAR_USERS, RESET_NEAR_USERS, UNFRIEND_USER } from './actionTypes'
+import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, RESET_NEAR_USERS, UNFRIEND_USER } from './actionTypes'
 import { NearUsersActionProps, NearByUsersProps } from './types';
-import { InvitationStatusOptions } from '../invitations/tsTypes';
 import { update_nearBy } from '../../utils/functions';
 
 const INITIAL_STATE = {
     nearBy: [],
     all: [],
-    fetched: false,
-    nearUsersListener: undefined
+    fetched: false
 }
 
 export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
@@ -17,11 +15,6 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
                 nearBy: action.payload.nearBy,
                 all: action.payload.all,
                 fetched: true
-            }
-        case INIT_NEAR_USERS:
-            return {
-                ...state,
-                nearUsersListener: action.payload.nearUsersListener
             }
         case REMOVE_NEAR_USERS:
             return {

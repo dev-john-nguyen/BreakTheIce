@@ -2,9 +2,9 @@ import React from 'react';
 import { View, StyleSheet, StyleProp, Pressable } from 'react-native';
 import { ProfileImgProps, NewProfileImgProps } from '../../services/user/types';
 import { FontAwesome } from '@expo/vector-icons';
-import { colors } from '../../utils/styles';
+import { colors } from '../styles';
 import { Image } from 'react-native';
-import { Icon } from '../../utils/components';
+import { Icon } from '.';
 
 interface ProfileImageProp {
     image: ProfileImgProps | NewProfileImgProps | null;
@@ -28,14 +28,14 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
             break
         default:
             styles = regularStyles;
-            iconSize = 12
+            iconSize = 10
     }
 
 
     const renderImage = () => {
         if (image && image.uri) {
             return <Image
-                source={{ uri: image.cachedUrl ? image.cachedUrl : image.uri, cache: 'force-cache' }}
+                source={{ uri: image.uri, cache: 'force-cache' }}
                 style={styles.image}
             />
         }
@@ -131,8 +131,8 @@ const regularStyles = StyleSheet.create({
         fontSize: 40
     },
     image: {
-        width: 40,
-        height: 40,
+        width: 45,
+        height: 45,
         ...baseStyles.image
     }
 })

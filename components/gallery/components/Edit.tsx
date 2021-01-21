@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode, useLayoutEffect } from 'react';
-import { View, Image, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
@@ -9,16 +9,16 @@ import * as Progress from 'react-native-progress';
 import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
 import { UserDispatchActionsProps } from '../../../services/user/types';
-import { UtilsRootStateProps, UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
+import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { AutoId } from '../../../utils/functions';
 import _ from 'lodash'
-import { MeStackNavigationProp } from '../../navigation/utils';
+import { MeStackNavigationProp } from '../../navigation/utils/types';
 import { set_banner } from '../../../services/utils/actions';
 import { Feather } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { hashCode } from '../../../utils/functions';
-import { Icon } from '../../../utils/components';
+import { Icon, CustomInput } from '../../../utils/components';
 
 //Summary
 //image limit will be set to 10000000 byte = 10mb
@@ -155,7 +155,8 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
         var index = imgObjs.findIndex(item => item.id === id);
 
         if (index !== undefined) {
-            imgObjs[index].removed = true
+            const { removed } = imgObjs[index]
+            imgObjs[index].removed = removed ? false : true
         } else {
             return set_banner('Issues removing the image', 'error')
         }
@@ -172,12 +173,15 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
             onLongPress={drag}
         >
             <View style={[styles.image_content, isActive && styles.image_content_drag]}>
-                {item.removed ? <Feather name='trash-2' size={30} color={colors.red} style={styles.trash} /> : <Feather name='trash' size={30} color={colors.white} onPress={() => handleRemoveGalleryItem(item.id)} style={styles.trash} />}
+
+                <Icon type={item.removed ? 'trash-2' : 'trash'} color={colors.red} pressColor={colors.lightRed} size={30} onPress={() => handleRemoveGalleryItem(item.id)} style={styles.trash} />
+
                 <Image
                     source={{ uri: item.uri ? item.uri : item.cachedUrl ? item.cachedUrl : item.url, cache: 'force-cache' }} style={styles.image}
                 />
-                <TextInput
-                    style={styles.image_description_input}
+
+                <CustomInput
+                    styles={styles.image_description_input}
                     placeholder="Add a description... (100 character limit)"
                     multiline={true}
                     maxLength={100}
@@ -231,7 +235,7 @@ const styles = StyleSheet.create({
     add_image_container: {
         alignSelf: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(40,223,153,.5)',
+        borderColor: `rgba(${colors.primary_rgb},.5)`,
         borderRadius: 5,
         shadowColor: "#000",
         shadowOffset: {
@@ -263,7 +267,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(40,223,153,.5)',
+        borderColor: `rgba(${colors.primary_rgb},.5)`,
         borderRadius: 5,
         shadowColor: "#000",
         shadowOffset: {
@@ -277,7 +281,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#eee'
     },
     image_content_drag: {
-        margin: 20,
+        margin: 50,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -285,7 +289,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.46,
         shadowRadius: 11.14,
-        elevation: 17,
+        elevation: 5,
         backgroundColor: colors.lightGrey
     },
     image: {
@@ -294,13 +298,11 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     image_description_input: {
-        padding: 10,
         marginTop: 5,
         marginBottom: 5,
         fontSize: 12,
         alignSelf: 'flex-start',
-        fontWeight: "400",
-        letterSpacing: .5
+        color: colors.black
     }
 })
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import Home from '../../home';
@@ -14,9 +13,8 @@ import Settings from '../../settings';
 import EditGallery from '../../gallery/components/Edit';
 import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/types';
-import { SettingsSvgHeader } from '../../../utils/components';
-import { NearByUsersProps } from '../../../services/near_users/types';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { ProfileImgProps } from '../../../services/user/types';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -51,7 +49,11 @@ export type RootBottomParamList = {
         screen: 'Message',
         initial?: boolean;
         params: {
-            targetUser: { uid: string, username: string };
+            targetUser: {
+                uid: string,
+                username: string,
+                profileImg: ProfileImgProps | null
+            };
             title: string;
         }
     };
@@ -83,7 +85,11 @@ export type ChatStackParams = {
     Message: {
         msgDocId: ChatPreviewProps['docId'],
         setRead: boolean,
-        targetUser?: { uid: string, username: string },
+        targetUser: {
+            uid: string,
+            username: string,
+            profileImg: ProfileImgProps | null
+        },
         title?: string
     },
     Profile: ProfileRouteParams
@@ -132,7 +138,7 @@ export const InvitationsStackScreen = () => (
 
 export const HomeStackScreen = () => (
     <HomeStack.Navigator screenOptions={screenOptions}>
-        <HomeStack.Screen name="Home" component={Home} />
+        <HomeStack.Screen name="Home" component={Home} options={{ headerTransparent: true }} />
         <HomeStack.Screen name="NearByList" component={NearByList} />
         <HomeStack.Screen name="Profile" component={Profile}
             options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}

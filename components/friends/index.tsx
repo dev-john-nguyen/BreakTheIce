@@ -2,11 +2,11 @@ import React from 'react';
 import { View, FlatList, TouchableHighlight, Text, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { FriendsRootProps, FriendObjProps } from '../../services/friends/tsTypes';
-import { MeStackNavigationProp } from '../navigation/utils';
+import { FriendsRootProps, FriendObjProps } from '../../services/friends/types';
+import { MeStackNavigationProp } from '../navigation/utils/types';
 import { colors } from '../../utils/styles';
 import { UnderlineHeader } from '../../utils/components';
-import ProfileImage from '../components/ProfileImage';
+import ProfileImage from '../../utils/components/ProfileImage';
 
 interface FriendsProps {
     friends: FriendsRootProps;
@@ -59,10 +59,11 @@ const styles = StyleSheet.create({
     friend_container: {
         padding: 10,
         paddingLeft: 110,
-        borderBottomWidth: 2,
-        borderTopWidth: 2,
+        borderBottomWidth: 1,
+        borderTopWidth: 1,
         borderBottomColor: colors.primary,
-        borderTopColor: colors.primary
+        borderTopColor: colors.primary,
+        marginBottom: 20
     },
     content: {
         position: 'relative',

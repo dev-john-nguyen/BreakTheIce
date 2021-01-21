@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { colors } from '../../utils/styles';
-import { MeStackNavigationProp } from '../navigation/utils';
+import { MeStackNavigationProp } from '../navigation/utils/types';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import Gallery from '../gallery';
 import { Feather } from '@expo/vector-icons';
-import ProfileImage from '../components/ProfileImage';
-import { CustomButton } from '../../utils/components';
+import ProfileImage from '../../utils/components/ProfileImage';
+import { CustomButton, HeaderText, BodyText, Icon } from '../../utils/components';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
@@ -22,28 +22,28 @@ const Me = ({ navigation, user }: MeProps) => {
     return (
         <View style={styles.container}>
             <View style={styles.header_section}>
-                <ProfileImage image={user.profileImg} size='large' />
+                <View style={styles.profile_image}>
+                    <ProfileImage image={user.profileImg} size='large' />
+                </View>
                 <View style={styles.header_content}>
                     <View style={styles.header_content_text}>
-                        <Text style={[styles.base_text, { fontSize: 24 }]}>
-                            {user.name}
-                        </Text>
-                        <Text style={[styles.base_text, { fontSize: 14 }]}>
-                            {user.age} years old
-                        </Text>
-
+                        <HeaderText text={user.name} styles={styles.header_text} />
+                        <BodyText text={`${user.age} years old`} styles={styles.sub_header_text} />
                     </View>
                     <CustomButton onPress={directToFriends} text='Friends' type='primary' />
                 </View>
             </View>
             <View style={styles.bio}>
-                <Text style={[styles.base_text, { fontSize: 12 }]}>
-                    {user.bioLong}
-                </Text>
+                <BodyText text={user.bioLong} styles={styles.bio_text} />
             </View>
-            <Pressable onPress={directToEditGallery} style={styles.edit_icon}>
-                {({ pressed }) => <Feather name="edit" size={24} color={pressed ? colors.secondary : colors.primary} />}
-            </Pressable>
+            <Icon
+                type='edit'
+                size={24}
+                color={colors.primary}
+                pressColor={colors.secondary}
+                onPress={directToEditGallery}
+                style={styles.edit_icon}
+            />
             <Gallery gallery={user.gallery} />
         </View>
     )
@@ -54,21 +54,16 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        paddingBottom: 0,
-        padding: 10
-    },
-    base_text: {
-        color: colors.primary,
-        fontWeight: '400',
-        letterSpacing: .2
+        padding: 20
     },
     header_section: {
-        flexBasis: 'auto',
-        alignItems: "center",
         padding: 20,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        height: '20%'
+        alignItems: 'center',
+    },
+    header_text: {
+        color: colors.primary,
+        fontSize: 18
     },
     header_content: {
         flex: 1,
@@ -79,15 +74,25 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         alignItems: 'center'
     },
+    profile_image: {
+        flex: 1
+    },
+    sub_header_text: {
+        fontSize: 14,
+        color: colors.primary
+    },
     bio: {
         flexBasis: 'auto',
-        padding: 20,
-
+        padding: 10,
+    },
+    bio_text: {
+        fontSize: 12,
+        color: colors.primary,
+        lineHeight: 15
     },
     edit_icon: {
         alignSelf: 'flex-end',
-        marginBottom: 20,
-        marginRight: 40
+        padding: 10
     }
 })
 

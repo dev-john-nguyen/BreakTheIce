@@ -1,6 +1,6 @@
 import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET_INVITATIONS, RESET_INVITATIONS } from './actionTypes';
 import { AppDispatch } from '../../App';
-import { InvitationObject, InvitationStatusOptions } from './tsTypes';
+import { InvitationObject, InvitationStatusOptions } from './types';
 import { fireDb } from '../firebase';
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { RootProps } from '..';
@@ -49,10 +49,10 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
         .where("sentBy.uid", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
         .get()
-        .then((querySnapshot) => {
+        .then(async (querySnapshot) => {
             dispatch({
                 type: SET_INVITATIONS_OUTBOUND,
-                payload: handleInvitations(querySnapshot)
+                payload: await handleInvitations(querySnapshot)
             })
         })
         .catch(err => {
@@ -64,10 +64,10 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
     var invitationListener = fireDb.collection(InvitationsDb)
         .where("sentTo.uid", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
-        .onSnapshot((querySnapshot) => {
+        .onSnapshot(async (querySnapshot) => {
             dispatch({
                 type: SET_INVITATIONS_INBOUND,
-                payload: handleInvitations(querySnapshot)
+                payload: await handleInvitations(querySnapshot)
             })
         },
             err => {
@@ -84,32 +84,9 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
 export const update_invitation_from_invitations = (invitationObj: InvitationObject, updatedStatus: InvitationObject['status']) => async (dispatch: AppDispatch, getState: () => RootProps) => {
     const user = getState().user;
 
-    var batch = fireDb.batch();
-
-    const InvitationRef = fireDb.collection(InvitationsDb).doc(invitationObj.docId);
-    batch.set(InvitationRef, { status: updatedStatus }, { merge: true })
-
-    //if accepted then create new friend
-    if (updatedStatus === InvitationStatusOptions.accepted) {
-        const InviteeRef = fireDb.collection(FriendsDb).doc(invitationObj.sentBy.uid).collection(FriendsUsersDb).doc(user.uid);
-        batch.set(InviteeRef, {
-            username: user.username,
-            dateUpdated: new Date(),
-            dateCreated: new Date(),
-            active: true
-        })
-        const InviterRef = fireDb.collection(FriendsDb).doc(user.uid).collection(FriendsUsersDb).doc(invitationObj.sentBy.uid);
-        batch.set(InviterRef, {
-            username: invitationObj.sentBy.username,
-            dateUpdated: new Date(),
-            dateCreated: new Date(),
-            active: true
-        })
-    }
-
     //update the invitations in inviter(outbound) and current user (inbound)
     try {
-        await batch.commit()
+        await handle_invitation_status(invitationObj, updatedStatus, user)
     } catch (err) {
         console.log(err)
         dispatch(set_banner("Oops! Something went wrong updated your request", 'error'))

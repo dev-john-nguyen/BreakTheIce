@@ -4,7 +4,7 @@ import { colors } from '../../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
 import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps } from '../../../../services/user/types';
 import { UtilsDispatchActionProps } from '../../../../services/utils/tsTypes';
-import { MeStackNavigationProp } from '../../../navigation/utils';
+import { MeStackNavigationProp } from '../../../navigation/utils/types';
 import { isEqual } from 'lodash';
 import EditProfileImg from './components/EditProfileImg';
 

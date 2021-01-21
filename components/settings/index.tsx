@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableHighlight, Pressable, KeyboardAvoiding
 import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out, send_password_reset_email } from '../../services/user/actions';
 import { colors } from '../../utils/styles';
-import { MeStackNavigationProp } from '../navigation/utils';
+import { MeStackNavigationProp } from '../navigation/utils/types';
 import EditProfile from './components/editprofile';
 import Privacy from './components/Privacy';
 import { RootProps } from '../../services';

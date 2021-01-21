@@ -21,11 +21,11 @@ export const renderDateDiff = (date: any) => {
 
 export const renderDate = (date: Date) => {
     if (!date) return
-    return date.getMonth() + '/' + date.getDay() + '/' + date.getFullYear()
+    return (date.getMonth() + 1) + '/' + date.getDay() + '/' + date.getFullYear()
 }
 
-export const renderOtherUser = (userInfo: ChatPreviewProps['usersInfo']) => {
-    return userInfo.find(user => user.uid !== user.uid)
+export const renderOtherUser = (userInfo: ChatPreviewProps['usersInfo'], uid: string) => {
+    return userInfo.find(user => uid !== user.uid)
 }
 
 export const handleUpdateUnread = (docId: string, unread: boolean, recentUid: string, userId: string) => {

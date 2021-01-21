@@ -8,7 +8,7 @@ import { set_and_listen_user_location, go_online } from '../../services/user/act
 import { set_and_listen_near_users } from '../../services/near_users/actions';
 import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/types';
 import { NearUsersDispatchActionProps } from '../../services/near_users/types';
-import { HomeToChatNavProp } from '../navigation/utils';
+import { HomeToChatNavProp } from '../navigation/utils/types';
 import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
 // @ts-ignore

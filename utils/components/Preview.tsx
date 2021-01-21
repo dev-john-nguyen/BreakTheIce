@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, StyleProp, Dimensions } from 'react-native';
 import { NearByUsersProps } from '../../services/near_users/types';
-import { colors } from '../../utils/styles';
-import { HomeToChatNavProp } from '../navigation/utils';
-import { CustomButton } from '../../utils/components';
+import { colors } from '../styles';
+import { HomeToChatNavProp } from '../../components/navigation/utils/types';
+import { CustomButton } from '.';
 import ProfileImage from './ProfileImage';
 import RespondButton from './RespondButton';
-import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
+import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../services/invitations/types';
 
 interface PreviewProps {
     nearUser: NearByUsersProps,
@@ -23,10 +23,13 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
     const [respondLoading, setRespondLoading] = useState<boolean>(false);
 
     const handleMessageOnPress = () => {
+
+        const targetUser = { uid: nearUser.uid, username: nearUser.username, profileImg: nearUser.profileImg }
+
         navigation.navigate('Chat', {
             screen: 'Message',
             initial: false,
-            params: { targetUser: { uid: nearUser.uid, username: nearUser.username }, title: nearUser.username }
+            params: { targetUser, title: nearUser.username }
         })
     }
 

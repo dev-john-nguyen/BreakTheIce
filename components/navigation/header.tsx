@@ -1,27 +1,27 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils';
+import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
 import { colors } from '../../utils/styles';
-import { Icon } from '../../utils/components';
+import { Icon, HeaderText } from '../../utils/components';
 
 interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
 }
 
-const renderTitle = (route: RouteProps['props']) => {
-    if (!route.params || !route.params.title) {
-        switch (route.name) {
-            case 'Home':
-                return 'Map'
-            case 'NearByList':
-                return 'List'
-            case 'Me':
-                return 'Profile'
-            default:
-                return route.name
-        }
-    } else return route.params.title;
-}
+// const renderTitle = (route: RouteProps['props']) => {
+//     if (!route.params || !route.params.title) {
+//         switch (route.name) {
+//             case 'Home':
+//                 return 'Map'
+//             case 'NearByList':
+//                 return 'List'
+//             case 'Me':
+//                 return 'Profile'
+//             default:
+//                 return route.name
+//         }
+//     } else return route.params.title;
+// }
 
 const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
     switch (route.name) {
@@ -40,21 +40,19 @@ const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
 }
 
 export const screenOptions = ({ route, navigation }: { navigation: any, route: RouteProps['props'] }) => ({
-    // headerTitle: () => {
-    //     return (
-    //         <View style={styles.container}>
-    //             <Text style={styles.text}>{renderTitle(route)}</Text>
-    //             <View style={styles.underline} />
-    //         </View>
-    //     )
-    // },
-    headerTitle: '',
+    headerTitle: () => {
+        return (
+            <View style={styles.container}>
+                <HeaderText styles={styles.header_text} text={route.params?.title ? route.params.title : ''} />
+                <View style={styles.underline} />
+            </View>
+        )
+    },
     headerRight: () => renderHeaderRight(route, navigation),
     headerStyle: styles.header_style,
     headerTintColor: colors.primary,
     headerTitleStyle: styles.header_tint_style,
     headerBackTitleVisible: false,
-    headerTransparent: false,
     cardStyle: {
         backgroundColor: colors.white
     }
@@ -65,10 +63,8 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative'
     },
-    text: {
-        fontWeight: 'bold',
+    header_text: {
         fontSize: 25,
-        letterSpacing: 2,
         position: 'relative',
         bottom: 5,
         color: colors.primary

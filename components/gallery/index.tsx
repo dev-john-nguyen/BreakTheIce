@@ -5,6 +5,7 @@ import { colors } from '../../utils/styles';
 import { cacheImage } from '../../utils/functions';
 import _ from 'lodash';
 import { NearByUsersProps } from '../../services/near_users/types';
+import { BodyText } from '../../utils/components';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
@@ -27,7 +28,7 @@ export default ({ gallery, nearByUser }: GalleryComProps) => {
         return <View style={[styles.gallery_container, index > 0 ? { margin: 30 } : { marginTop: 0, margin: 30 }]}>
             <Image source={{ uri, cache: 'force-cache' }} style={styles.gallery_image} />
             <View style={styles.gallery_text_container}>
-                <Text style={styles.gallery_text}>{item.description}</Text>
+                <BodyText text={item.description} styles={styles.gallery_text} />
             </View>
         </View>
     }
@@ -47,7 +48,6 @@ const styles = StyleSheet.create({
         paddingRight: 10
     },
     gallery_container: {
-        alignItems: 'center',
         borderWidth: 1,
         borderColor: `rgba(${colors.primary_rgb},.5)`,
         borderRadius: 5,
@@ -74,10 +74,7 @@ const styles = StyleSheet.create({
     },
     gallery_text: {
         color: colors.primary,
-        fontSize: 12,
-        alignSelf: 'flex-start',
-        fontWeight: "400",
-        letterSpacing: .5
+        fontSize: 12
     }
 })
 

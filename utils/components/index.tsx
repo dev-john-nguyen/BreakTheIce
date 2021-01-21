@@ -1,50 +1,10 @@
 import React from 'react';
-import { View, Pressable, StyleProp, Text, ActivityIndicator } from 'react-native';
-import { colors, button_styles, underline_header_styles } from '../styles';
-import { SvgXml } from 'react-native-svg';
-import { settingSvg, editSvg, airplaneSvg, saveSvg, portraitSvg, plusSvg, minusSvg } from '../svgs';
+import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { button_styles, underline_header_styles, colors } from '../styles';
 import { Feather } from '@expo/vector-icons';
-
-export const SettingsSvgHeader = ({ pressed }: { pressed: boolean }) => (
-    <SvgXml xml={settingSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white}
-        style={{ right: 10 }} />
-)
-
-export const SettingsSvg = ({ styles }: { styles?: StyleProp<any> }) => (
-    <SvgXml xml={settingSvg} width='30' height='30' fill={colors.primary} style={styles} />
-)
-
-export const EditSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
-    <SvgXml xml={editSvg} width='30' height='30' fill={pressed ? colors.white : colors.primary} style={styles} />
-)
-
-export const SaveSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
-    <SvgXml xml={saveSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white} style={styles} />
-)
-
-export const PlusSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
-    <SvgXml xml={plusSvg} width='30' height='30' fill={pressed ? colors.secondary : colors.white} style={styles} />
-)
-
-export const MinusSvg = ({ styles, onPress }: { styles?: StyleProp<any>, onPress: () => void }) => (
-    <Pressable
-        style={styles}
-        onPress={onPress}
-    >
-        {({ pressed }) => (
-            <SvgXml xml={minusSvg} width='30' height='30' fill={pressed ? colors.greyRed : colors.darkRed} />
-        )}
-    </Pressable>
-)
-
-export const AirplaneSvg = ({ styles }: { styles?: StyleProp<any> }) => (
-    <SvgXml xml={airplaneSvg} width='20' height='20' fill={colors.primary} style={styles} />
-)
-
-export const PortraitSvg = ({ styles, pressed }: { styles?: StyleProp<any>, pressed?: boolean }) => (
-    <SvgXml xml={portraitSvg} width='30' height='30' fill={pressed ? colors.white : colors.primary} style={styles} />
-)
-
+import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
+import { Roboto_400Regular } from '@expo-google-fonts/roboto';
+import { TextInput } from 'react-native-gesture-handler';
 
 export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: string, size: number, color: string, pressColor?: string, onPress?: () => void, style?: StyleProp<any> }) => (
     <Pressable onPress={onPress} style={style}>
@@ -75,7 +35,7 @@ export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, 
     >
         {(props) => (
             <View style={{ flexDirection: 'row' }}>
-                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <Text style={props.pressed ? pressed.text : unpressed.text}>{text}</Text>}
+                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <BodyText text={text} styles={props.pressed ? pressed.text : unpressed.text} />}
             </View>
         )}
     </Pressable>
@@ -89,3 +49,70 @@ export const UnderlineHeader = ({ text, styles }: { text: string, styles?: Style
         </View>
     </View>
 )
+
+export const BodyText = ({ styles, text }: { styles?: StyleProp<any>, text: string }) => {
+    let [fontsLoaded] = useFonts({
+        Roboto_400Regular
+    });
+
+    if (!fontsLoaded) {
+        return <ActivityIndicator />;
+    }
+
+    return <Text style={[{ fontFamily: 'Roboto_400Regular' }, text_styles.body, styles]}>{text}</Text>;
+
+}
+
+export const HeaderText = ({ styles, text }: { styles?: StyleProp<any>, text: string }) => {
+    let [fontsLoaded] = useFonts({
+        Rubik_500Medium
+    });
+
+    if (!fontsLoaded) {
+        return <ActivityIndicator />;
+    }
+
+    return <Text style={[{ fontFamily: 'Rubik_500Medium' }, text_styles.header, styles]}>{text}</Text>;
+}
+
+interface CustomInput {
+    styles?: StyleProp<any>;
+    placeholder: string;
+    multiline: boolean;
+    maxLength: number;
+    value: string;
+    onChangeText: (text: string) => void
+}
+
+export const CustomInput = ({ styles, placeholder, multiline, maxLength, value, onChangeText }: CustomInput) => {
+    let [fontsLoaded] = useFonts({
+        Rubik_500Medium
+    });
+
+    if (!fontsLoaded) {
+        return <ActivityIndicator />;
+    }
+
+    return <TextInput
+        style={[styles, text_styles.input, { fontFamily: 'Rubik_500Medium' }]}
+        placeholder={placeholder}
+        multiline={multiline}
+        maxLength={maxLength}
+        value={value}
+        onChangeText={onChangeText}
+    />
+}
+
+const text_styles = StyleSheet.create({
+    body: {
+        letterSpacing: .2,
+    },
+    header: {
+        letterSpacing: .5
+    },
+    input: {
+        padding: 10,
+        letterSpacing: .2
+    }
+})
+

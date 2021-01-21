@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system'
 import { NearByUsersProps } from '../../services/near_users/types';
-import { InvitationStatusOptions } from '../../services/invitations/tsTypes';
-import { ProfileUserProps } from '../../services/profile/tsTypes';
+import { InvitationStatusOptions } from '../../services/invitations/types';
+import { ProfileUserProps } from '../../services/profile/types';
 
 export class AutoId {
     static newId(len?: number): string {

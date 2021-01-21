@@ -10,10 +10,10 @@ import profileReducer from './profile/reducer';
 import { NearUsersRootProps } from './near_users/types';
 import { UtilsRootStateProps } from './utils/tsTypes';
 import { UserRootStateProps } from './user/types';
-import { InvitationsRootProps } from './invitations/tsTypes';
-import { FriendsRootProps } from './friends/tsTypes';
+import { InvitationsRootProps } from './invitations/types';
+import { FriendsRootProps } from './friends/types';
 import { ChatRootProps } from './chat/types';
-import { ProfileRootProps } from './profile/tsTypes';
+import { ProfileRootProps } from './profile/types';
 
 export default combineReducers({
     user: userReducer,

@@ -1,6 +1,6 @@
 import { LocationObject } from 'expo-location';
 import { StateCityProps, UserRootStateProps, UserProfilePreviewProps } from '../user/types';
-import { InvitationStatusOptions } from '../invitations/tsTypes';
+import { InvitationStatusOptions } from '../invitations/types';
 
 export interface NearUsersActionProps {
     type: string;

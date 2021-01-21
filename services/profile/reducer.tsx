@@ -1,5 +1,5 @@
 import { INSERT_HISTORY, UPDATE_INVITE_STATUS_PROFILE_HISTORY, RESET_HISTORY, SENT_INVITE_PROFILE_HISTORY, UPDATE_UNFRIEND_PROFILE } from './actionTypes';
-import { ProfileActionProps, ProfileUserProps, } from './tsTypes';
+import { ProfileActionProps, ProfileUserProps, } from './types';
 import { update_nearBy } from '../../utils/functions';
 
 const INITIAL_STATE = {

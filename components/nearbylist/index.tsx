@@ -3,13 +3,13 @@ import { View, FlatList, ActivityIndicator, Text, StyleSheet } from 'react-nativ
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/types';
-import { HomeToChatNavProp } from '../navigation/utils';
+import { HomeToChatNavProp } from '../navigation/utils/types';
 import { ProfilePage } from '../../utils/variables';
 import { colors } from '../../utils/styles';
 import InvitationModal from '../modal/InvitationModal';
-import Preview from '../components/Preview';
+import Preview from '../../utils/components/Preview';
 import { update_invitation } from '../../services/invitations/actions';
-import { InvitationsDispatchActionProps } from '../../services/invitations/tsTypes';
+import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 
 
 interface NearByListProps {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { colors } from '../../../utils/styles';
-import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils';
+import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils/types';
 import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
 import { ChatDb, ChatMessageDb } from '../../../utils/variables';
@@ -12,6 +12,7 @@ import { set_banner } from '../../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { CustomButton } from '../../../utils/components';
 import { handleUpdateUnread, searchReduxChat } from '../utils';
+import { ProfileImgProps } from '../../../services/user/types';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
@@ -24,6 +25,7 @@ interface ComMessageProps {
 export interface TargetUserProps {
     uid: string;
     username: string;
+    profileImg: ProfileImgProps | null
 }
 
 const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessageProps) => {
@@ -36,7 +38,23 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
     const initChatListener = (msgDocId: string, setRead: boolean) => {
         if (setRead) {
             //set message read
-            fireDb.collection(ChatDb).doc(msgDocId).set({ unread: false }, { merge: true })
+            //update usersInfo with profileImg
+
+            var updatedObj: {
+                unread: boolean,
+                [uid: string]: any
+            } = {
+                unread: false
+            }
+
+            if (user.profileImg) {
+                updatedObj[`profileImgs.${user.uid}`] = {
+                    uri: user.profileImg.uri,
+                    updatedAt: new Date()
+                }
+            }
+
+            fireDb.collection(ChatDb).doc(msgDocId).update(updatedObj)
         }
 
         return fireDb.collection(ChatDb).doc(msgDocId).collection(ChatMessageDb).onSnapshot((querySnapshot) => {
@@ -191,8 +209,36 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
             const { targetUser } = route.params;
 
+
             chatObj.dateCreated = new Date();
-            chatObj.usersInfo = [{ username: targetUser.username, uid: targetUser.uid }, { username: user.username, uid: user.uid }]
+
+            chatObj.usersInfo = [{
+                username: targetUser.username,
+                uid: targetUser.uid
+            },
+            {
+                username: user.username,
+                uid: user.uid
+            }]
+
+            if (user.profileImg) {
+                chatObj.profileImgs = {
+                    [user.uid]: {
+                        uri: user.profileImg.uri,
+                        updatedAt: new Date()
+                    }
+                }
+            }
+
+            if (targetUser.profileImg) {
+                chatObj.profileImgs = {
+                    ...chatObj.profileImgs,
+                    [targetUser.uid]: {
+                        uri: targetUser.profileImg.uri,
+                        updatedAt: new Date()
+                    }
+                }
+            }
 
             //set new targetChatDocId and this will eventually set the listener
             newChatId = chatRef.id;
@@ -201,7 +247,12 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             return set_banner("Oops! Wasn't able to find user information", 'error');
         }
 
-        batch.set(chatRef, chatObj, { merge: true })
+        try {
+            batch.set(chatRef, chatObj, { merge: true })
+        } catch (err) {
+            console.log(err)
+        }
+
 
         var newMsgRef = chatRef.collection(ChatMessageDb).doc();
 

@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableHighlight, ActivityIndicator, StyleProp, StyleSheet, Animated, Pressable } from 'react-native';
 import { colors } from '../../utils/styles';
 import { connect } from 'react-redux';
-import { ChatScreenRouteProp, ChatStackNavigationProp } from '../navigation/utils'
+import { ChatStackNavigationProp } from '../navigation/utils/types'
 import { RootProps } from '../../services';
 import { ChatPreviewProps, ChatDispatchActionsProps } from '../../services/chat/types'
-import ProfileImage from '../components/ProfileImage';
+import ProfileImage from '../../utils/components/ProfileImage';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
 import { Icon, UnderlineHeader } from '../../utils/components';
 import { delete_chat } from '../../services/chat/actions';
-import { renderOtherUser, renderDate, renderDateDiff } from './utils';
+import { renderOtherUser, renderDateDiff } from './utils';
 
 interface ChatProps {
     navigation: ChatStackNavigationProp;
@@ -29,13 +29,21 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
     }, [chat.previews])
 
     const directToMessage = (preview: ChatPreviewProps) => {
-        var otherUser = renderOtherUser(preview.usersInfo);
+        var otherUser = renderOtherUser(preview.usersInfo, user.uid);
+
+        if (!otherUser) return;
+
+        const targetUser = {
+            ...otherUser,
+            profileImg: preview.profileImgs[otherUser.uid]
+        }
+
         var title = otherUser ? otherUser.username : 'RandomUser'
 
         //figure out if unread should be updated ....
         const setRead = preview.unread && user.uid !== preview.recentUid ? true : false
 
-        navigation.push('Message', { msgDocId: preview.docId, setRead, title });
+        navigation.push('Message', { msgDocId: preview.docId, setRead, title, targetUser });
     }
 
     const renderRightActions = (progress: Animated.AnimatedInterpolation) => {
@@ -73,7 +81,13 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
 
                 var unread = item.unread && item.recentUid !== user.uid;
 
-                var otherUser = renderOtherUser(item.usersInfo);
+                var otherUser = renderOtherUser(item.usersInfo, user.uid);
+
+                var otherOtherProfileImg = null;
+
+                if (otherUser) {
+                    otherOtherProfileImg = item.profileImgs[otherUser.uid]
+                }
 
                 const list_style = chat_styles(unread)
 
@@ -86,7 +100,7 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
                     >
                         <Pressable style={({ pressed }) => [list_style.content, pressed && { backgroundColor: colors.tertiary }]} onPress={() => directToMessage(item)}>
                             <View style={list_style.profile_section}>
-                                <ProfileImage friend={true} size='regular' image={otherUser ? otherUser.profileImg : null} />
+                                <ProfileImage friend={true} size='regular' image={otherOtherProfileImg} />
                                 <View style={list_style.profile_section_text}>
                                     <Text style={list_style.username}>{otherUser ? otherUser.username : 'RandomUser'}</Text>
                                 </View>
@@ -114,7 +128,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     actionText: {
-        color: 'white',
+        color: colors.white,
         fontSize: 16,
         backgroundColor: 'transparent',
         padding: 10,
@@ -133,7 +147,8 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
         borderTopWidth: 1,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
-        position: 'relative'
+        position: 'relative',
+        marginBottom: 20
     },
     content: {
         flex: 1,

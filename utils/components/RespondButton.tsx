@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { CustomButton, Icon } from '../../utils/components';
-import { colors } from '../../utils/styles';
-import { InvitationStatusOptions } from '../../services/invitations/tsTypes';
+import { CustomButton, Icon } from '.';
+import { colors } from '../styles';
+import { InvitationStatusOptions } from '../../services/invitations/types';
 
 interface InvitationButtonsProps {
     handleInvitationUpdate: (status: InvitationStatusOptions) => Promise<void>;

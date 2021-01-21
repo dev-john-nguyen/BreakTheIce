@@ -10,7 +10,6 @@ export interface InvitationsRootProps {
     inbound: Array<InvitationObject>
     outbound: Array<InvitationObject>
     fetched: boolean;
-    invitationListener?: () => void;
 }
 
 export enum InvitationStatusOptions {

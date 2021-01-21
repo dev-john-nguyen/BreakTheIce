@@ -20,7 +20,8 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
 
         querySnapshot.docs.forEach(doc => {
             if (doc.exists) {
-                const { unread, recentUid, recentMsg, dateSent, usersInfo, dateCreated } = doc.data()
+                const { unread, recentUid, recentMsg, dateSent, usersInfo, dateCreated, profileImgs } = doc.data()
+
                 chatPreviews.push({
                     docId: doc.id,
                     recentMsg,
@@ -28,7 +29,8 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
                     dateCreated: dateCreated.toDate(),
                     usersInfo,
                     unread,
-                    recentUid
+                    recentUid,
+                    profileImgs
                 })
             }
         })

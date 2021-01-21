@@ -1,6 +1,6 @@
 import { NearByUsersProps } from '../near_users/types';
 import { UserRootStateProps } from '../user/types';
-import { InvitationStatusOptions } from '../invitations/tsTypes';
+import { InvitationStatusOptions } from '../invitations/types';
 
 export interface ProfileActionProps {
     type: string;

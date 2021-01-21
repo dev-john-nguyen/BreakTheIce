@@ -5,15 +5,15 @@ import { connect } from 'react-redux';
 import { remove_banner } from '../services/utils/actions';
 import { UtilsRootStateProps } from '../services/utils/tsTypes';
 import Login from './login';
-import BottomNav from './navigation/BottomNav';
+import BottomNav from './navigation/Bottom';
 import { RootProps } from '../services';
 import { NavigationContainer } from '@react-navigation/native';
-import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation/utils'
+import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation/utils/types'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
-import { colors } from '../utils/styles';
-import { InvitationsDispatchActionProps } from '../services/invitations/tsTypes';
-import { FriendDispatchActionProps } from '../services/friends/tsTypes';
+import { bannerStyles } from '../utils/styles';
+import { InvitationsDispatchActionProps } from '../services/invitations/types';
+import { FriendDispatchActionProps } from '../services/friends/types';
 import { ChatDispatchActionsProps } from '../services/chat/types';
 import { set_and_listen_invitations } from '../services/invitations/actions';
 import { set_and_listen_friends } from '../services/friends/actions';
@@ -106,48 +106,13 @@ const Base = (props: Base) => {
         </>
     );
 }
-
-const bannerStyles = (type: string) => {
-    interface StylesProps {
-        container: StyleProp<any>
-        text: StyleProp<any>
-    }
-
-    var styles: StylesProps = {
-        container: {
-            padding: 10
-        },
-        text: {
-            textAlign: 'center',
-            fontSize: 14,
-            letterSpacing: .5,
-            textTransform: 'capitalize'
-        }
-    }
-
-    switch (type) {
-        case 'warning':
-            styles.container.backgroundColor = colors.yellow
-            styles.text.color = colors.white
-            break;
-        case 'error':
-            styles.container.backgroundColor = colors.red
-            styles.text.color = colors.white
-            break;
-        default:
-            styles.container.backgroundColor = colors.green
-            styles.text.color = colors.white
-    }
-    return styles
-}
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'stretch',
         justifyContent: 'space-between',
         position: 'relative',
-        opacity: .95
+        opacity: .92
     },
     background_image: {
         position: 'absolute',

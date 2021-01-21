@@ -1,16 +1,18 @@
-import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from "@firebase/firestore-types"; import { InvitationObject, InvitationStatusOptions, InvitationUserInfo } from "./tsTypes";
+import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from "@firebase/firestore-types"; import { InvitationObject, InvitationStatusOptions, InvitationUserInfo } from "./types";
 import { RootProps } from "..";
 import { fireDb } from "../firebase";
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from "../../utils/variables";
 import { cacheImage } from "../../utils/functions";
-import { isEmpty } from 'lodash';
 
-export function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
+export async function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
 
     var invitations: Array<InvitationObject> = [];
 
-    querySnapshot.forEach(async (doc: QueryDocumentSnapshot<DocumentData>) => {
+    for (let i = 0; i < querySnapshot.docs.length; i++) {
+        const doc = querySnapshot.docs[i];
+
         if (doc.exists) {
+
             const invitationDoc = doc.data()
 
             if (invitationDoc) {
@@ -29,6 +31,7 @@ export function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
                 }
 
 
+
                 var invitationObj: InvitationObject = {
                     docId: doc.id,
                     sentBy,
@@ -38,10 +41,12 @@ export function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
                     message,
                     status
                 }
+
                 invitations.push(invitationObj)
             }
         }
-    })
+
+    }
 
     return invitations;
 }
@@ -52,7 +57,7 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
 
     const InvitationRef = fireDb.collection(InvitationsDb).doc(invitation.docId);
 
-    batch.set(InvitationRef, { status: status }, { merge: true })
+    batch.set(InvitationRef, { status: status, updatedAt: new Date() }, { merge: true })
 
     //if accepted then create new friend
     if (status === InvitationStatusOptions.accepted) {
@@ -61,6 +66,10 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
             username: user.username,
             dateUpdated: new Date(),
             dateCreated: new Date(),
+            profileImg: {
+                uri: user.profileImg?.uri,
+                updatedAt: new Date()
+            },
             active: true
         })
         const InviterRef = fireDb.collection(FriendsDb).doc(user.uid).collection(FriendsUsersDb).doc(invitation.sentBy.uid);
@@ -68,6 +77,10 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
             username: invitation.sentBy.username,
             dateUpdated: new Date(),
             dateCreated: new Date(),
+            profileImg: {
+                uri: invitation.sentBy.profileImg?.uri,
+                updatedAt: new Date()
+            },
             active: true
         })
     }
