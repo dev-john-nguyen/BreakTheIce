@@ -1,11 +1,24 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
+import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../../utils/styles';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
-import { FontAwesome } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { RootProps } from '../../services';
+import { InvitationsRootProps, InvitationStatusOptions } from '../../services/invitations/types';
+import { ChatRootProps } from '../../services/chat/types';
+import { BodyText } from '../../utils/components';
+import { BottomNavBackground } from '../../utils/svgs';
 
-const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+
+interface BottomNavProps {
+    invitations: InvitationsRootProps['inbound'];
+    chat: ChatRootProps['previews'];
+    uid: string;
+}
+
+const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descriptors, navigation, invitations, chat, uid }) => {
     const focusedOptions = descriptors[state.routes[state.index].key].options;
 
     if (focusedOptions.tabBarVisible === false) {
@@ -14,6 +27,8 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
 
     return (
         <View style={styles.container}>
+            <BottomNavBackground style={styles.background} height={'100%'} width={Math.round(Dimensions.get('window').width)} />
+
             {state.routes.map((route: any, index: number) => {
                 const { options } = descriptors[route.key];
                 const label =
@@ -46,17 +61,37 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
 
                 var type: string;
                 var size = 32;
+                var notificationNum = 0;
+
                 switch (route.name) {
                     case bottomTabsHome:
                         type = 'search'
-                        size = 29
                         break;
                     case bottomTabInvitations:
-                        type = 'envelope'
-                        size = 29
+                        type = 'mail'
+                        if (invitations.length > 0) {
+                            invitations.forEach((invitations) => {
+                                if (invitations.status === InvitationStatusOptions.pending
+                                    &&
+                                    invitations.sentTo.uid === uid
+                                ) {
+                                    notificationNum++
+                                }
+                            })
+                        }
+
                         break;
                     case bottomTabChat:
                         type = 'inbox'
+
+                        if (chat.length > 0) {
+                            chat.forEach((chat) => {
+                                if (chat.unread && chat.recentUid !== uid) {
+                                    notificationNum++
+                                }
+                            })
+                        }
+
                         break;
                     case bottomTabsProfile:
                         type = 'user'
@@ -65,7 +100,20 @@ const BottomNav: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation
                         type = 'search'
                 }
 
-                return <FontAwesome key={index} name={type} size={size} color={isFocused ? colors.tertiary : colors.primary} pressColor={colors.secondary} onPress={onPress} />
+                return (
+                    <Pressable key={index} onPress={onPress} style={{ position: 'relative' }}>
+                        {({ pressed }) => (
+                            <View>
+                                <Feather name={type} size={size} color={isFocused ? colors.primary : pressed ? colors.tertiary : colors.white} />
+                                {notificationNum > 0 &&
+                                    <View style={styles.notification_container}>
+                                        <BodyText text={notificationNum.toString()} styles={styles.notification_text} />
+                                    </View>
+                                }
+                            </View>
+                        )}
+                    </Pressable>
+                )
             })}
         </View>
     );
@@ -77,9 +125,15 @@ const styles = StyleSheet.create({
         position: 'relative',
         display: 'flex',
         flexDirection: 'row',
-        backgroundColor: colors.white,
         alignItems: 'center',
-        justifyContent: 'space-evenly'
+        justifyContent: 'space-evenly',
+        backgroundColor: `rgba(${colors.lightWhite_rgb},.92)`,
+    },
+    background: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%'
     },
     svg: {
         alignSelf: 'center',
@@ -91,7 +145,25 @@ const styles = StyleSheet.create({
     },
     text_style_focused: {
         color: colors.primary
+    },
+    notification_container: {
+        borderRadius: 100,
+        padding: 5,
+        backgroundColor: colors.secondary,
+        position: 'absolute',
+        right: -5,
+        top: -5
+    },
+    notification_text: {
+        fontSize: 8,
+        color: colors.primary
     }
 })
 
-export default BottomNav;
+const mapStateToProps = (state: RootProps) => ({
+    invitations: state.invitations.inbound,
+    chat: state.chat.previews,
+    uid: state.user.uid
+})
+
+export default connect(mapStateToProps, {})(BottomNav);

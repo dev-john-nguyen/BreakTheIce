@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator } from 'react-native';
-import { button_styles, underline_header_styles, colors } from '../styles';
+import { button_styles, underline_header_styles } from '../styles';
 import { Feather } from '@expo/vector-icons';
 import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';
@@ -44,7 +44,7 @@ export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, 
 export const UnderlineHeader = ({ text, styles }: { text: string, styles?: StyleProp<any> }) => (
     <View style={[underline_header_styles.section, styles]}>
         <View style={underline_header_styles.container}>
-            <Text style={underline_header_styles.text}>{text}</Text>
+            <HeaderText styles={underline_header_styles.text} text={text} />
             <View style={underline_header_styles.underline} />
         </View>
     </View>

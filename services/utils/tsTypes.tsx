@@ -1,15 +1,10 @@
 export interface UtilsRootStateProps {
-    error: {
-        message: string,
-        color: string
-    };
     loading: boolean;
-    color: 'error' | 'warning';
     banner: {
         message: string,
         type: string
     }[];
-    statusBar: number
+    notification: string
 }
 
 export interface UtilsActionProps {

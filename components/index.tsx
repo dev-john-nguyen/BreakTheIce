@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Pressable, ActivityIndicator, Dimensions, StyleProp, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, Dimensions, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
-import { remove_banner } from '../services/utils/actions';
+import { remove_banner, remove_notification } from '../services/utils/actions';
 import { UtilsRootStateProps } from '../services/utils/tsTypes';
 import Login from './login';
 import BottomNav from './navigation/Bottom';
@@ -11,14 +11,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation/utils/types'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
-import { bannerStyles } from '../utils/styles';
 import { InvitationsDispatchActionProps } from '../services/invitations/types';
 import { FriendDispatchActionProps } from '../services/friends/types';
 import { ChatDispatchActionsProps } from '../services/chat/types';
 import { set_and_listen_invitations } from '../services/invitations/actions';
 import { set_and_listen_friends } from '../services/friends/actions';
 import { set_and_listen_messages } from '../services/chat/actions';
-import { FlatList } from 'react-native-gesture-handler';
+import Banner from '../utils/components/Banner';
+import Notification from '../utils/components/Notification';
+import { colors } from '../utils/styles';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -30,6 +31,7 @@ interface Base {
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
     set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
+    remove_notification: () => void;
 }
 
 const Base = (props: Base) => {
@@ -77,32 +79,24 @@ const Base = (props: Base) => {
 
     const handleRemoveBanner = () => props.remove_banner()
 
-    const Banner = () => (
-        <Pressable onPress={handleRemoveBanner} style={styles.banner_container}>
-            <FlatList
-                data={props.utils.banner}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => {
-                    const styles = bannerStyles(item.type)
-                    return (
-                        <View style={styles.container}>
-                            <Text style={styles.text}>{item.message}</Text>
-                        </View>
-                    )
-                }}
-            />
-        </Pressable>
-
-    )
-
     return (
         <>
-            <ImageBackground source={require('../utils/ice.jpg')} style={styles.background_image} />
-            <View style={styles.container}>
-                <StatusBar style='dark' />
-                {props.utils.banner.length > 0 && <Banner />}
-                {handleRender()}
-            </View>
+            <ImageBackground source={require('../utils/ice.jpg')} style={styles.background_image}>
+                <View style={styles.container}>
+                    <StatusBar style='dark' />
+                    {
+                        props.utils.notification.length > 0 &&
+                        <Notification notification={props.utils.notification} />
+                    }
+                    {
+                        props.utils.banner.length > 0 &&
+                        <Banner handleRemoveBanner={handleRemoveBanner} banner={props.utils.banner} />
+                    }
+                    {
+                        handleRender()
+                    }
+                </View>
+            </ImageBackground>
         </>
     );
 }
@@ -112,18 +106,10 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         justifyContent: 'space-between',
         position: 'relative',
-        opacity: .92
+        backgroundColor: `rgba(${colors.lightWhite_rgb},.1)`
     },
     background_image: {
-        position: 'absolute',
-        width: Math.round(Dimensions.get('window').width),
-        height: Math.round(Dimensions.get('window').height),
-    },
-    banner_container: {
-        position: 'absolute',
-        top: 40,
-        zIndex: 100,
-        width: Math.round(Dimensions.get('window').width)
+        flex: 1
     }
 });
 
@@ -135,5 +121,6 @@ const mapStateToProps = (state: RootProps) => ({
 export default connect(mapStateToProps, {
     remove_banner, set_and_listen_invitations,
     set_and_listen_friends,
-    set_and_listen_messages
+    set_and_listen_messages,
+    remove_notification
 })(Base)

@@ -1,4 +1,4 @@
-import { SET_NEAR_USERS, UPDATE_NEAR_USERS, INIT_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes';
+import { SET_NEAR_USERS, UPDATE_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
@@ -114,7 +114,7 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
     return nearUsersListener
 }
 
-export const validate_near_users = (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<NearByUsersProps>) => (dispatch: AppDispatch) => {
+export const validate_near_users = async (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<NearByUsersProps>, dispatch: AppDispatch) => {
     //update nearByUsers directly to prevent full reload of the component on rerender
 
     const { longitude, latitude } = location.coords

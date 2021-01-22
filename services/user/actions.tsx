@@ -128,7 +128,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
             }
         })
 
-        if (nearUsers.all.length > 0) validate_near_users(newLocation, nearUsers.nearBy, nearUsers.all);
+        if (nearUsers.all.length > 0) validate_near_users(newLocation, nearUsers.nearBy, nearUsers.all, dispatch);
 
     })
 
@@ -256,17 +256,30 @@ export const go_online = () => (dispatch: AppDispatch, getState: () => RootProps
         })
 }
 
-export const update_profile = (updatedProfileVals: UpdateUserProfileProps, profileImg: NewProfileImgProps | undefined) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const update_profile = (updatedProfileVals: UpdateUserProfileProps, newProfileImg: NewProfileImgProps | undefined) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    const { uid } = getState().user;
+    const { uid, profileImg } = getState().user;
 
-    var newProfileImg: ProfileImgProps | undefined;
+    var updatedProfileImg: ProfileImgProps | undefined;
 
-    if (profileImg) {
+    if (newProfileImg) {
+
+        //delete previous image
+        if (profileImg) {
+            fireStorage.refFromURL(profileImg.uri).delete()
+                .then(() => {
+                    console.log('Removed previous profile image')
+                })
+                .catch((err) => {
+                    console.log(err)
+                    console.log('Failed to remove previous profile image')
+                })
+        }
+
         //upload new image
-        var path: string = `${uid}/profile/${profileImg.name}`;
+        var path: string = `${uid}/profile/${newProfileImg.name}`;
 
-        var newProfileImgUri = await fireStorage.ref().child(path).put(profileImg.blob)
+        var newProfileImgUri = await fireStorage.ref().child(path).put(newProfileImg.blob)
             .then(async (snapshot) => {
                 return await snapshot.ref.getDownloadURL()
                     .then((downloadURL) => {
@@ -283,7 +296,7 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, profi
             })
 
         if (newProfileImgUri) {
-            newProfileImg = {
+            updatedProfileImg = {
                 uri: newProfileImgUri,
                 updatedAt: new Date()
             }
@@ -292,7 +305,7 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, profi
 
     const initProfileVals = {
         ...updatedProfileVals,
-        profileImg: newProfileImg ? newProfileImg : null
+        profileImg: updatedProfileImg ? updatedProfileImg : null
     }
 
     await fireDb.collection(UsersDb).doc(uid).update(initProfileVals);
@@ -302,7 +315,7 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, profi
 
     dispatch({ type: UPDATE_PROFILE, payload: initProfileVals });
 
-    dispatch(set_banner('Saved', 'success'));
+    dispatch(set_banner('Successfully updated', 'success'));
 }
 
 export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {

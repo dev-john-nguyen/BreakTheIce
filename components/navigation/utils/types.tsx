@@ -138,7 +138,7 @@ export const InvitationsStackScreen = () => (
 
 export const HomeStackScreen = () => (
     <HomeStack.Navigator screenOptions={screenOptions}>
-        <HomeStack.Screen name="Home" component={Home} options={{ headerTransparent: true }} />
+        <HomeStack.Screen name="Home" component={Home} options={{ cardStyle: { marginTop: 0 } }} />
         <HomeStack.Screen name="NearByList" component={NearByList} />
         <HomeStack.Screen name="Profile" component={Profile}
             options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}

@@ -1,9 +1,10 @@
-import { SET_LOADING, REMOVE_LOADING, SET_BANNER, REMOVE_BANNER } from './actionTypes';
+import { SET_LOADING, REMOVE_LOADING, SET_BANNER, REMOVE_BANNER, SET_NOTIFICATION, REMOVE_NOTIFICATION } from './actionTypes';
 import { UtilsActionProps } from './tsTypes'
 
 const INITIAL_STATE = {
     loading: true,
-    banner: []
+    banner: [],
+    notification: ''
 }
 
 export default (state = INITIAL_STATE, action: UtilsActionProps) => {
@@ -27,6 +28,16 @@ export default (state = INITIAL_STATE, action: UtilsActionProps) => {
             return {
                 ...state,
                 banner: []
+            }
+        case SET_NOTIFICATION:
+            return {
+                ...state,
+                notification: action.payload
+            }
+        case REMOVE_NOTIFICATION:
+            return {
+                ...state,
+                notification: ''
             }
         default:
             return state;

@@ -30,6 +30,6 @@ export interface NearUsersRootProps {
 
 export interface NearUsersDispatchActionProps {
     set_and_listen_near_users: (stateZip: StateCityProps, location: LocationObject) => (() => void) | undefined;
-    validate_near_users: (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<UserRootStateProps>) => void;
+    validate_near_users: (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<UserRootStateProps>) => Promise<void>;
     reset_near_users: () => void;
 }

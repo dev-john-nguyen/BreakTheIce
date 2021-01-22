@@ -41,7 +41,7 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, st
     //don't want to send the cacheduri
     const profileImg: ProfileImgProps | null = userData.profileImg && {
         uri: userData.profileImg.uri,
-        updatedAt: userData.profileImg.updatedAt
+        updatedAt: new Date()
     }
 
     const profilePreview: UserProfilePreviewProps = {

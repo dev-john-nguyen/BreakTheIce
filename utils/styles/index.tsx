@@ -33,7 +33,7 @@ export const colors = {
 
 //buttons
 const buttonBase: StyleProp<any> = {
-    borderRadius: 20,
+    borderRadius: 5,
     paddingLeft: 30,
     paddingRight: 30,
     paddingTop: 10,

@@ -53,15 +53,17 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
     headerTintColor: colors.primary,
     headerTitleStyle: styles.header_tint_style,
     headerBackTitleVisible: false,
+    headerTransparent: true,
     cardStyle: {
-        backgroundColor: colors.white
+        backgroundColor: `rgba(${colors.lightWhite_rgb},.9)`,
+        marginTop: 90
     }
 }
 )
 
 const styles = StyleSheet.create({
     container: {
-        position: 'relative'
+        position: 'relative',
     },
     header_text: {
         fontSize: 25,
@@ -80,7 +82,7 @@ const styles = StyleSheet.create({
         width: '120%'
     },
     header_style: {
-        backgroundColor: colors.white,
+        backgroundColor: `rgba(${colors.lightWhite_rgb},.9)`,
         borderBottomColor: colors.primary,
         borderBottomWidth: .1
     },

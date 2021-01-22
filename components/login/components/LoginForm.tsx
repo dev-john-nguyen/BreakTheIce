@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, Text, StyleProp } from 'react-native';
+import { TextInput, Text, StyleProp, View, Pressable } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { CustomButton } from '../../../utils/components';
 import { SigninDispatchActionProps } from '../../../services/signin/types';
@@ -51,6 +51,7 @@ export default ({ login_user, renderSignup, styles }: LoginForm) => {
             />
 
             <CustomButton type='primary' text='Login' onPress={handleLogin} moreStyles={{ marginTop: 20 }} indicatorColor={loading && colors.white} />
+
 
             <CustomButton type='secondary' text='Sign Up' onPress={renderSignup} moreStyles={{ marginTop: 10 }} />
         </>

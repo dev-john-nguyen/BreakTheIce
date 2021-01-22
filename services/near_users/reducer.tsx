@@ -24,7 +24,8 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
         case UPDATE_NEAR_USERS:
             return {
                 ...state,
-                nearBy: action.payload.nearBy
+                nearBy: action.payload.nearBy,
+                all: action.payload.all
             }
         case UPDATE_INVITE_STATUS_NEAR_USER:
             return {
