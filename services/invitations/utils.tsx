@@ -1,8 +1,10 @@
-import { QuerySnapshot, DocumentData, QueryDocumentSnapshot } from "@firebase/firestore-types"; import { InvitationObject, InvitationStatusOptions, InvitationUserInfo } from "./types";
+import { QuerySnapshot, DocumentData } from "@firebase/firestore-types";
+import { InvitationObject, InvitationStatusOptions, InvitationUserInfo } from "./types";
 import { RootProps } from "..";
 import { fireDb } from "../firebase";
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from "../../utils/variables";
 import { cacheImage } from "../../utils/functions";
+import { timestamp } from '../../utils/variables';
 
 export async function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
 
@@ -57,7 +59,7 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
 
     const InvitationRef = fireDb.collection(InvitationsDb).doc(invitation.docId);
 
-    batch.set(InvitationRef, { status: status, updatedAt: new Date() }, { merge: true })
+    batch.set(InvitationRef, { status: status, updatedAt: new Date(), timestamp }, { merge: true })
 
     //if accepted then create new friend
     if (status === InvitationStatusOptions.accepted) {
@@ -67,10 +69,11 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
             dateUpdated: new Date(),
             dateCreated: new Date(),
             profileImg: {
-                uri: user.profileImg?.uri,
+                uri: user.profileImg ? user.profileImg.uri : null,
                 updatedAt: new Date()
             },
-            active: true
+            active: true,
+            timestamp
         })
         const InviterRef = fireDb.collection(FriendsDb).doc(user.uid).collection(FriendsUsersDb).doc(invitation.sentBy.uid);
         batch.set(InviterRef, {
@@ -78,10 +81,11 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
             dateUpdated: new Date(),
             dateCreated: new Date(),
             profileImg: {
-                uri: invitation.sentBy.profileImg?.uri,
+                uri: invitation.sentBy.profileImg ? invitation.sentBy.profileImg.uri : null,
                 updatedAt: new Date()
             },
-            active: true
+            active: true,
+            timestamp
         })
     }
 

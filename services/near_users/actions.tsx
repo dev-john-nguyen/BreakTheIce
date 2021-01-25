@@ -47,7 +47,7 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
                     age,
                     distance: 0,
                     hideOnMap,
-                    profileImg,
+                    profileImg: profileImg ? profileImg : null,
                     sentInvite: false,
                     receivedInvite: false,
                     friend: false,

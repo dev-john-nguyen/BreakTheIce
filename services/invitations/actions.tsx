@@ -8,12 +8,13 @@ import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER } from '../near_u
 import { set_banner } from '../utils/actions';
 import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
 import { handleInvitations, handle_invitation_status } from './utils';
+import firebase from 'firebase';
 
 //define the structure of the invitation
 
 export const send_invitation = (invitationObj: Omit<InvitationObject, 'docId'>) => async (dispatch: AppDispatch) => {
     try {
-        await fireDb.collection(InvitationsDb).add(invitationObj)
+        await fireDb.collection(InvitationsDb).add({ ...invitationObj, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
     } catch (e) {
         console.log(e)
         dispatch(set_banner("Oops! Something went wrong sending your invitation.", 'error'))

@@ -144,10 +144,13 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
 
 export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    if (newGallery.length > 5) {
+    if (newGallery.filter(img => !img.removed).length > 5) {
         dispatch(set_banner('Exceeds the maxium number of images of 5.', 'error'))
         return;
     }
+
+    //reverse back the order ...
+    // newGallery.reverse()
 
     const uid = getState().user.uid;
     var gallery: GalleryItemProps[] = [];
@@ -200,7 +203,9 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
     }
 
     await fireDb.collection(UsersDb).doc(uid).set({
-        gallery: gallery
+        gallery: gallery,
+        updatedAt: new Date(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true })
         .then(async () => {
             //cache images and update gallery
@@ -219,36 +224,10 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         })
 }
 
-export const go_offline = () => (dispatch: AppDispatch, getState: () => RootProps) => {
-    const { uid, stateCity, locationListener } = getState().user
-
-    //remove listener
-    if (locationListener) locationListener.remove()
-
-    var batch = fireDb.batch()
-
-    const locationRef = fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(uid)
-
-    const userRef = fireDb.collection(UsersDb).doc(uid)
-
-    batch.update(userRef, { offline: true })
-
-    batch.delete(locationRef)
-
-    batch.commit()
-        .then(() => {
-            dispatch({ type: GO_OFFILINE, payload: undefined })
-        })
-        .catch(err => {
-            console.log(err)
-            dispatch(set_banner('Failed to go offiline.', 'error'))
-        })
-}
-
 export const go_online = () => (dispatch: AppDispatch, getState: () => RootProps) => {
     const { uid } = getState().user
 
-    fireDb.collection(UsersDb).doc(uid).update({ offline: false })
+    fireDb.collection(UsersDb).doc(uid).update({ offline: false, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() })
         .then(() => dispatch({ type: GO_ONLINE, payload: undefined }))
         .catch((err) => {
             console.log(err)
@@ -260,7 +239,20 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, newPr
 
     const { uid, profileImg } = getState().user;
 
-    var updatedProfileImg: ProfileImgProps | undefined;
+    interface ProfileValsProp extends UpdateUserProfileProps {
+        timestamp: any,
+        updatedAt: Date,
+        profileImg?: {
+            uri: string,
+            updatedAt: Date
+        }
+    }
+
+    const profileVals: ProfileValsProp = {
+        ...updatedProfileVals,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: new Date()
+    }
 
     if (newProfileImg) {
 
@@ -296,33 +288,32 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, newPr
             })
 
         if (newProfileImgUri) {
-            updatedProfileImg = {
+            profileVals.profileImg = {
                 uri: newProfileImgUri,
                 updatedAt: new Date()
             }
         }
     }
 
-    const initProfileVals = {
-        ...updatedProfileVals,
-        profileImg: updatedProfileImg ? updatedProfileImg : null
-    }
-
-    await fireDb.collection(UsersDb).doc(uid).update(initProfileVals);
+    await fireDb.collection(UsersDb).doc(uid).update(profileVals);
 
     //cache profile img
-    initProfileVals.profileImg && cacheImage(initProfileVals.profileImg.uri)
+    profileVals.profileImg && cacheImage(profileVals.profileImg.uri)
 
-    dispatch({ type: UPDATE_PROFILE, payload: initProfileVals });
+    dispatch({ type: UPDATE_PROFILE, payload: profileVals });
 
     dispatch(set_banner('Successfully updated', 'success'));
 }
 
 export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    const { uid } = getState().user;
+    const { uid, locationListener } = getState().user;
 
-    await fireDb.collection(UsersDb).doc(uid).update(updatedPrivacyData);
+    if (updatedPrivacyData.offline) {
+        if (locationListener) locationListener.remove()
+    }
+
+    await fireDb.collection(UsersDb).doc(uid).update({ ...updatedPrivacyData, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() });
     dispatch({ type: UPDATE_PRIVACY, payload: updatedPrivacyData });
     dispatch(set_banner('Saved', 'success'));
 }

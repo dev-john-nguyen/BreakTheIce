@@ -99,7 +99,6 @@ export interface UserDispatchActionsProps {
     update_profile: (updatedProfileData: UpdateUserProfileProps, profileImg: NewProfileImgProps | undefined) => Promise<any>;
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => Promise<void | undefined>;
-    go_offline: () => void;
     go_online: () => void;
     sign_out: () => void;
     send_password_reset_email: (email: string) => void | undefined

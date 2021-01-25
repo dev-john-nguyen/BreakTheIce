@@ -10,7 +10,6 @@ import Chat from '../../chat';
 import Message from '../../chat/components/Message';
 import Me from '../../me';
 import Settings from '../../settings';
-import EditGallery from '../../gallery/components/Edit';
 import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/types';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -100,7 +99,6 @@ type MeStackParams = {
     Me: { title: string };
     Profile: ProfileRouteParams;
     Settings: undefined;
-    EditGallery: { title: string } | undefined;
 }
 
 
@@ -119,7 +117,7 @@ export type InvitationsStackNavigationProp = StackNavigationProp<InvitationsStac
 export type ChatScreenRouteProp = RouteProp<ChatStackParams, "Chat" | "Message" | "Profile">
 export type ChatStackNavigationProp = StackNavigationProp<ChatStackParams>;
 
-export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings" | "EditGallery">
+export type MeScreenRouteProp = RouteProp<MeStackParams, "Friends" | "Me" | "Profile" | "Settings">
 export type SettingScreenRouteProp = RouteProp<MeStackParams, "Settings">
 export type MeStackNavigationProp = StackNavigationProp<MeStackParams>
 
@@ -150,7 +148,7 @@ export const MeStackScreen = (props: any) => {
     const { title } = props.route.params;
 
     return <MeStack.Navigator screenOptions={screenOptions}>
-        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} />
+        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={{ cardStyle: { marginTop: 0 } }} />
         <MeStack.Screen name="Friends" component={Friends} />
         <MeStack.Screen name="Profile" component={Profile}
             options={({ route }) => ({
@@ -158,7 +156,6 @@ export const MeStackScreen = (props: any) => {
             })}
             initialParams={{ profileUid: '' }} />
         <MeStack.Screen name="Settings" component={Settings} />
-        <MeStack.Screen name="EditGallery" component={EditGallery} initialParams={{ title: 'Gallery' }} />
     </MeStack.Navigator>
 }
 

@@ -32,7 +32,7 @@ const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
         case 'Me':
             const navigateSettings = () => navigation.navigate('Settings')
 
-            return <Icon type='settings' size={30} color={colors.primary} pressColor={colors.secondary} onPress={navigateSettings} style={styles.header_right} />
+            return <Icon type='settings' size={30} color={colors.white} pressColor={colors.tertiary} onPress={navigateSettings} style={styles.header_right} />
 
         default:
             return undefined
@@ -55,8 +55,8 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
     headerBackTitleVisible: false,
     headerTransparent: true,
     cardStyle: {
-        backgroundColor: `rgba(${colors.lightWhite_rgb},.9)`,
-        marginTop: 90
+        backgroundColor: colors.white,
+        paddingTop: 90
     }
 }
 )
@@ -66,20 +66,21 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     header_text: {
-        fontSize: 25,
+        fontSize: 27,
         position: 'relative',
         bottom: 5,
-        color: colors.primary
+        color: colors.white
     },
     underline: {
         position: 'absolute',
         backgroundColor: colors.primary,
-        opacity: .5,
+        opacity: .8,
         height: 15,
-        borderRadius: 20,
+        borderRadius: 5,
         bottom: 3,
         alignSelf: 'center',
-        width: '120%'
+        width: '120%',
+        zIndex: -1
     },
     header_style: {
         backgroundColor: `rgba(${colors.lightWhite_rgb},.9)`,

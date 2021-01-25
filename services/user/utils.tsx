@@ -3,6 +3,7 @@ import { LocationsDb, UsersDb } from '../../utils/variables';
 import { StateCityProps, UserRootStateProps, GalleryItemProps, UserProfilePreviewProps, ProfileImgProps } from './types';
 import { LocationObject } from 'expo-location';
 import { cacheImage } from '../../utils/functions';
+import firebase from 'firebase';
 
 //summary
 ////check if users state and city location has changed since last stored entry
@@ -18,7 +19,7 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, st
     //fireDb Profile Path
     const userRef = fireDb.collection(UsersDb).doc(userData.uid);
 
-    var updateUserData = { stateCity: stateCity, offline: false }
+    var updateUserData = { stateCity: stateCity, offline: false, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() }
 
     if (userData.stateCity && userData.stateCity.city && userData.stateCity.state) {
         //check if the dbStatZip different than currentStateZip
@@ -54,14 +55,16 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, st
         profileImg: profileImg
     }
 
-    batch.set(LocationRef, profilePreview)
+    batch.set(LocationRef, { ...profilePreview, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() })
 
     return await batch.commit()
 }
 
 export const fireDb_update_user_location = async (uid: string, stateCity: StateCityProps, newLocation: LocationObject) => {
     await fireDb.collection(LocationsDb).doc(stateCity.state).collection(stateCity.city).doc(uid).set({
-        location: newLocation
+        location: newLocation,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: new Date()
     }, { merge: true })
 }
 

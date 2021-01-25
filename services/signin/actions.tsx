@@ -72,8 +72,9 @@ export const signup_user = (userFormValues: SignUpValuesProps) => async (dispatc
 
     if (!newUserId) return;
 
+
     //init firestore user data in user collection
-    return fireDb.collection(UsersDb).doc(newUserId).set({ name, age, username, uid: newUserId })
+    return fireDb.collection(UsersDb).doc(newUserId).set({ name, age, username, uid: newUserId, createdAt: new Date(), timestamp: firebase.firestore.FieldValue.serverTimestamp() })
         .then(() => {
             return true
         })

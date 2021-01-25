@@ -11,6 +11,7 @@ import { UserRootStateProps, UserDispatchActionsProps } from '../../services/use
 import { set_banner } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import ChangePassword from './components/ChangePassword';
+import EditGallery from '../gallery/components/Edit';
 
 interface SettingsProps {
     navigation: MeStackNavigationProp;
@@ -27,7 +28,8 @@ enum TargetOptions {
     privacy,
     password,
     contacts,
-    signOut
+    signOut,
+    gallery
 }
 
 const Settings = ({ navigation, user, update_profile, set_banner, update_privacy, sign_out, send_password_reset_email }: SettingsProps) => {
@@ -39,6 +41,8 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
             case TargetOptions.password:
                 return <ChangePassword sendChangePasswordEmail={send_password_reset_email} />
+            case TargetOptions.gallery:
+                return <EditGallery navigation={navigation} />
             case TargetOptions.profile:
             default:
                 return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} />
@@ -82,11 +86,11 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
 
                 <TouchableHighlight
                     style={styles.item_container}
-                    onPress={() => setTarget(TargetOptions.contacts)}
+                    onPress={() => setTarget(TargetOptions.gallery)}
                     underlayColor={colors.secondary}
                 >
                     <View style={styles.content}>
-                        <Text style={styles.text}>Manage Contacts</Text>
+                        <Text style={styles.text}>Edit Gallery</Text>
                     </View>
                 </TouchableHighlight>
 
@@ -101,7 +105,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                     </View>
                 </TouchableHighlight>
             </View>
-            <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1, marginTop: 10 }}>
+            <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1 }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     {renderTargetComponent()}
                 </TouchableWithoutFeedback>

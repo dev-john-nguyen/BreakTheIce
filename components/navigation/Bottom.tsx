@@ -27,7 +27,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
 
     return (
         <View style={styles.container}>
-            <BottomNavBackground style={styles.background} height={'100%'} width={Math.round(Dimensions.get('window').width)} />
+            <BottomNavBackground style={styles.background} height={'130%'} width={Math.round(Dimensions.get('window').width).toString()} />
 
             {state.routes.map((route: any, index: number) => {
                 const { options } = descriptors[route.key];
@@ -101,7 +101,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
                 }
 
                 return (
-                    <Pressable key={index} onPress={onPress} style={{ position: 'relative' }}>
+                    <Pressable key={index} onPress={onPress} style={styles.item}>
                         {({ pressed }) => (
                             <View>
                                 <Feather name={type} size={size} color={isFocused ? colors.primary : pressed ? colors.tertiary : colors.white} />
@@ -121,30 +121,23 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
 
 const styles = StyleSheet.create({
     container: {
-        flexBasis: '10%',
+        flexBasis: '8%',
         position: 'relative',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-evenly',
-        backgroundColor: `rgba(${colors.lightWhite_rgb},.92)`,
+        backgroundColor: colors.white
     },
     background: {
         position: 'absolute',
-        top: 0,
+        top: -15,
         left: 0,
         width: '100%'
     },
-    svg: {
-        alignSelf: 'center',
+    item: {
         position: "relative",
-        bottom: 10
-    },
-    text_style: {
-        color: colors.secondary
-    },
-    text_style_focused: {
-        color: colors.primary
+        marginBottom: 10
     },
     notification_container: {
         borderRadius: 100,

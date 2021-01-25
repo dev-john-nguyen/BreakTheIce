@@ -10,12 +10,7 @@ import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '.
 import { NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import * as Location from 'expo-location';
-import Geocoder from 'react-native-geocoding';
-// @ts-ignore
-import { GEOCODER_KEY } from '@env'
 import { CustomButton } from '../../utils/components';
-// @ts-ignore
-Geocoder.init(GEOCODER_KEY);
 
 interface HomeProps {
     navigation: HomeToChatNavProp;

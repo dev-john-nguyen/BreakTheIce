@@ -10,9 +10,10 @@ export const colors = {
 
     primary: '#26baee',
     primary_rgb: '38, 186, 238',
-    secondary: '#9fe8fa',
-    secondary_rgb: '159, 232, 250',
-    tertiary: '#73d2f3',
+    secondary: '#73d2f3',
+    secondary_rgb: '115, 210, 243',
+    tertiary: '#9fe8fa',
+    tertiary_rgb: '159, 232, 250',
     lightWhite: '#fff4e0',
     lightWhite_rgb: '255, 244, 244',
     lightOrange: '#f58634',
@@ -185,8 +186,8 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
             pressed = {
                 button: {
                     ...baseBtn,
-                    backgroundColor: colors.secondary,
-                    borderColor: colors.secondary
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.primary
                 },
                 text: {
                     ...baseText,
@@ -196,12 +197,12 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
             unpressed = {
                 button: {
                     ...baseBtn,
-                    backgroundColor: colors.primary,
+                    backgroundColor: colors.secondary,
                     borderColor: colors.primary
                 },
                 text: {
                     ...baseText,
-                    color: colors.white
+                    color: colors.white,
                 }
             }
     }
@@ -233,7 +234,7 @@ export const underline_header_styles: StyleProp<any> = {
         backgroundColor: colors.primary,
         opacity: .5,
         height: 15,
-        borderRadius: 20,
+        borderRadius: 5,
         bottom: 3,
         alignSelf: 'center',
         width: '120%'

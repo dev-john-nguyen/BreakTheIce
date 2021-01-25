@@ -16,15 +16,8 @@ interface EditProfileProps {
 }
 
 const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfileProps) => {
-    const { name, bioShort, bioLong, age, gender } = user;
-    const [imgObj, setImgObj] = useState<NewProfileImgProps | undefined>();
-    const [profileVals, setProfileVals] = useState<UpdateUserProfileProps>({
-        name,
-        bioShort,
-        bioLong,
-        age,
-        gender: gender ? gender : 'man'
-    })
+    const [profileImg, setProfileImg] = useState<NewProfileImgProps>();
+    const [profileVals, setProfileVals] = useState<UpdateUserProfileProps>()
 
 
     const [loading, setLoading] = useState(false);
@@ -49,15 +42,37 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
             mount = false
             navigation.setOptions({ headerRight: undefined })
         }
-    }, [loading, profileVals, user, imgObj])
+    }, [loading, profileVals, user, profileImg])
+
+    useEffect(() => {
+        const { name, bioShort, bioLong, age, gender, profileImg } = user;
+
+        setProfileVals({
+            name,
+            bioShort,
+            bioLong,
+            age,
+            gender: gender ? gender : 'man'
+        })
+
+        if (profileImg) {
+            setProfileImg(undefined)
+        }
+
+    }, [user])
+
+
+    if (!profileVals) return (
+        <View style={styles.container}>
+            <ActivityIndicator size='large' />
+        </View>
+    )
 
     const handleValidation = (mount: boolean) => {
 
         const { name, bioShort, bioLong, age, gender } = user;
 
-        var oldVals = { name, bioShort, bioLong, age, gender }
-
-
+        var oldVals = { name, bioShort, bioLong, age, gender };
 
         if (isEqual(oldVals, profileVals)) {
             if (mount) {
@@ -87,11 +102,11 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
     const handleSave = (mount: boolean) => {
 
         mount && setLoading(true)
-        if (!imgObj) {
+        if (!profileImg) {
             if (!handleValidation(mount)) return;
         }
 
-        update_profile(profileVals, imgObj)
+        update_profile(profileVals, profileImg)
             .then(() => {
                 mount && setLoading(false)
             })
@@ -109,7 +124,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                     <ScrollView contentContainerStyle={styles.scrollView}>
 
                         <View style={styles.profile_image_container}>
-                            <EditProfileImg set_banner={set_banner} imgObj={imgObj} setImgObj={setImgObj} profileImg={user.profileImg} />
+                            <EditProfileImg set_banner={set_banner} profileImg={user.profileImg} setImgObj={setProfileImg} imgObj={profileImg} />
                         </View>
 
                         <View style={styles.text_input_container}>

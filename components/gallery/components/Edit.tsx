@@ -5,7 +5,6 @@ import { colors } from '../../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
 import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/types';
 import { connect } from 'react-redux';
-import * as Progress from 'react-native-progress';
 import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
 import { UserDispatchActionsProps } from '../../../services/user/types';
@@ -41,9 +40,12 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
                     {loading ?
                         <ActivityIndicator size='small' color={colors.primary} /> :
                         <>
-                            <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
-                                {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
-                            </Pressable >
+                            {
+                                imgObjs.filter(img => !img.removed).length < 5 &&
+                                <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
+                                    {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
+                                </Pressable >
+                            }
                             <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
                         </>
                     }
@@ -56,7 +58,8 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
     useEffect(() => {
         (async () => {
 
-            gallery && setImgObjs(_.cloneDeep(gallery));
+            //need to reverse the order of the images to display correctly
+            gallery && setImgObjs(_.cloneDeep(gallery).reverse());
 
             try {
                 const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync();
@@ -172,9 +175,9 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
             }}
             onLongPress={drag}
         >
-            <View style={[styles.image_content, isActive && styles.image_content_drag]}>
+            <View style={[isActive ? styles.image_content_drag : styles.image_content]}>
 
-                <Icon type={item.removed ? 'trash-2' : 'trash'} color={colors.red} pressColor={colors.lightRed} size={30} onPress={() => handleRemoveGalleryItem(item.id)} style={styles.trash} />
+                <Icon type={item.removed ? 'trash-2' : 'trash'} color={colors.red} pressColor={colors.lightRed} size={24} onPress={() => handleRemoveGalleryItem(item.id)} style={styles.trash} />
 
                 <Image
                     source={{ uri: item.uri ? item.uri : item.cachedUrl ? item.cachedUrl : item.url, cache: 'force-cache' }} style={styles.image}
@@ -222,8 +225,8 @@ const styles = StyleSheet.create({
         position: 'relative'
     },
     flat_list: {
-        padding: 50,
-        paddingTop: 30,
+        paddingRight: 25,
+        paddingLeft: 25,
         paddingBottom: 10,
     },
     trash: {
@@ -278,19 +281,21 @@ const styles = StyleSheet.create({
         shadowRadius: 1.41,
 
         elevation: 2,
-        backgroundColor: '#eee'
+        backgroundColor: colors.white
     },
     image_content_drag: {
-        margin: 50,
+        marginRight: 25,
+        marginLeft: 25,
+        marginTop: 5,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
-            height: 8,
+            height: 5,
         },
-        shadowOpacity: 0.46,
-        shadowRadius: 11.14,
-        elevation: 5,
-        backgroundColor: colors.lightGrey
+        shadowOpacity: 0.34,
+        shadowRadius: 6.27,
+        elevation: 10,
+        backgroundColor: colors.white
     },
     image: {
         width: '100%',
@@ -307,7 +312,6 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (state: RootProps) => ({
-    statusBar: state.utils.statusBar,
     gallery: state.user.gallery
 })
 

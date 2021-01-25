@@ -9,7 +9,6 @@ import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/
 import { UserRootStateProps } from '../../services/user/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import { CustomButton } from '../../utils/components';
-import { go_offline } from '../../services/user/actions';
 import Preview from '../../utils/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
 import ProfileImage from '../../utils/components/ProfileImage';
@@ -231,4 +230,4 @@ const mapStateToProps = (state: RootProps) => ({
     allUsers: state.nearUsers.all
 })
 
-export default connect(mapStateToProps, { validate_near_users, go_offline, update_invitation })(Maps);
+export default connect(mapStateToProps, { validate_near_users, update_invitation })(Maps);

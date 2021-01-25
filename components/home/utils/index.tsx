@@ -1,3 +1,53 @@
+import { LocationObject } from "expo-location";
+import { StateCityProps } from "../../../services/user/types";
+import Geocoder from 'react-native-geocoding';
+// @ts-ignore
+import { GEOCODER_KEY } from '@env'
+// @ts-ignore
+Geocoder.init(GEOCODER_KEY);
+
+export async function setBucket(location: LocationObject) {
+    var stateCity: StateCityProps = {
+        state: '',
+        city: ''
+    }
+
+    // return stateCity = {
+    //     state: 'WA',
+    //     city: 'Bellevue'
+    // }
+
+    try {
+        // @ts-ignore
+        const res = await Geocoder.from({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        })
+
+        console.log(res)
+
+        var address: string = res.results[0].formatted_address
+
+        //the second index should be the state and zip
+        var addressArr: Array<string> = address.split(',');
+        var state: string = addressArr[2].split(' ')[1];
+        var city: string = addressArr[1].replace(' ', '');
+
+        if (state && city) {
+            return stateCity = {
+                state,
+                city
+            }
+        }
+
+    } catch (e) {
+        console.log(e)
+        return;
+    }
+
+    //then nothing and have an alternative (manually set it)
+}
+
 export function getState(zipString: string) {
 
     /* Ensure param is a string to prevent unpredictable parsing results */

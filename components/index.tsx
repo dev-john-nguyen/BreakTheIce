@@ -80,24 +80,20 @@ const Base = (props: Base) => {
     const handleRemoveBanner = () => props.remove_banner()
 
     return (
-        <>
-            <ImageBackground source={require('../utils/ice.jpg')} style={styles.background_image}>
-                <View style={styles.container}>
-                    <StatusBar style='dark' />
-                    {
-                        props.utils.notification.length > 0 &&
-                        <Notification notification={props.utils.notification} />
-                    }
-                    {
-                        props.utils.banner.length > 0 &&
-                        <Banner handleRemoveBanner={handleRemoveBanner} banner={props.utils.banner} />
-                    }
-                    {
-                        handleRender()
-                    }
-                </View>
-            </ImageBackground>
-        </>
+        <View style={styles.container}>
+            <StatusBar style='dark' />
+            {
+                props.utils.notification.length > 0 &&
+                <Notification notification={props.utils.notification} />
+            }
+            {
+                props.utils.banner.length > 0 &&
+                <Banner handleRemoveBanner={handleRemoveBanner} banner={props.utils.banner} />
+            }
+            {
+                handleRender()
+            }
+        </View>
     );
 }
 const styles = StyleSheet.create({
@@ -106,10 +102,6 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         justifyContent: 'space-between',
         position: 'relative',
-        backgroundColor: `rgba(${colors.lightWhite_rgb},.1)`
-    },
-    background_image: {
-        flex: 1
     }
 });
 

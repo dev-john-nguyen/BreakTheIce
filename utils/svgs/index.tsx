@@ -1,11 +1,21 @@
 import React from 'react';
 import { SvgXml } from 'react-native-svg';
 import { StyleProp } from 'react-native';
+import { colors } from '../styles';
 
-const backgroundSvg = `<svg viewBox="0 0 414 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M23.5 23L0 7.95598V80H414V45.2201V1L381.5 23L341.263 13.4214L299.699 7.95597L258.135 1L246.103 13.4214H209.461L190.32 1L141.646 7.95597L130.708 13.4214L100.082 7.95597L76.5654 1L64.5337 7.95597H43.7516L23.5 23Z" fill="#26BAEE" fill-opacity="0.5" stroke="#26BAEE"/>
-</svg>`
+const bottomSvg = `<svg viewBox="0 0 414 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M21.0429 26.8453L3.24675 12.6576C1.93668 11.6132 0 12.546 0 14.2214V104H414V58.6541V5.43267C414 3.71032 411.968 2.79346 410.677 3.93316L383.607 27.8241C382.299 28.9788 380.483 29.3678 378.816 28.8506L341.263 17.195L299.699 10.0692L261.289 1.68824C259.369 1.26928 257.381 2.01396 256.209 3.59149L247.602 15.1768C246.659 16.4465 245.171 17.195 243.589 17.195H211.292C210.11 17.195 208.966 16.7758 208.063 16.0121L192.132 2.53309C190.985 1.56291 189.463 1.15964 187.986 1.43477L142.625 9.88677C141.979 10.0072 141.362 10.2539 140.812 10.6128L132.494 16.0314C131.353 16.7747 129.958 17.0205 128.632 16.7119L115.395 13.6321L100.082 10.0692L82.8341 2.08103C81.3693 1.4026 79.667 1.47315 78.2633 2.27047L65.6823 9.41677C64.9295 9.84438 64.0785 10.0692 63.2127 10.0692H42.9456C41.4025 10.0692 39.9459 10.7816 38.9987 11.9997L28.1067 26.0052C26.397 28.2036 23.2206 28.5814 21.0429 26.8453Z" fill="${colors.secondary}" fill-opacity="1" stroke="${colors.primary}"/>
+</svg>
+`
+const topSvg = `<svg viewBox="0 0 414 154" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M415 -1.99991L-0.50014 -1.99991L-0.500148 65.5914C-0.500132 68.1107 1.37425 70.2365 3.87374 70.552L47.951 76.1152C49.8211 76.3512 51.3996 77.619 52.0336 79.3941L60.0826 101.931C60.6544 103.532 62.0005 104.733 63.6563 105.119L126.513 119.77C127.164 119.922 127.779 120.203 128.319 120.596L148.185 135.044C149.04 135.665 150.069 136 151.126 136L183.442 136C184.14 136 184.829 136.146 185.467 136.428L218.317 150.976C219.093 151.32 219.943 151.46 220.789 151.384L257.968 148.048C258.322 148.016 258.671 147.947 259.009 147.841L296.216 136.244C296.735 136.083 297.225 135.837 297.665 135.517L327.495 113.866C327.83 113.623 328.134 113.339 328.399 113.021L334.001 106.299C334.951 105.159 336.358 104.5 337.842 104.5L367.6 104.5C369.652 104.5 371.495 103.246 372.25 101.338L378.675 85.0856C379.2 83.7589 380.266 82.7194 381.606 82.2288L411.719 71.2013C413.69 70.4798 415 68.6046 415 66.5063L415 -1.99991Z" fill="${colors.secondary}" stroke="${colors.primary}"/>
+</svg>
+`
 
-export const BottomNavBackground = ({ style, height, width }: { style: StyleProp<any>, height: string, width: number }) => (
-    <SvgXml xml={backgroundSvg} height={height} width={width} style={style} preserveAspectRatio='none' />
+export const BottomNavBackground = ({ style, height, width }: { style: StyleProp<any>, height: string, width: string }) => (
+    <SvgXml xml={bottomSvg} height={height} width={width} style={style} preserveAspectRatio='none' />
+)
+
+export const TopProfileBackground = ({ style, height, width }: { style: StyleProp<any>, height: string, width: string }) => (
+    <SvgXml xml={topSvg} height={height} width={width} style={style} preserveAspectRatio='none' />
 )

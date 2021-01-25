@@ -13,6 +13,7 @@ import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { CustomButton } from '../../../utils/components';
 import { handleUpdateUnread, searchReduxChat } from '../utils';
 import { ProfileImgProps } from '../../../services/user/types';
+import { timestamp } from '../../../utils/variables';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
@@ -36,6 +37,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
 
     const initChatListener = (msgDocId: string, setRead: boolean) => {
+
+
         if (setRead) {
             //set message read
             //update usersInfo with profileImg
@@ -44,7 +47,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                 unread: boolean,
                 [uid: string]: any
             } = {
-                unread: false
+                unread: false,
+                timestamp
             }
 
             if (user.profileImg) {
@@ -192,12 +196,15 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
         //initate vars
         var chatRef;
+
         var chatObj: any = {
             recentMsg: messageTxt,
             dateSent: new Date(),
             unread: true,
-            recentUid: user.uid
+            recentUid: user.uid,
+            timestamp
         }
+
         var newChatId: string;
 
         if (targetChatDocId) {
@@ -259,7 +266,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         batch.set(newMsgRef, {
             sentBy: user.uid,
             sentAt: new Date(),
-            message: messageTxt
+            message: messageTxt,
+            timestamp
         }
         )
 
@@ -342,7 +350,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     message_form: {
-        backgroundColor: colors.secondary
+        borderTopColor: colors.primary,
+        borderTopWidth: 2,
     },
     message_form_content: {
         flexDirection: 'row',
@@ -350,7 +359,6 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         paddingTop: 20,
         paddingBottom: 20,
-        backgroundColor: colors.secondary,
         alignItems: 'center'
     },
     message_form_input: {
@@ -361,8 +369,7 @@ const styles = StyleSheet.create({
         padding: 5,
         paddingLeft: 10,
         paddingRight: 10,
-        backgroundColor: colors.white,
-        borderColor: colors.white,
+        borderColor: colors.primary,
         maxHeight: 80
     },
     message_form_input_text: {

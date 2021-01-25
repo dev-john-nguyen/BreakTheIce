@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet } from 'react-native'
+import React, { useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { UtilsDispatchActionProps } from '../../../../../services/utils/tsTypes';
@@ -87,21 +86,3 @@ export default ({ set_banner, profileImg, imgObj, setImgObj }: EditProfileImage)
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    profile_image: {
-        width: 80,
-        height: 80,
-        borderRadius: 50,
-        borderColor: colors.primary,
-        borderWidth: 1,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.20,
-        shadowRadius: 1.41
-    }
-})
-

@@ -8,6 +8,7 @@ import { set_banner } from '../utils/actions';
 import { UNFRIEND_USER } from '../near_users/actionTypes';
 import { UPDATE_UNFRIEND_PROFILE } from '../profile/actionTypes';
 import { cacheImage } from '../../utils/functions';
+import firebase from 'firebase';
 
 export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: () => RootProps) => {
     const { uid } = getState().user;
@@ -81,7 +82,8 @@ export const unfriend_user = (friendUid: string) => async (dispatch: AppDispatch
 
     const updatedData = {
         active: false,
-        dateUpdated: new Date()
+        dateUpdated: new Date(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }
 
     batch.update(myRef, updatedData)
