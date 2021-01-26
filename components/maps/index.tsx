@@ -45,7 +45,7 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.003;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-//location and stateCity are checked are parent element so this won't render unless those are checked
+//location and ctryStateCity are checked are parent element so this won't render unless those are checked
 class Maps extends React.Component<MapsProps, MapStateProps> {
 
     constructor(props: MapsProps) {

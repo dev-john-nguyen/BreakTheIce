@@ -4,7 +4,7 @@ import 'firebase/storage';
 // @ts-ignore
 import { FIREBASE_APIKEY, FIREBASE_AUTHDOMAIN, FIREBASE_MEASUREMENTID, FIREBASE_DATABASEURL, FIREBASE_PROJECTID, FIREBASE_STORAGEBUCKET, FIREBASE_MESSAGINGSENDERID, FIREBASE_APPID } from '@env';
 
-const firebaseConfig = {
+export const firebaseConfig: any = {
     apiKey: FIREBASE_APIKEY,
     authDomain: FIREBASE_AUTHDOMAIN,
     databaseURL: FIREBASE_DATABASEURL,

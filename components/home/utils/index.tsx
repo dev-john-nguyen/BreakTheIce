@@ -1,22 +1,12 @@
 import { LocationObject } from "expo-location";
-import { StateCityProps } from "../../../services/user/types";
+import { CtryStateCityProps } from "../../../services/user/types";
 import Geocoder from 'react-native-geocoding';
 // @ts-ignore
 import { GEOCODER_KEY } from '@env'
 // @ts-ignore
 Geocoder.init(GEOCODER_KEY);
 
-export async function setBucket(location: LocationObject) {
-    var stateCity: StateCityProps = {
-        state: '',
-        city: ''
-    }
-
-    // return stateCity = {
-    //     state: 'WA',
-    //     city: 'Bellevue'
-    // }
-
+export async function getBucket(location: LocationObject): Promise<CtryStateCityProps | undefined> {
     try {
         // @ts-ignore
         const res = await Geocoder.from({
@@ -24,20 +14,38 @@ export async function setBucket(location: LocationObject) {
             longitude: location.coords.longitude,
         })
 
-        console.log(res)
+        if (!res.results[0] || res.status !== 'OK') {
+            return;
+        }
 
-        var address: string = res.results[0].formatted_address
+        const addrComponents = res.results[0].address_components
 
-        //the second index should be the state and zip
-        var addressArr: Array<string> = address.split(',');
-        var state: string = addressArr[2].split(' ')[1];
-        var city: string = addressArr[1].replace(' ', '');
+        const countryName = getCountry(addrComponents);
 
-        if (state && city) {
-            return stateCity = {
-                state,
-                city
+        if (!countryName) return;
+
+        //this will return city for countries outside of america
+        const areaLvl1 = getAreaLvl1(addrComponents)
+
+        if (!areaLvl1) return
+
+        if (countryName === 'US') {
+            const usaCity = getAreaLvl2(addrComponents)
+
+            if (usaCity) {
+                return {
+                    ctryState: areaLvl1,
+                    city: usaCity
+                }
+            } else {
+                console.log("wasn't able to get city")
+                return
             }
+        }
+
+        return {
+            ctryState: countryName,
+            city: areaLvl1
         }
 
     } catch (e) {
@@ -48,7 +56,39 @@ export async function setBucket(location: LocationObject) {
     //then nothing and have an alternative (manually set it)
 }
 
-export function getState(zipString: string) {
+function getAreaLvl1(addrComponents: any) {
+    for (var i = 0; i < addrComponents.length; i++) {
+        if (addrComponents[i].types[0] == "administrative_area_level_1") {
+            return addrComponents[i].short_name;
+        }
+    }
+    return false;
+}
+
+function getAreaLvl2(addrComponents: any) {
+    for (var i = 0; i < addrComponents.length; i++) {
+        if (addrComponents[i].types[0] == "administrative_area_level_2") {
+            return addrComponents[i].short_name;
+        }
+    }
+    return false;
+}
+
+function getCountry(addrComponents: any) {
+    for (var i = 0; i < addrComponents.length; i++) {
+        if (addrComponents[i].types[0] == "country") {
+            return addrComponents[i].short_name;
+        }
+        if (addrComponents[i].types.length == 2) {
+            if (addrComponents[i].types[0] == "political") {
+                return addrComponents[i].short_name;
+            }
+        }
+    }
+    return false;
+}
+
+export function getStateZip(zipString: string) {
 
     /* Ensure param is a string to prevent unpredictable parsing results */
     if (typeof zipString !== 'string') {

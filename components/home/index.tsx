@@ -6,11 +6,12 @@ import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { set_and_listen_user_location, go_online } from '../../services/user/actions';
 import { set_and_listen_near_users } from '../../services/near_users/actions';
-import { UserRootStateProps, UserDispatchActionsProps, StateCityProps, } from '../../services/user/types';
+import { UserRootStateProps, UserDispatchActionsProps, CtryStateCityProps, } from '../../services/user/types';
 import { NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import * as Location from 'expo-location';
 import { CustomButton } from '../../utils/components';
+import { getBucket } from './utils';
 
 interface HomeProps {
     navigation: HomeToChatNavProp;
@@ -23,7 +24,7 @@ interface HomeProps {
 }
 
 interface CurrentLocationProps {
-    stateCity: StateCityProps | undefined;
+    ctryStateCity: CtryStateCityProps | undefined;
     location: Location.LocationObject | undefined;
 }
 
@@ -37,51 +38,7 @@ interface ListenersProps {
 
 
 const Home = (props: HomeProps) => {
-    const [currentLocation, setCurrentLocation] = useState<CurrentLocationProps>({ stateCity: undefined, location: undefined })
-
-    const getUserstateCity = async (location: Location.LocationObject) => {
-
-        var stateCity: StateCityProps = {
-            state: '',
-            city: ''
-        }
-
-        return stateCity = {
-            state: 'WA',
-            city: 'Bellevue'
-        }
-
-        try {
-            // @ts-ignore
-            const res = await Geocoder.from({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            })
-
-            console.log(res)
-
-            var address: string = res.results[0].formatted_address
-
-            //the second index should be the state and zip
-            var addressArr: Array<string> = address.split(',');
-            var state: string = addressArr[2].split(' ')[1];
-            var city: string = addressArr[1].replace(' ', '');
-
-            if (state && city) {
-                return stateCity = {
-                    state,
-                    city
-                }
-            }
-
-        } catch (e) {
-            console.log(e)
-            return;
-        }
-
-        //then nothing and have an alternative (manually set it)
-
-    }
+    const [currentLocation, setCurrentLocation] = useState<CurrentLocationProps>({ ctryStateCity: undefined, location: undefined })
 
     useEffect(() => {
         //onMount update/set user location
@@ -96,10 +53,12 @@ const Home = (props: HomeProps) => {
                 let location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest });
 
                 if (location) {
-                    const stateCity: StateCityProps | undefined = await getUserstateCity(location);
+                    const ctryStateCity: CtryStateCityProps | undefined = await getBucket(location);
 
-                    if (stateCity) {
-                        setCurrentLocation({ location, stateCity })
+                    if (ctryStateCity) {
+                        setCurrentLocation({ location, ctryStateCity })
+                    } else {
+                        console.log('manually set it')
                     }
 
                 }
@@ -112,14 +71,18 @@ const Home = (props: HomeProps) => {
     }, [])
 
     useEffect(() => {
-        const { location, stateCity } = currentLocation;
+        const { location, ctryStateCity } = currentLocation;
         const { user, friendsFetched, invitationFetched } = props;
 
-        //need to have inviations and friends in state before setting listener so near users
-        //listener has access
-        if (location && stateCity && !user.offline && invitationFetched && friendsFetched) {
-            props.set_and_listen_user_location(stateCity, location);
-            var unsubscribeNearUsers = props.set_and_listen_near_users(stateCity, location);
+        if (location && ctryStateCity && !user.offline && invitationFetched && friendsFetched) {
+
+            if (user.locationListener) {
+                user.locationListener.remove()
+            }
+            props.set_and_listen_user_location(ctryStateCity, location);
+
+            var unsubscribeNearUsers = props.set_and_listen_near_users(ctryStateCity, location)
+
         }
 
         return () => {
@@ -138,7 +101,7 @@ const Home = (props: HomeProps) => {
 
     return (
         <View style={styles.container}>
-            {props.user.location && props.user.stateCity ?
+            {props.user.location && props.user.ctryStateCity ?
                 <Maps navigation={props.navigation} />
                 :
                 <ActivityIndicator size='large' color={colors.primary} />}

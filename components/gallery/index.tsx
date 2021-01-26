@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { GalleryItemProps } from '../../services/user/types';
 import { colors } from '../../utils/styles';
-import { BodyText } from '../../utils/components';
+import { BodyText, UnderlineHeader } from '../../utils/components';
 import Card from './components/Card';
 
 interface GalleryComProps {
@@ -12,6 +12,13 @@ interface GalleryComProps {
 
 
 export default ({ gallery, nearByUser }: GalleryComProps) => {
+    if (!gallery.length) return (
+        <View style={styles.container}>
+            <UnderlineHeader text='No Images' />
+        </View>
+    )
+
+
     return (
         <View style={styles.container}>
             {gallery.reverse().map((item, index) => {

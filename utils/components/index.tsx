@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator, Keyboard } from 'react-native';
 import { button_styles, underline_header_styles } from '../styles';
 import { Feather } from '@expo/vector-icons';
 import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
@@ -18,18 +18,19 @@ interface CustomButtonProps {
     type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled";
     moreStyles?: StyleProp<any>;
     indicatorColor?: string | false;
-    size?: 'small' | 'regular'
+    size?: 'small' | 'regular';
+    disabled?: boolean
 }
 
 //buttons
-export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, size }: CustomButtonProps) => {
+export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, size, disabled }: CustomButtonProps) => {
 
     const { pressed, unpressed } = button_styles(size, type)
 
     const handlePressableStyle = (props: { pressed: boolean }) => [props.pressed ? pressed.button : unpressed.button, moreStyles]
 
     return <Pressable
-        disabled={indicatorColor ? true : false}
+        disabled={disabled ? disabled : indicatorColor ? true : false}
         onPress={onPress}
         style={handlePressableStyle}
     >
@@ -78,13 +79,16 @@ export const HeaderText = ({ styles, text }: { styles?: StyleProp<any>, text: st
 interface CustomInput {
     styles?: StyleProp<any>;
     placeholder: string;
-    multiline: boolean;
+    multiline?: boolean;
     maxLength: number;
     value: string;
-    onChangeText: (text: string) => void
+    onChangeText: (text: string) => void,
+    keyboardType?: 'numeric';
+    textContentType?: 'name'
+    autoCapitalize?: 'none'
 }
 
-export const CustomInput = ({ styles, placeholder, multiline, maxLength, value, onChangeText }: CustomInput) => {
+export const CustomInput = ({ styles, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize }: CustomInput) => {
     let [fontsLoaded] = useFonts({
         Rubik_500Medium
     });
@@ -100,6 +104,9 @@ export const CustomInput = ({ styles, placeholder, multiline, maxLength, value, 
         maxLength={maxLength}
         value={value}
         onChangeText={onChangeText}
+        keyboardType={keyboardType}
+        textContentType={textContentType}
+        autoCapitalize={autoCapitalize}
     />
 }
 

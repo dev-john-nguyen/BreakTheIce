@@ -1,4 +1,4 @@
-import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
+import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER } from './actionTypes';
 import { UserActionProps } from './types';
 
 const INITIAL_STATE = {
@@ -8,7 +8,7 @@ const INITIAL_STATE = {
         coords: null,
         timestamp: null
     },
-    stateCity: null,
+    ctryStateCity: null,
     name: null,
     age: null,
     bioLong: null,
@@ -20,7 +20,8 @@ const INITIAL_STATE = {
     timeline: [],
     hideOnMap: false,
     offline: false,
-    locationListener: undefined
+    locationListener: undefined,
+    init: false
 }
 
 export default (state: any = INITIAL_STATE, action: UserActionProps) => {
@@ -31,8 +32,17 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
                 ...INITIAL_STATE,
                 fetchFail: true
             }
+        case INIT_USER:
+            return {
+                ...state,
+                init: true,
+                uid: action.payload.uid
+            }
         case SET_USER:
-            return action.payload;
+            return {
+                ...action.payload,
+                init: false
+            };
         case REMOVE_USER:
             if (state.locationListener) {
                 state.locationListener.remove()
@@ -42,7 +52,7 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
             return {
                 ...state,
                 location: action.payload.location,
-                stateCity: action.payload.stateCity,
+                ctryStateCity: action.payload.ctryStateCity,
                 locationListener: action.payload.locationListener,
                 offline: false
             }
@@ -50,7 +60,7 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
             return {
                 ...state,
                 location: null,
-                stateCity: null
+                ctryStateCity: null
             }
         case UPDATE_LOCATION:
             return {

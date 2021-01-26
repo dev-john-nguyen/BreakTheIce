@@ -19,6 +19,7 @@ export class AutoId {
 
 
 export async function cacheImage(image: string) {
+    if (!image) return;
 
     const hashImg = hashCode(image);
 

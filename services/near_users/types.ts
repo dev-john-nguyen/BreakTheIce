@@ -1,5 +1,5 @@
 import { LocationObject } from 'expo-location';
-import { StateCityProps, UserRootStateProps, UserProfilePreviewProps } from '../user/types';
+import { CtryStateCityProps, UserRootStateProps, UserProfilePreviewProps } from '../user/types';
 import { InvitationStatusOptions } from '../invitations/types';
 
 export interface NearUsersActionProps {
@@ -29,7 +29,7 @@ export interface NearUsersRootProps {
 }
 
 export interface NearUsersDispatchActionProps {
-    set_and_listen_near_users: (stateZip: StateCityProps, location: LocationObject) => (() => void) | undefined;
+    set_and_listen_near_users: (ctryStateCity: CtryStateCityProps, location: LocationObject) => (() => void) | undefined;
     validate_near_users: (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<UserRootStateProps>) => Promise<void>;
     reset_near_users: () => void;
 }

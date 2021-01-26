@@ -48,7 +48,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                 [uid: string]: any
             } = {
                 unread: false,
-                timestamp
+                timestamp,
+                updatedAt: new Date()
             }
 
             if (user.profileImg) {
@@ -202,7 +203,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             dateSent: new Date(),
             unread: true,
             recentUid: user.uid,
-            timestamp
+            timestamp,
+            updatedAt: new Date()
         }
 
         var newChatId: string;
@@ -267,7 +269,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             sentBy: user.uid,
             sentAt: new Date(),
             message: messageTxt,
-            timestamp
+            timestamp,
+            updatedAt: new Date()
         }
         )
 

@@ -1,7 +1,7 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY } from './actionTypes';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER } from './actionTypes';
 import { set_loading, remove_loading, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { StateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps } from './types';
+import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps } from './types';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
 import { validate_near_users, reset_near_users } from '../near_users/actions';
@@ -25,22 +25,25 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
         if (user) {
 
             //get the user profile and chatIds
-            var fetchUserRes: { profile: UserRootStateProps } | undefined;
+            var fetchedUser: { profile: UserRootStateProps } | undefined | 'new';
 
             try {
-                fetchUserRes = await fetch_profile(user.uid)
+                fetchedUser = await fetch_profile(user.uid)
             } catch (err) {
                 console.log(err);
 
                 dispatch(set_banner("Oops! Something went wrong getting your profile.", 'error'))
 
             } finally {
-                if (fetchUserRes) {
+                if (fetchedUser) {
 
-                    //check if profile data exists
-                    if (fetchUserRes.profile) {
+                    if (fetchedUser === 'new') {
 
-                        var { gallery, bioShort, bioLong, profileImg } = fetchUserRes.profile
+                        dispatch({ type: INIT_USER, payload: { uid: user.uid } });
+
+                    } else if (fetchedUser.profile) {
+
+                        var { gallery, bioShort, bioLong, profileImg } = fetchedUser.profile
 
                         //cache gallery images
                         gallery = await cache_user_images(gallery, 'cachedUrl')
@@ -56,7 +59,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                         //set banner if profile information has not be initiated
                         if (!bioShort || !bioLong) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
 
-                        dispatch({ type: SET_USER, payload: fetchUserRes.profile });
+                        dispatch({ type: SET_USER, payload: fetchedUser.profile });
                     } else {
                         dispatch(set_banner("Looks like we couldn't get your profile", 'error'))
                     }
@@ -78,7 +81,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
     });
 }
 
-export const set_and_listen_user_location = (stateCity: StateCityProps, location: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const set_and_listen_user_location = (ctryStateCity: CtryStateCityProps, location: LocationObject) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
     //check if user is offline
     if (getState().user.offline) {
@@ -89,7 +92,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
 
     try {
         //batch operation to init user location and perform the nesscary updates
-        await fireDb_init_user_location(getState().user, stateCity, location);
+        await fireDb_init_user_location(getState().user, ctryStateCity, location);
     } catch (e) {
         console.log(e)
         dispatch(set_banner('Something went wrong initializing your location', 'error'))
@@ -115,7 +118,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
         //update user location in the server
 
         try {
-            await fireDb_update_user_location(user.uid, user.stateCity, newLocation);
+            await fireDb_update_user_location(user.uid, user.ctryStateCity, newLocation);
         } catch (e) {
             console.log(e)
             dispatch(set_banner('Oops! Failed to update your location', 'error'))
@@ -135,7 +138,7 @@ export const set_and_listen_user_location = (stateCity: StateCityProps, location
     dispatch({
         type: SET_LOCATION,
         payload: {
-            stateCity: stateCity,
+            ctryStateCity: ctryStateCity,
             location: location,
             locationListener
         }

@@ -1,9 +1,9 @@
-import { SET_NEAR_USERS, UPDATE_NEAR_USERS, RESET_NEAR_USERS } from './actionTypes';
+import { SET_NEAR_USERS, UPDATE_NEAR_USERS, RESET_NEAR_USERS, INIT_NEAR_USERS } from './actionTypes';
 import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
 import { LocationsDb, acceptedRadius } from '../../utils/variables';
-import { StateCityProps } from '../user/types';
+import { CtryStateCityProps } from '../user/types';
 import { NearByUsersProps } from './types';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
@@ -12,7 +12,7 @@ import { set_banner } from '../utils/actions';
 import { cacheImage } from '../../utils/functions';
 
 //find near by users
-export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
+export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
 
     const { uid } = getState().user;
 
@@ -21,10 +21,12 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
         return;
     }
 
+    console.log(ctryStateCity)
+
     var nearUsersListener = fireDb
         .collection(LocationsDb)
-        .doc(stateCity.state)
-        .collection(stateCity.city)
+        .doc(ctryStateCity.ctryState)
+        .collection(ctryStateCity.city)
         .where(firebase.firestore.FieldPath.documentId(), "!=", uid)
         .onSnapshot(async (querySnapshot) => {
 
@@ -87,7 +89,7 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
                     userData.receivedInvite = invitationInbound.find(item => item.sentBy.uid === userData.uid) ? true : false
 
                     //init profile image includign caching image
-                    if (userData.profileImg) {
+                    if (userData.profileImg?.uri) {
                         userData.profileImg.cachedUrl = await cacheImage(userData.profileImg.uri)
                     }
 
@@ -110,6 +112,8 @@ export const set_and_listen_near_users = (stateCity: StateCityProps, newLocation
             console.log(err)
             dispatch(set_banner('Oops! We are having trouble retrieving near by users.', 'error'))
         })
+
+    dispatch({ type: INIT_NEAR_USERS, payload: {} })
 
     return nearUsersListener
 }

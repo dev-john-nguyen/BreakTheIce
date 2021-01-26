@@ -181,6 +181,7 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
                     color: colors.white
                 }
             }
+            break;
         case 'primary':
         default:
             pressed = {

@@ -5,15 +5,15 @@ export interface UserActionProps {
     payload: {
         uid: string,
         location: LocationObject,
-        stateCity: StateCityProps,
+        ctryStateCity: CtryStateCityProps,
         timelineLocDocId: string,
         gallery: GalleryItemProps[],
         locationListener: { remove: () => void }
     }
 }
 
-export interface StateCityProps {
-    state: string;
+export interface CtryStateCityProps {
+    ctryState: string;
     city: string
 }
 
@@ -67,7 +67,7 @@ export interface UserRootStateProps {
     uid: string;
     username: string;
     location: LocationObject;
-    stateCity: StateCityProps;
+    ctryStateCity: CtryStateCityProps;
     name: string;
     age: number;
     bioLong: string;
@@ -78,6 +78,7 @@ export interface UserRootStateProps {
     hideOnMap: boolean;
     offline: boolean;
     fetchFail?: boolean;
+    init?: boolean;
     locationListener?: { remove: () => void }
 }
 
@@ -95,7 +96,7 @@ export interface UpdateUserPrivacyProps {
 }
 
 export interface UserDispatchActionsProps {
-    set_and_listen_user_location: (stateCity: StateCityProps, location: LocationObject) => Promise<void>;
+    set_and_listen_user_location: (ctryStateCity: CtryStateCityProps, location: LocationObject) => Promise<void>;
     update_profile: (updatedProfileData: UpdateUserProfileProps, profileImg: NewProfileImgProps | undefined) => Promise<any>;
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => Promise<void | undefined>;

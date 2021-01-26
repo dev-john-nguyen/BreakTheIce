@@ -35,23 +35,30 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerRight: () => (
-                <View style={{ flexDirection: 'row', right: loading ? 30 : 20 }}>
-                    {loading ?
-                        <ActivityIndicator size='small' color={colors.primary} /> :
-                        <>
-                            {
-                                imgObjs.filter(img => !img.removed).length < 5 &&
-                                <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
-                                    {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
-                                </Pressable >
-                            }
-                            <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
-                        </>
-                    }
-                </View>
+            headerRight: () => {
 
-            )
+                const imgObjsLen = imgObjs.filter(img => !img.removed).length
+
+                return (
+                    <View style={{ flexDirection: 'row', right: loading ? 30 : 20 }}>
+                        {loading ?
+                            <ActivityIndicator size='small' color={colors.primary} /> :
+                            <>
+                                {
+                                    imgObjsLen < 5 &&
+                                    <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
+                                        {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
+                                    </Pressable >
+                                }
+                                {imgObjsLen > 0 &&
+                                    <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
+                                }
+                            </>
+                        }
+                    </View>
+                )
+
+            }
         })
     }, [loading, imgObjs])
 

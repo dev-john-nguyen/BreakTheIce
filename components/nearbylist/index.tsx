@@ -10,6 +10,7 @@ import InvitationModal from '../modal/InvitationModal';
 import Preview from '../../utils/components/Preview';
 import { update_invitation } from '../../services/invitations/actions';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
+import { UnderlineHeader } from '../../utils/components';
 
 
 interface NearByListProps {
@@ -59,7 +60,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
 
         if (!nearUsersFetched) return <ActivityIndicator />
 
-        if (nearUsers.length < 1) return <Text>No Near By Users</Text>
+        if (nearUsers.length < 1) return <UnderlineHeader text='No Users Near By' styles={{ marginTop: 20 }} />
 
         return (
             <View style={{ flex: 1 }}>

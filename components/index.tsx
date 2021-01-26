@@ -20,6 +20,9 @@ import { set_and_listen_messages } from '../services/chat/actions';
 import Banner from '../utils/components/Banner';
 import Notification from '../utils/components/Notification';
 import { colors } from '../utils/styles';
+import UserInitForm from './login/components/UserInitForm';
+import { init_user } from '../services/signin/actions';
+import { SigninDispatchActionProps } from '../services/signin/types';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -32,13 +35,20 @@ interface Base {
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
     set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
     remove_notification: () => void;
+    init_user: SigninDispatchActionProps['init_user'];
 }
 
 const Base = (props: Base) => {
     const handleRender = () => {
         if (props.utils.loading) return <ActivityIndicator />
         if (props.user.fetchFail) return <Text>Oops! We couldn't retrieve your profile.</Text>
+
         if (props.user.uid) {
+
+            if (props.user.init) {
+                return <UserInitForm init_user={props.init_user} />
+            }
+
             return (
                 <NavigationContainer>
                     <BottomTabs.Navigator backBehavior='history' lazy={true} tabBar={props => <BottomNav {...props} />}>
@@ -66,7 +76,7 @@ const Base = (props: Base) => {
             props.user.locationListener && props.user.locationListener.remove();
         }
 
-        if (props.user.uid) {
+        if (props.user.uid && !props.user.init) {
             unsubscribeFriends = props.set_and_listen_friends();
             unsubscribeInvitations = props.set_and_listen_invitations();
             unsubscribeChat = props.set_and_listen_messages();
@@ -75,7 +85,7 @@ const Base = (props: Base) => {
         }
 
         return () => unsubscribeListeners()
-    }, [props.user.uid])
+    }, [props.user.uid, props.user.init])
 
     const handleRemoveBanner = () => props.remove_banner()
 
@@ -114,5 +124,6 @@ export default connect(mapStateToProps, {
     remove_banner, set_and_listen_invitations,
     set_and_listen_friends,
     set_and_listen_messages,
-    remove_notification
+    remove_notification,
+    init_user
 })(Base)

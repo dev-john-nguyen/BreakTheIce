@@ -9,3 +9,4 @@ export const GO_OFFILINE = 'GO_OFFLINE';
 export const GO_ONLINE = 'GO_ONLINE';
 export const UPDATE_PROFILE = 'UPDATE_PROFILE';
 export const UPDATE_PRIVACY = 'UPDATE_PRIVACY';
+export const INIT_USER = 'INIT_USER';

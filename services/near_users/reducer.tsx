@@ -1,4 +1,4 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, RESET_NEAR_USERS, UNFRIEND_USER } from './actionTypes'
+import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, RESET_NEAR_USERS, UNFRIEND_USER, INIT_NEAR_USERS } from './actionTypes'
 import { NearUsersActionProps, NearByUsersProps } from './types';
 import { update_nearBy } from '../../utils/functions';
 
@@ -14,6 +14,11 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
             return {
                 nearBy: action.payload.nearBy,
                 all: action.payload.all,
+                fetched: true
+            }
+        case INIT_NEAR_USERS:
+            return {
+                ...state,
                 fetched: true
             }
         case REMOVE_NEAR_USERS:
