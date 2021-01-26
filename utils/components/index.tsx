@@ -15,7 +15,7 @@ export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: 
 interface CustomButtonProps {
     text: string;
     onPress?: () => void;
-    type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled";
+    type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled" | "red" | "white";
     moreStyles?: StyleProp<any>;
     indicatorColor?: string | false;
     size?: 'small' | 'regular';

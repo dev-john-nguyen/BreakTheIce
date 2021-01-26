@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, Route } from '@react-navigation/native';
 import Home from '../../home';
 import NearByList from '../../nearbylist';
 import Invitations from '../../invitations';
@@ -126,10 +126,20 @@ const InvitationsStack = createStackNavigator<InvitationsStackParams>();
 const MeStack = createStackNavigator<MeStackParams>();
 const ChatStack = createStackNavigator<ChatStackParams>();
 
+const profileOptions = ({ route }: { route: Route<'Profile', ProfileRouteParams> }) => ({
+    title: route.params.title ? route.params.title : 'Profile',
+    cardStyle: { marginTop: 0 }
+})
+
 export const InvitationsStackScreen = () => (
     <InvitationsStack.Navigator screenOptions={screenOptions}>
         <InvitationsStack.Screen name="Invitations" component={Invitations} />
-        <HomeStack.Screen name="Profile" component={Profile} options={{ title: 'Profile' }} initialParams={{ profileUid: '' }} />
+        <InvitationsStack.Screen
+            name="Profile"
+            component={Profile}
+            options={profileOptions}
+            initialParams={{ profileUid: '' }}
+        />
     </InvitationsStack.Navigator>
 )
 
@@ -138,8 +148,10 @@ export const HomeStackScreen = () => (
     <HomeStack.Navigator screenOptions={screenOptions}>
         <HomeStack.Screen name="Home" component={Home} options={{ cardStyle: { marginTop: 0 } }} />
         <HomeStack.Screen name="NearByList" component={NearByList} />
-        <HomeStack.Screen name="Profile" component={Profile}
-            options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}
+        <HomeStack.Screen
+            name="Profile"
+            component={Profile}
+            options={profileOptions}
             initialParams={{ profileUid: '' }} />
     </HomeStack.Navigator>
 )
@@ -150,10 +162,10 @@ export const MeStackScreen = (props: any) => {
     return <MeStack.Navigator screenOptions={screenOptions}>
         <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={{ cardStyle: { marginTop: 0 } }} />
         <MeStack.Screen name="Friends" component={Friends} />
-        <MeStack.Screen name="Profile" component={Profile}
-            options={({ route }) => ({
-                title: route.params.title ? route.params.title : 'Profile'
-            })}
+        <MeStack.Screen
+            name="Profile"
+            component={Profile}
+            options={profileOptions}
             initialParams={{ profileUid: '' }} />
         <MeStack.Screen name="Settings" component={Settings} />
     </MeStack.Navigator>
@@ -163,8 +175,10 @@ export const ChatStackScreen = () => (
     <ChatStack.Navigator screenOptions={screenOptions}>
         <ChatStack.Screen name="Chat" component={Chat} />
         <ChatStack.Screen name="Message" component={Message} />
-        <ChatStack.Screen name="Profile" component={Profile}
-            options={({ route }) => ({ title: route.params.title ? route.params.title : 'Profile' })}
+        <ChatStack.Screen
+            name="Profile"
+            component={Profile}
+            options={profileOptions}
             initialParams={{ profileUid: '' }} />
     </ChatStack.Navigator>
 )

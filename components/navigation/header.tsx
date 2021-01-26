@@ -8,21 +8,6 @@ interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
 }
 
-// const renderTitle = (route: RouteProps['props']) => {
-//     if (!route.params || !route.params.title) {
-//         switch (route.name) {
-//             case 'Home':
-//                 return 'Map'
-//             case 'NearByList':
-//                 return 'List'
-//             case 'Me':
-//                 return 'Profile'
-//             default:
-//                 return route.name
-//         }
-//     } else return route.params.title;
-// }
-
 const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
     switch (route.name) {
         case 'Home':

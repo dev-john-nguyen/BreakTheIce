@@ -13,14 +13,14 @@ import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, ProfileUserProps, ProfileRootProps } from '../../services/profile/types';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
-import Gallery from '../gallery';
-import ProfileImage from '../../utils/components/ProfileImage';
-import RespondButton from '../../utils/components/RespondButton';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import ProfileHeaderRight from './components/ProfileHeaderRight';
+import HeaderRight from './components/HeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
 import { set_banner } from '../../services/utils/actions';
-import { CustomButton } from '../../utils/components';
+import { UnderlineHeader } from '../../utils/components';
+import ProfileContent from './components/ProfileContent';
+import { TopProfileBackground } from '../../utils/svgs';
+import { windowWidth } from '../../utils/variables';
 
 interface ProfileProps {
     navigation: BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp
@@ -42,12 +42,11 @@ const Profile = (props: ProfileProps) => {
     const [profileUser, setProfileUser] = useState<ProfileUserProps>();
     const [notFound, setNotFound] = useState<boolean>(false);
     const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
-    const [inviteStatusLoading, setInviteStatusLoading] = useState<boolean>(false);
-
 
     useLayoutEffect(() => {
         props.navigation.setOptions({
-            headerRight: () => <ProfileHeaderRight handleUnfriendUser={handleUnfriendUser} block_user={() => console.log('blocking..')} />
+            headerRight: () => <HeaderRight handleUnfriendUser={handleUnfriendUser} block_user={() => console.log('blocking..')} />,
+            headerTintColor: colors.white
         })
     }, [profileUser, props.unfriend_user])
 
@@ -108,53 +107,41 @@ const Profile = (props: ProfileProps) => {
         })
     }
 
-    const renderHeaderContentButton = () => {
-        if (!profileUser) return;
 
-        if (profileUser.friend) return <CustomButton onPress={directToMessage} text='Message' type='primary' />
+    const renderContent = () => {
+        if (notFound || !profileUser) {
+            return (
+                <View style={styles.utils_container}>
+                    <TopProfileBackground style={styles.header_background} height={'180'} width={windowWidth.toString()} />
+                    {notFound ? <UnderlineHeader text='User Not Found' /> : <ActivityIndicator size='large' color={colors.primary} />}
+                </View>
+            )
 
-        if (profileUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
+        }
 
-        if (profileUser.receivedInvite) return <RespondButton handleInvitationUpdate={handleInvitationUpdate}
-            setLoading={setInviteStatusLoading}
-            loading={inviteStatusLoading}
-        />
-
-        return <CustomButton onPress={() => setShowModalInvite(true)} text='Invite' type='primary' />
+        return (
+            <>
+                <InvitationModal
+                    visible={showModalInvite && !profileUser.sentInvite && !profileUser.friend}
+                    targetUser={profileUser}
+                    handleClose={() => setShowModalInvite(false)}
+                />
+                <ProfileContent
+                    user={profileUser}
+                    admin={false}
+                    nearUser={true}
+                    directToMessage={directToMessage}
+                    handleInvitationUpdate={handleInvitationUpdate}
+                    setShowModalInvite={setShowModalInvite}
+                />
+            </>
+        )
 
     }
 
-    const baseText = (text: string | number, additionalStyle: Object) => (
-        <Text style={[styles.base_text, additionalStyle]}>
-            {text}
-        </Text>
-    )
-
-    if (notFound) return (<View><Text>Not Found</Text></View>)
-
-    if (!profileUser) return (<View><ActivityIndicator /></View>)
-
     return (
         <View style={styles.container}>
-            <InvitationModal
-                visible={showModalInvite && !profileUser.sentInvite && !profileUser.friend}
-                targetUser={profileUser}
-                handleClose={() => setShowModalInvite(false)}
-            />
-            <View style={styles.header_section}>
-                <ProfileImage image={profileUser.profileImg} size='large' />
-                <View style={styles.header_content}>
-                    <View style={styles.header_content_text}>
-                        {baseText(profileUser.name, { fontSize: 24 })}
-                        {baseText(`${profileUser.age} years old`, { fontSize: 14 })}
-                    </View>
-                    {renderHeaderContentButton()}
-                </View>
-            </View>
-            <View style={styles.bio}>
-                {baseText(profileUser.bioLong, { fontSize: 12 })}
-            </View>
-            <Gallery gallery={profileUser.gallery} nearByUser={true} />
+            {renderContent()}
         </View>
     )
 }
@@ -162,42 +149,10 @@ const Profile = (props: ProfileProps) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        padding: 10
     },
-    base_text: {
-        color: colors.primary,
-        fontWeight: '400'
-    },
-    header_section: {
-        flexBasis: 'auto',
-        alignItems: "center",
-        marginLeft: 10,
-        marginRight: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        height: '20%'
-    },
-    header_content: {
+    utils_container: {
         flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginLeft: 10
-    },
-    header_content_text: {
-        marginBottom: 10,
-        alignItems: 'center'
-    },
-    bio: {
-        flexBasis: 'auto',
-        marginTop: 20,
-        marginBottom: 20,
-        marginLeft: 10,
-        marginRight: 10
-    },
-    bioText: {
-        fontSize: 12
+        justifyContent: 'center'
     },
     invite_modal: {
         flex: 1,
@@ -205,7 +160,12 @@ const styles = StyleSheet.create({
     },
     invitation_buttons: {
         flexDirection: 'row'
-    }
+    },
+    header_background: {
+        position: 'absolute',
+        top: 0,
+        left: 0
+    },
 })
 
 

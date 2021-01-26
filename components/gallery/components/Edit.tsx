@@ -34,6 +34,8 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
     const [loading, setLoading] = useState<boolean>(false);
 
     useLayoutEffect(() => {
+        var mount = true
+
         navigation.setOptions({
             headerRight: () => {
 
@@ -51,7 +53,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
                                     </Pressable >
                                 }
                                 {imgObjsLen > 0 &&
-                                    <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
+                                    <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={() => handleSaveGallery(mount)} />
                                 }
                             </>
                         }
@@ -60,6 +62,10 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
 
             }
         })
+
+        return () => {
+            mount = false;
+        }
     }, [loading, imgObjs])
 
     useEffect(() => {
@@ -81,7 +87,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
 
     }, [gallery])
 
-    const handleSaveGallery = () => {
+    const handleSaveGallery = (mount: boolean) => {
         //allow description to be empty
         //check if any changes were made
 
@@ -98,10 +104,10 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
         setLoading(true)
 
         save_gallery(imgObjs)
-            .then(() => setLoading(false))
+            .then(() => mount && setLoading(false))
             .catch((err) => {
                 console.log(err)
-                setLoading(false)
+                mount && setLoading(false)
             })
     }
 

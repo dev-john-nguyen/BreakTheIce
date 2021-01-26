@@ -1,10 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, Dimensions, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import { remove_banner, remove_notification } from '../services/utils/actions';
 import { UtilsRootStateProps } from '../services/utils/tsTypes';
-import Login from './login';
+import SignIn from './signin';
 import BottomNav from './navigation/Bottom';
 import { RootProps } from '../services';
 import { NavigationContainer } from '@react-navigation/native';
@@ -19,8 +19,7 @@ import { set_and_listen_friends } from '../services/friends/actions';
 import { set_and_listen_messages } from '../services/chat/actions';
 import Banner from '../utils/components/Banner';
 import Notification from '../utils/components/Notification';
-import { colors } from '../utils/styles';
-import UserInitForm from './login/components/UserInitForm';
+import UserInitForm from './signin/components/UserInitForm';
 import { init_user } from '../services/signin/actions';
 import { SigninDispatchActionProps } from '../services/signin/types';
 
@@ -60,7 +59,7 @@ const Base = (props: Base) => {
                 </NavigationContainer>
             )
         }
-        else { return <Login /> }
+        else { return <SignIn /> }
     }
 
     useEffect(() => {

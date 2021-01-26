@@ -74,7 +74,7 @@ export interface UserRootStateProps {
     bioShort: string;
     gender: string;
     profileImg: ProfileImgProps | null;
-    gallery: GalleryItemProps[];
+    gallery: GalleryItemProps[] | [];
     hideOnMap: boolean;
     offline: boolean;
     fetchFail?: boolean;
@@ -102,5 +102,4 @@ export interface UserDispatchActionsProps {
     save_gallery: (newGallery: NewGalleryItemProps[]) => Promise<void | undefined>;
     go_online: () => void;
     sign_out: () => void;
-    send_password_reset_email: (email: string) => void | undefined
 }

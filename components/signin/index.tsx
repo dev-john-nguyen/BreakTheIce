@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import * as FirebaseRecaptcha from 'expo-firebase-recaptcha';
 import firebase from 'firebase';
-import { firebaseConfig } from '../../../services/firebase';
-import { CustomButton, BodyText } from '../../../utils/components';
-import { colors } from '../../../utils/styles';
+import { firebaseConfig } from '../../services/firebase';
+import { CustomButton, BodyText } from '../../utils/components';
+import { colors } from '../../utils/styles';
 
 export default function PhoneAuthScreen() {
     const recaptchaVerifier = React.useRef(null);

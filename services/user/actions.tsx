@@ -330,27 +330,3 @@ export const sign_out = () => async (dispatch: AppDispatch) => {
             dispatch(set_banner('Oops! Something happened trying to sign out', 'error'))
         })
 }
-
-export const send_password_reset_email = (email: string) => (dispatch: AppDispatch) => {
-    var user = myFire.auth().currentUser;
-
-    if (!user || !user.email) {
-        dispatch(set_banner("Oops! couldn't find your email", "error"))
-        return;
-    }
-
-    if (user.email != email) {
-        dispatch(set_banner("Email doesn't match what we have on file. Please try again.", "error"))
-        return;
-    }
-
-
-    myFire.auth().sendPasswordResetEmail(user.email)
-        .then(() => {
-            dispatch(set_banner(`Email sent to ${user?.email}. Please follow the direction to reset your password.`, 'success'))
-        })
-        .catch((err) => {
-            console.log(err)
-            dispatch(set_banner(`Failed to send email to ${user?.email}. Please try again or contact us directly.`, 'error'))
-        })
-}

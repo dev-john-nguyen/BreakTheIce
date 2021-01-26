@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { MeStackNavigationProp } from '../../navigation/utils/types';
@@ -6,20 +6,56 @@ import Gallery from '../../gallery';
 import ProfileImage from '../../../utils/components/ProfileImage';
 import { CustomButton, HeaderText, BodyText, Icon } from '../../../utils/components';
 import { TopProfileBackground } from '../../../utils/svgs';
-import { ProfileUserProps } from '../../../services/profile/types';
+import { GalleryItemProps } from '../../../services/user/types';
+import RespondButton from '../../../utils/components/RespondButton';
+import { InvitationStatusOptions } from '../../../services/invitations/types';
+import { windowWidth } from '../../../utils/variables';
 
-interface ProfileProps {
-    navigation: MeStackNavigationProp;
-    user: ProfileUserProps;
+interface UserProps {
+    profileImg: any;
+    name: string;
+    age: number;
+    bioLong: string;
+    gallery: GalleryItemProps[] | [];
+    friend?: boolean;
+    sentInvite?: boolean;
+    receivedInvite?: boolean;
 }
 
-const Profile = ({ navigation, user }: ProfileProps) => {
+interface ProfileProps {
+    user: UserProps;
+    directToMessage?: () => void;
+    directToFriends?: () => void;
+    handleInvitationUpdate?: (status: InvitationStatusOptions) => Promise<void>;
+    admin: boolean;
+    setShowModalInvite?: (show: boolean) => void;
+    nearUser?: true;
+}
 
-    const directToFriends = () => navigation.navigate('Friends')
+export default ({ user, directToMessage, directToFriends, handleInvitationUpdate, admin, setShowModalInvite, nearUser }: ProfileProps) => {
+    const [inviteStatusLoading, setInviteStatusLoading] = useState<boolean>(false);
+
+    const renderButton = () => {
+        if (admin) return <CustomButton onPress={directToFriends} text='Friends' type='primary' moreStyles={styles.header_button} />
+
+        if (user.friend) return <CustomButton onPress={directToMessage} text='Message' type='primary' moreStyles={styles.header_button} />
+
+        if (user.sentInvite) return <CustomButton type='disabled' text='Pending' moreStyles={styles.header_button} />
+
+        if (user.receivedInvite && handleInvitationUpdate) return <RespondButton handleInvitationUpdate={handleInvitationUpdate}
+            setLoading={setInviteStatusLoading}
+            loading={inviteStatusLoading}
+        />
+
+        if (setShowModalInvite) return <CustomButton onPress={() => setShowModalInvite(true)} text='Invite' type='primary' moreStyles={styles.header_button} />
+
+        return <CustomButton type='disabled' text='unavailable' moreStyles={styles.header_background} />
+
+    }
 
     return (
         <>
-            <TopProfileBackground style={styles.header_background} height={'180'} width={Math.round(Dimensions.get('window').width).toString()} />
+            <TopProfileBackground style={styles.header_background} height={'180'} width={windowWidth.toString()} />
             <View style={styles.container}>
                 <View style={styles.header_section}>
 
@@ -30,14 +66,14 @@ const Profile = ({ navigation, user }: ProfileProps) => {
                             <HeaderText text={user.name} styles={styles.header_text} />
                             <BodyText text={`${user.age} years old`} styles={styles.sub_header_text} />
                         </View>
-                        <CustomButton onPress={directToFriends} text='Friends' type='primary' moreStyles={styles.header_button} />
+                        {renderButton()}
                     </View>
                 </View>
 
                 <View style={styles.bio}>
                     <BodyText text={user.bioLong} styles={styles.bio_text} />
                 </View>
-                <Gallery gallery={user.gallery} />
+                <Gallery gallery={user.gallery} nearUser={nearUser} />
             </View>
         </>
     )
@@ -92,5 +128,3 @@ const styles = StyleSheet.create({
         padding: 10
     }
 })
-
-export default Profile;

@@ -2,7 +2,7 @@ import React from 'react';
 import { MeStackNavigationProp } from '../navigation/utils/types';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import Profile from '../profile/components/Profile';
+import ProfileContent from '../profile/components/ProfileContent';
 
 interface MeProps {
     navigation: MeStackNavigationProp;
@@ -10,7 +10,9 @@ interface MeProps {
 }
 
 const Me = ({ navigation, user }: MeProps) => {
-    return <Profile navigation={navigation} user={user} />
+    const directToFriends = () => navigation.navigate('Friends')
+
+    return <ProfileContent user={user} directToFriends={directToFriends} admin={true} />
 }
 
 const mapStateToProps = (state: RootProps) => ({

@@ -28,14 +28,14 @@ export default ({ handleUnfriendUser, block_user }: ProfileHeaderRightProps) => 
 
     if (showMenu) return (
         <View style={{ marginRight: 10, flexDirection: 'row', alignItems: 'center' }}>
-            <CustomButton type='secondary' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={loading && colors.primary} />
+            <CustomButton type='red' text='block' size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} />
 
-            <CustomButton type='red_outline' text='block' size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} />
+            <CustomButton type='white' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={loading && colors.primary} />
             <Icon
                 type='more-horizontal'
                 size={24}
-                color={colors.primary}
-                pressColor={colors.secondary}
+                color={colors.white}
+                pressColor={colors.tertiary}
                 onPress={handleShowMenu}
                 style={{ marginRight: 10 }}
             />
@@ -45,8 +45,8 @@ export default ({ handleUnfriendUser, block_user }: ProfileHeaderRightProps) => 
     return <Icon
         type='more-vertical'
         size={24}
-        color={colors.primary}
-        pressColor={colors.secondary}
+        color={colors.white}
+        pressColor={colors.tertiary}
         onPress={handleShowMenu}
         style={{ marginRight: 10 }}
     />

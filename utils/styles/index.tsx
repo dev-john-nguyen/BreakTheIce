@@ -80,133 +80,86 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
     var pressed: {
         button: StyleProp<any>
         text: StyleProp<any>
+    } = {
+        button: { ...baseBtn },
+        text: { ...baseText }
     };
 
     var unpressed: {
         button: StyleProp<any>
         text: StyleProp<any>
+    } = {
+        button: { ...baseBtn },
+        text: { ...baseText }
     };
 
 
     switch (type) {
+        case 'white':
+            pressed.button.backgroundColor = colors.tertiary;
+            pressed.button.borderColor = colors.white;
+            pressed.text.color = colors.primary;
+
+            unpressed.button.backgroundColor = colors.white;
+            unpressed.button.borderColor = colors.lightWhite;
+            unpressed.text.color = colors.primary;
+            break;
+        case 'red':
+            pressed.button.backgroundColor = colors.lightRed;
+            pressed.button.borderColor = colors.red;
+            pressed.text.color = colors.white;
+
+            unpressed.button.backgroundColor = colors.red;
+            unpressed.button.borderColor = colors.red;
+            unpressed.text.color = colors.white;
+            break;
         case 'red_outline':
-            pressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.lightRed,
-                    borderColor: colors.lightRed
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
-            unpressed = {
-                button: {
-                    ...baseBtn,
-                    borderColor: colors.lightRed
-                },
-                text: {
-                    ...baseText,
-                    color: colors.lightRed
-                }
-            }
+            pressed.button.backgroundColor = colors.lightRed;
+            pressed.button.borderColor = colors.lightRed;
+            pressed.text.color = colors.white;
+
+            unpressed.button.backgroundColor = 'transparent';
+            unpressed.button.borderColor = colors.lightRed;
+            unpressed.text.color = colors.lightRed;
             break;
         case 'white_outline':
-            pressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.primary,
-                    borderColor: colors.primary
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
-            unpressed = {
-                button: {
-                    ...baseBtn,
-                    borderColor: colors.white
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
+            pressed.button.backgroundColor = colors.primary;
+            pressed.button.borderColor = colors.primary;
+            pressed.text.color = colors.white;
+
+            unpressed.button.backgroundColor = 'transparent';
+            unpressed.button.borderColor = colors.white;
+            unpressed.text.color = colors.white;
             break;
         case 'secondary':
-            pressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.primary,
-                    borderColor: colors.primary
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
-            unpressed = {
-                button: {
-                    ...baseBtn,
-                    borderColor: colors.primary
-                },
-                text: {
-                    ...baseText,
-                    color: colors.primary
-                }
-            }
+            pressed.button.backgroundColor = colors.primary;
+            pressed.button.borderColor = colors.primary;
+            pressed.text.color = colors.white;
+
+            unpressed.button.backgroundColor = 'transparent';
+            unpressed.button.borderColor = colors.primary;
+            unpressed.text.color = colors.primary;
             break;
         case 'disabled':
-            pressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.lightGrey,
-                    borderColor: colors.lightGrey
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
-            unpressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.lightGrey,
-                    borderColor: colors.lightGrey
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
+            pressed.button.backgroundColor = colors.lightGrey;
+            pressed.button.borderColor = colors.lightGrey;
+            pressed.text.color = colors.white;
+
+            unpressed.button.backgroundColor = colors.lightGrey;
+            unpressed.button.borderColor = colors.lightGrey;
+            unpressed.text.color = colors.white;
             break;
         case 'primary':
         default:
-            pressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.tertiary,
-                    borderColor: colors.primary
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white
-                }
-            }
-            unpressed = {
-                button: {
-                    ...baseBtn,
-                    backgroundColor: colors.secondary,
-                    borderColor: colors.primary
-                },
-                text: {
-                    ...baseText,
-                    color: colors.white,
-                }
-            }
+            pressed.button.backgroundColor = colors.tertiary;
+            pressed.button.borderColor = colors.primary;
+            pressed.text.color = colors.white;
+
+            unpressed.button.backgroundColor = colors.secondary;
+            unpressed.button.borderColor = colors.primary;
+            unpressed.text.color = colors.white;
     }
+
     return {
         pressed,
         unpressed

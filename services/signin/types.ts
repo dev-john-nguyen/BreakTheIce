@@ -1,3 +1,5 @@
+import { UserProfilePreviewProps } from "../user/types";
+
 export interface SignUpValuesProps {
     email: string;
     password: string;
@@ -12,8 +14,10 @@ export interface InitFormValues {
     age: number;
 }
 
+export interface InitUserProps extends Omit<UserProfilePreviewProps, 'location'> {
+    gallery: []
+}
+
 export interface SigninDispatchActionProps {
-    signup_user: (userFormValues: SignUpValuesProps) => Promise<void | boolean>;
-    login_user: (email: string, password: string) => Promise<void | boolean>;
     init_user: (userFormValues: InitFormValues) => Promise<void | undefined | boolean>;
 }

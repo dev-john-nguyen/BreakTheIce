@@ -7,11 +7,11 @@ import Card from './components/Card';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
-    nearByUser?: true
+    nearUser?: true
 }
 
 
-export default ({ gallery, nearByUser }: GalleryComProps) => {
+export default ({ gallery, nearUser }: GalleryComProps) => {
     if (!gallery.length) return (
         <View style={styles.container}>
             <UnderlineHeader text='No Images' />
@@ -21,11 +21,11 @@ export default ({ gallery, nearByUser }: GalleryComProps) => {
 
     return (
         <View style={styles.container}>
-            {gallery.reverse().map((item, index) => {
+            {gallery.map((item, index) => {
 
                 var uri: string = '';
 
-                if (nearByUser) {
+                if (nearUser) {
                     const { url, nearUserUri } = gallery[index];
                     uri = nearUserUri ? nearUserUri : url
 
