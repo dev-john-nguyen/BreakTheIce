@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { View, Image, Animated, PanResponder, StyleSheet, Pressable } from 'react-native';
 import { windowWidth } from '../../../utils/variables';
 import { GalleryItemProps } from '../../../services/user/types';
@@ -101,7 +101,9 @@ export default ({ item, index, uri }: CardProps) => {
             <View style={styles.content_container}>
                 <Image source={{ uri, cache: 'force-cache' }} style={styles.image} />
                 <Animated.View style={[styles.text_container, { opacity: textOpacity }]}>
-                    <BodyText text={item.description} styles={styles.text} />
+                    <View style={styles.text_content}>
+                        <BodyText text={item.description} styles={styles.text} />
+                    </View>
                 </Animated.View>
             </View>
         </Animated.View>
@@ -137,10 +139,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        backgroundColor: `rgba(${colors.secondary_rgb}, .95)`,
-        borderTopColor: colors.primary,
-        borderTopWidth: 1,
-        padding: 20
+    },
+    text_content: {
+        backgroundColor: `rgba(${colors.secondary_rgb}, .9)`,
+        borderColor: colors.primary,
+        borderWidth: 1,
+        padding: 20,
+        margin: 10,
+        borderRadius: 5
     },
     text: {
         color: colors.white,

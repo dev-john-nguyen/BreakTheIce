@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import { remove_banner, remove_notification } from '../services/utils/actions';
-import { UtilsRootStateProps } from '../services/utils/tsTypes';
+import { UtilsRootStateProps, UtilsDispatchActionProps } from '../services/utils/tsTypes';
 import SignIn from './signin';
 import BottomNav from './navigation/Bottom';
 import { RootProps } from '../services';
@@ -17,7 +17,7 @@ import { ChatDispatchActionsProps } from '../services/chat/types';
 import { set_and_listen_invitations } from '../services/invitations/actions';
 import { set_and_listen_friends } from '../services/friends/actions';
 import { set_and_listen_messages } from '../services/chat/actions';
-import Banner from '../utils/components/Banner';
+import Banner from '../utils/components/banner';
 import Notification from '../utils/components/Notification';
 import UserInitForm from './signin/components/UserInitForm';
 import { init_user } from '../services/signin/actions';
@@ -28,7 +28,7 @@ const BottomTabs = createBottomTabNavigator();
 interface Base {
     utils: UtilsRootStateProps;
     remove_error: () => void;
-    remove_banner: () => void;
+    remove_banner: UtilsDispatchActionProps['remove_banner']
     user: RootProps['user'];
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
@@ -86,8 +86,6 @@ const Base = (props: Base) => {
         return () => unsubscribeListeners()
     }, [props.user.uid, props.user.init])
 
-    const handleRemoveBanner = () => props.remove_banner()
-
     return (
         <View style={styles.container}>
             <StatusBar style='dark' />
@@ -97,7 +95,10 @@ const Base = (props: Base) => {
             }
             {
                 props.utils.banner.length > 0 &&
-                <Banner handleRemoveBanner={handleRemoveBanner} banner={props.utils.banner} />
+                <Banner
+                    remove_banner={props.remove_banner}
+                    banner={props.utils.banner}
+                />
             }
             {
                 handleRender()

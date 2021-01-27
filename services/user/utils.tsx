@@ -97,7 +97,8 @@ export const fetch_profile = async (uid: string) => {
                     hideOnMap: data.hideOnMap ? data.hideOnMap : false,
                     gallery: data.gallery ? data.gallery : [],
                     offline: data.offline === undefined ? false : data.offline,
-                    profileImg: data.profileImg ? data.profileImg : null
+                    profileImg: data.profileImg ? data.profileImg : null,
+                    blockedUsers: data.blockedUsers ? data.blockedUsers : []
                 }
 
                 return { profile: profileObj }
@@ -107,7 +108,7 @@ export const fetch_profile = async (uid: string) => {
         })
 }
 
-export async function cache_user_images(gallery: GalleryItemProps[], uriType: 'cachedUrl' | 'nearUserUri') {
+export async function cache_user_images(gallery: GalleryItemProps[]) {
 
     if (!gallery.length) return gallery
 
@@ -119,7 +120,7 @@ export async function cache_user_images(gallery: GalleryItemProps[], uriType: 'c
             console.log(e)
         }
         if (cachedUrl) {
-            gallery[i][uriType] = cachedUrl
+            gallery[i]['cachedUrl'] = cachedUrl
         } else {
             console.log(`failed to cached img url ${gallery[i].url}`)
         }

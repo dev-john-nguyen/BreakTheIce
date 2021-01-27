@@ -39,7 +39,7 @@ const buttonBase: StyleProp<any> = {
     paddingRight: 30,
     paddingTop: 10,
     paddingBottom: 10,
-    borderWidth: 2,
+    borderWidth: 1,
     maxHeight: 40,
     alignItems: 'center',
 }

@@ -9,7 +9,7 @@ import { colors } from '../../utils/styles';
 import { UnderlineHeader } from '../../utils/components';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { renderDate } from '../chat/utils';
-import ProfileImage from '../../utils/components/ProfileImage';
+import ProfileImage from '../profile/components/ProfileImage';
 
 interface Invitations {
     navigation: InvitationsStackNavigationProp;

@@ -3,7 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { MeStackNavigationProp } from '../../navigation/utils/types';
 import Gallery from '../../gallery';
-import ProfileImage from '../../../utils/components/ProfileImage';
+import ProfileImage from './ProfileImage';
 import { CustomButton, HeaderText, BodyText, Icon } from '../../../utils/components';
 import { TopProfileBackground } from '../../../utils/svgs';
 import { GalleryItemProps } from '../../../services/user/types';
@@ -29,10 +29,9 @@ interface ProfileProps {
     handleInvitationUpdate?: (status: InvitationStatusOptions) => Promise<void>;
     admin: boolean;
     setShowModalInvite?: (show: boolean) => void;
-    nearUser?: true;
 }
 
-export default ({ user, directToMessage, directToFriends, handleInvitationUpdate, admin, setShowModalInvite, nearUser }: ProfileProps) => {
+export default ({ user, directToMessage, directToFriends, handleInvitationUpdate, admin, setShowModalInvite }: ProfileProps) => {
     const [inviteStatusLoading, setInviteStatusLoading] = useState<boolean>(false);
 
     const renderButton = () => {
@@ -73,7 +72,7 @@ export default ({ user, directToMessage, directToFriends, handleInvitationUpdate
                 <View style={styles.bio}>
                     <BodyText text={user.bioLong} styles={styles.bio_text} />
                 </View>
-                <Gallery gallery={user.gallery} nearUser={nearUser} />
+                <Gallery gallery={user.gallery} />
             </View>
         </>
     )

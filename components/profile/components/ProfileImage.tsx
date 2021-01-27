@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, StyleProp, Pressable } from 'react-native';
-import { ProfileImgProps, NewProfileImgProps } from '../../services/user/types';
+import { ProfileImgProps, NewProfileImgProps } from '../../../services/user/types';
 import { FontAwesome } from '@expo/vector-icons';
-import { colors } from '../styles';
+import { colors } from '../../../utils/styles';
 import { Image } from 'react-native';
-import { Icon } from '.';
+import { Icon } from '../../../utils/components';
 
 interface ProfileImageProp {
     image: ProfileImgProps | NewProfileImgProps | null;
@@ -34,10 +34,14 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
 
     const renderImage = () => {
         if (image && image.uri) {
-            return <Image
-                source={{ uri: image.uri, cache: 'force-cache' }}
-                style={styles.image}
-            />
+            return (
+                <View style={styles.image_container}>
+                    <Image
+                        source={{ uri: image.uri, cache: 'force-cache' }}
+                        style={baseStyles.image}
+                    />
+                </View>
+            )
         }
 
         return <FontAwesome
@@ -55,7 +59,7 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
     )
 }
 
-const baseStyles: StyleProp<any> = {
+const baseStyles: StyleProp<any> = StyleSheet.create({
     friend: {
         position: 'absolute',
         transform: [
@@ -65,18 +69,22 @@ const baseStyles: StyleProp<any> = {
         ]
     },
     image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 100
+    },
+    image_container: {
         borderRadius: 100,
-        borderColor: colors.primary,
-        borderWidth: 1,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
-            height: 1,
+            height: 2,
         },
-        shadowOpacity: 0.20,
-        shadowRadius: 1.41
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     }
-}
+})
 
 const largeStyles = StyleSheet.create({
     container: {
@@ -90,10 +98,10 @@ const largeStyles = StyleSheet.create({
         height: 100,
         fontSize: 100
     },
-    image: {
+    image_container: {
         width: 120,
         height: 120,
-        ...baseStyles.image
+        ...baseStyles.image_container
     }
 })
 
@@ -110,10 +118,10 @@ const smallStyles = StyleSheet.create({
         height: 25,
         fontSize: 25
     },
-    image: {
-        width: 25,
-        height: 25,
-        ...baseStyles.image
+    image_container: {
+        width: 30,
+        height: 30,
+        ...baseStyles.image_container
     }
 })
 
@@ -130,9 +138,9 @@ const regularStyles = StyleSheet.create({
         height: 40,
         fontSize: 40
     },
-    image: {
+    image_container: {
         width: 45,
         height: 45,
-        ...baseStyles.image
+        ...baseStyles.image_container
     }
 })

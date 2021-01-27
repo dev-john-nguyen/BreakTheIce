@@ -1,36 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { Icon, CustomButton } from '../../../utils/components';
 
-
 interface ProfileHeaderRightProps {
     handleUnfriendUser: () => Promise<void | undefined>;
-    block_user: () => void;
+    handleBlockUser: () => Promise<void | undefined>;
+    blocked: boolean;
+    friend: boolean;
 }
 
-export default ({ handleUnfriendUser, block_user }: ProfileHeaderRightProps) => {
+export default ({ handleUnfriendUser, handleBlockUser, blocked, friend }: ProfileHeaderRightProps) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const mount = useRef<boolean>();
+
+    useEffect(() => {
+        mount.current = true
+
+        return () => {
+            mount.current = false
+        }
+    }, [])
 
     const handleShowMenu = () => setShowMenu(showMenu ? false : true)
 
     const handleUnlinkPress = () => {
         setLoading(true);
-
         handleUnfriendUser()
-            .then(() => setLoading(false))
+            .then(() => mount && setLoading(false))
     }
 
     const handleBlockPress = () => {
-        block_user()
+        setLoading(true);
+        handleBlockUser()
+            .then(() => mount && setLoading(false))
     }
 
     if (showMenu) return (
         <View style={{ marginRight: 10, flexDirection: 'row', alignItems: 'center' }}>
-            <CustomButton type='red' text='block' size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} />
+            <CustomButton type='red' text={blocked ? 'unblock' : 'block'} size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} indicatorColor={loading && colors.white} />
 
-            <CustomButton type='white' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={loading && colors.primary} />
+            {
+                friend && <CustomButton type='white' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={loading && colors.primary} />
+            }
             <Icon
                 type='more-horizontal'
                 size={24}
@@ -39,6 +52,7 @@ export default ({ handleUnfriendUser, block_user }: ProfileHeaderRightProps) => 
                 onPress={handleShowMenu}
                 style={{ marginRight: 10 }}
             />
+
         </View>
     )
 

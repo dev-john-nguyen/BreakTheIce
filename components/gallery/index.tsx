@@ -7,11 +7,10 @@ import Card from './components/Card';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
-    nearUser?: true
 }
 
 
-export default ({ gallery, nearUser }: GalleryComProps) => {
+export default ({ gallery }: GalleryComProps) => {
     if (!gallery.length) return (
         <View style={styles.container}>
             <UnderlineHeader text='No Images' />
@@ -23,16 +22,7 @@ export default ({ gallery, nearUser }: GalleryComProps) => {
         <View style={styles.container}>
             {gallery.map((item, index) => {
 
-                var uri: string = '';
-
-                if (nearUser) {
-                    const { url, nearUserUri } = gallery[index];
-                    uri = nearUserUri ? nearUserUri : url
-
-                } else {
-                    const { cachedUrl, url } = gallery[index]
-                    uri = cachedUrl ? cachedUrl : url
-                }
+                var uri: string = item.cachedUrl ? item.cachedUrl : item.url
 
                 return <Card
                     item={item}

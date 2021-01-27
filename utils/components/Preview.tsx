@@ -4,7 +4,7 @@ import { NearByUsersProps } from '../../services/near_users/types';
 import { colors } from '../styles';
 import { HomeToChatNavProp } from '../../components/navigation/utils/types';
 import { CustomButton } from '.';
-import ProfileImage from './ProfileImage';
+import ProfileImage from '../../components/profile/components/ProfileImage';
 import RespondButton from './RespondButton';
 import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../services/invitations/types';
 

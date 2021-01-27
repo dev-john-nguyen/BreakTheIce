@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { ChatStackNavigationProp } from '../navigation/utils/types'
 import { RootProps } from '../../services';
 import { ChatPreviewProps, ChatDispatchActionsProps } from '../../services/chat/types'
-import ProfileImage from '../../utils/components/ProfileImage';
+import ProfileImage from '../profile/components/ProfileImage';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
 import { Icon, UnderlineHeader } from '../../utils/components';

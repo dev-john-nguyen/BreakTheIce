@@ -11,7 +11,7 @@ import { HomeToChatNavProp } from '../navigation/utils/types';
 import { CustomButton } from '../../utils/components';
 import Preview from '../../utils/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
-import ProfileImage from '../../utils/components/ProfileImage';
+import ProfileImage from '../profile/components/ProfileImage';
 import { colors } from '../../utils/styles';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { update_invitation } from '../../services/invitations/actions';
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     },
     view_me: {
         position: 'absolute',
-        bottom: 10,
+        bottom: 15,
         right: 10
     },
     preview_container: {

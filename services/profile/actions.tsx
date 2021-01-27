@@ -50,7 +50,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
             if (!docData) throw 'No data exists';
 
-            const { location, name, bioShort, bioLong, stateCity, gender, age, username, gallery, hideOnMap, offline, profileImg } = docData
+            const { location, name, bioShort, bioLong, ctryStateCity, gender, age, username, gallery, hideOnMap, offline, profileImg } = docData
 
             const profileData: ProfileUserProps = {
                 uid: doc.id,
@@ -59,7 +59,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 name,
                 bioShort,
                 bioLong,
-                stateCity,
+                ctryStateCity,
                 gender,
                 age,
                 hideOnMap,
@@ -73,7 +73,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
             }
             ///cache gallery images
             if (profileData.gallery.length > 0) {
-                await cache_user_images(profileData.gallery, 'nearUserUri')
+                await cache_user_images(profileData.gallery)
             }
 
             //cache profile image

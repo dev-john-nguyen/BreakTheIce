@@ -70,7 +70,6 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
 
     useEffect(() => {
         (async () => {
-
             //need to reverse the order of the images to display correctly
             gallery && setImgObjs(_.cloneDeep(gallery).reverse());
 
@@ -90,12 +89,13 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
     const handleSaveGallery = (mount: boolean) => {
         //allow description to be empty
         //check if any changes were made
+        const imgObjRev = _.cloneDeep(imgObjs).reverse();
 
-        if (_.isEqual(imgObjs, gallery)) {
+        if (_.isEqual(imgObjRev, gallery)) {
             return set_banner('Looks like there were no changes found.', 'warning');
         }
 
-        imgObjs.forEach((item, index) => {
+        imgObjRev.forEach((item, index) => {
             if ((!item.url && !item.blob) || !item.id) {
                 return set_banner(`Oops! Looks like image #${index + 1} did not load correctly. Please try to remove and upload again.`, 'error')
             }
@@ -103,7 +103,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
 
         setLoading(true)
 
-        save_gallery(imgObjs)
+        save_gallery(imgObjRev)
             .then(() => mount && setLoading(false))
             .catch((err) => {
                 console.log(err)
@@ -121,12 +121,6 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
 
         if (!result.cancelled) {
 
-            //resize
-            // const manipResult = await ImageManipulator.manipulateAsync(
-            //     result.uri,
-            //     [{ resize: { width: 500, height: 500 } }],
-            //     { compress: 1, format:ß ImageManipulator.SaveFormat.PNG }
-            // );
             const manipResult = await ImageManipulator.manipulateAsync(
                 result.uri,
                 [{ resize: { width: 600 } }],
@@ -149,7 +143,6 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
             }
 
             //generate the image name
-
             //might be an issue if the user what's to adjust the photo in some way and resubmit it ** resolved .. realized manipulate will return a diff uri
 
             var name: string = hashCode(manipResult.uri)
@@ -214,6 +207,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
             </View>
         </Pressable>
     );
+
 
     return (
         <View style={styles.container}>

@@ -6,7 +6,7 @@ import { FriendsRootProps, FriendObjProps } from '../../services/friends/types';
 import { MeStackNavigationProp } from '../navigation/utils/types';
 import { colors } from '../../utils/styles';
 import { UnderlineHeader } from '../../utils/components';
-import ProfileImage from '../../utils/components/ProfileImage';
+import ProfileImage from '../profile/components/ProfileImage';
 
 interface FriendsProps {
     friends: FriendsRootProps;

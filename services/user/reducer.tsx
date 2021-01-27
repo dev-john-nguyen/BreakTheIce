@@ -1,5 +1,6 @@
-import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER } from './actionTypes';
+import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, UPDATE_BLOCKED_USERS } from './actionTypes';
 import { UserActionProps } from './types';
+import _ from 'lodash';
 
 const INITIAL_STATE = {
     uid: '',
@@ -18,6 +19,7 @@ const INITIAL_STATE = {
     fetchFail: false,
     gallery: [],
     timeline: [],
+    blockedUsers: [],
     hideOnMap: false,
     offline: false,
     locationListener: undefined,
@@ -81,6 +83,11 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
             return {
                 ...state,
                 offline: false
+            }
+        case UPDATE_BLOCKED_USERS:
+            return {
+                ...state,
+                blockedUsers: action.payload
             }
         case UPDATE_PROFILE:
         case UPDATE_PRIVACY:

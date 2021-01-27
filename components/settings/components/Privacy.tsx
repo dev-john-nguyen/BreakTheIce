@@ -76,9 +76,9 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
             <View style={styles.content_container}>
                 <Text style={styles.content_text}>{privacyVals.hideOnMap ? 'Show On Map' : 'Hide On Map'}</Text>
                 <Switch
-                    trackColor={{ false: colors.secondary, true: colors.lightRed }}
-                    thumbColor={privacyVals.hideOnMap ? colors.red : colors.primary}
-                    ios_backgroundColor={colors.secondary}
+                    trackColor={{ false: colors.lightRed, true: colors.tertiary }}
+                    thumbColor={privacyVals.hideOnMap ? colors.primary : colors.red}
+                    ios_backgroundColor={colors.lightRed}
                     onValueChange={(value) => setPrivacyVals({ ...privacyVals, hideOnMap: value })}
                     value={privacyVals.hideOnMap}
                 />
@@ -87,9 +87,9 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
             <View style={styles.content_container}>
                 <Text style={styles.content_text}>{privacyVals.offline ? 'Go Online' : 'Go Offline'}</Text>
                 <Switch
-                    trackColor={{ false: colors.secondary, true: colors.lightRed }}
-                    thumbColor={privacyVals.offline ? colors.red : colors.primary}
-                    ios_backgroundColor={colors.secondary}
+                    trackColor={{ false: colors.lightRed, true: colors.tertiary }}
+                    thumbColor={privacyVals.offline ? colors.primary : colors.red}
+                    ios_backgroundColor={colors.lightRed}
                     onValueChange={(value) => setPrivacyVals({ ...privacyVals, offline: value })}
                     value={privacyVals.offline}
                 />

@@ -1,7 +1,7 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER } from './actionTypes';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, SET_GALLERY, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, UPDATE_BLOCKED_USERS } from './actionTypes';
 import { set_loading, remove_loading, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps } from './types';
+import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps, BlockUsersProps } from './types';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
 import { validate_near_users, reset_near_users } from '../near_users/actions';
@@ -15,9 +15,7 @@ import { reset_chat } from '../chat/actions';
 import { reset_friends } from '../friends/actions';
 import { reset_invitations } from '../invitations/actions';
 import { reset_history } from '../profile/actions';
-
-// import { PlaceProp, TimelineLocationProps } from '../profile/tsTypes';
-// const baseUrl = 'http://localhost:5050';
+import _ from 'lodash';
 
 export const verifyAuth = (): any => (dispatch: AppDispatch) => {
     myFire.auth().onAuthStateChanged(async (user) => {
@@ -46,7 +44,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                         var { gallery, bioShort, bioLong, profileImg } = fetchedUser.profile
 
                         //cache gallery images
-                        gallery = await cache_user_images(gallery, 'cachedUrl')
+                        gallery = await cache_user_images(gallery)
 
                         //cache profile image
                         if (profileImg) {
@@ -152,9 +150,6 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         return;
     }
 
-    //reverse back the order ...
-    // newGallery.reverse()
-
     const uid = getState().user.uid;
     var gallery: GalleryItemProps[] = [];
 
@@ -213,7 +208,7 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         .then(async () => {
             //cache images and update gallery
 
-            const cachedGallery = await cache_user_images(gallery, 'cachedUrl')
+            const cachedGallery = await cache_user_images(gallery)
 
             dispatch({
                 type: SET_GALLERY,
@@ -319,6 +314,43 @@ export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => as
     await fireDb.collection(UsersDb).doc(uid).update({ ...updatedPrivacyData, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() });
     dispatch({ type: UPDATE_PRIVACY, payload: updatedPrivacyData });
     dispatch(set_banner('Saved', 'success'));
+}
+
+export const update_block_user = (blockedUserId: string) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid, blockedUsers } = getState().user;
+
+    if (!blockedUserId) {
+        dispatch(set_banner("Unable to find the user's information.", 'error'))
+        return;
+    }
+
+    const foundBlockedUser = blockedUsers.find(user => user.uid == blockedUserId)
+    var updatedBlockedUsers: BlockUsersProps[];
+
+    if (foundBlockedUser) {
+        updatedBlockedUsers = _.filter(blockedUsers, (user) => user.uid !== blockedUserId)
+    } else {
+        updatedBlockedUsers = [...blockedUsers, {
+            uid: blockedUserId,
+            updatedAt: new Date()
+        }]
+    }
+
+    await fireDb.collection(UsersDb).doc(uid).update({
+        blockedUsers: updatedBlockedUsers
+    })
+        .then(() => {
+
+            dispatch({
+                type: UPDATE_BLOCKED_USERS,
+                payload: updatedBlockedUsers
+            })
+        })
+        .catch((err) => {
+            console.log(err)
+            dispatch(set_banner("Oops! Something went wrong adding the user to your block list.", 'error'))
+        })
+
 }
 
 export const sign_out = () => async (dispatch: AppDispatch) => {
