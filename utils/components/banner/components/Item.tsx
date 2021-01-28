@@ -7,14 +7,21 @@ interface ItemProps {
     item: BannerItemProps;
     styles: StyleProp<any>
     remove_banner: UtilsDispatchActionProps['remove_banner'];
-    index: number
 }
 
-export default ({ item, styles, remove_banner, index }: ItemProps) => {
+export default ({ item, styles, remove_banner }: ItemProps) => {
     const fadeAnim = useRef(new Animated.Value(1)).current;
+    const transYAdmin = useRef(new Animated.Value(0)).current;
+
     useEffect(() => {
+        Animated.timing(transYAdmin, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true
+        }).start()
+
         Animated.timing(fadeAnim, {
-            delay: 1000,
+            delay: item.message.length > 10 ? 5000 : 2000,
             toValue: 0,
             duration: 2000,
             useNativeDriver: true
@@ -27,10 +34,18 @@ export default ({ item, styles, remove_banner, index }: ItemProps) => {
         <Animated.View
             style={[
                 styles.container,
-                { opacity: fadeAnim }
+                { opacity: fadeAnim },
+                {
+                    transform: [{
+                        translateY: transYAdmin.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [100, -20]
+                        })
+                    }]
+                }
             ]}
         >
-            <BodyText styles={styles.text} text={item.message} />
+            <BodyText style={styles.text}>{item.message}</BodyText>
         </Animated.View>
     )
 }

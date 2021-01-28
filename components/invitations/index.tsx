@@ -72,7 +72,12 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     }
 
     const renderInvitationList = () => {
-        if (!invitation.inbound || invitation.inbound.length < 1) return <UnderlineHeader text='No Invitations Found' styles={{ marginTop: 20 }} />;
+        if (!invitation.inbound || invitation.inbound.length < 1) return (
+            <UnderlineHeader
+                textStyle={styles.underline_header_text}
+                underlineStyle={styles.underline_header_underline}
+                style={{ marginTop: 20 }}>No Invitations Found</UnderlineHeader>
+        )
 
         return <FlatList
             data={invitation.inbound}
@@ -115,6 +120,13 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
 }
 
 const styles = StyleSheet.create({
+    underline_header_text: {
+        color: colors.primary,
+        fontSize: 24
+    },
+    underline_header_underline: {
+        backgroundColor: colors.secondary
+    },
     leftAction: {
         flex: 1,
         backgroundColor: colors.green,

@@ -107,7 +107,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
                                 <Feather name={type} size={size} color={isFocused ? colors.primary : pressed ? colors.tertiary : colors.white} />
                                 {notificationNum > 0 &&
                                     <View style={styles.notification_container}>
-                                        <BodyText text={notificationNum.toString()} styles={styles.notification_text} />
+                                        <BodyText style={styles.notification_text}>{notificationNum.toString()}</BodyText>
                                     </View>
                                 }
                             </View>
@@ -141,15 +141,15 @@ const styles = StyleSheet.create({
     },
     notification_container: {
         borderRadius: 100,
-        padding: 5,
-        backgroundColor: colors.secondary,
+        padding: 6,
+        backgroundColor: colors.primary,
         position: 'absolute',
         right: -5,
         top: -5
     },
     notification_text: {
         fontSize: 8,
-        color: colors.primary
+        color: colors.white
     }
 })
 

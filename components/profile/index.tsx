@@ -18,7 +18,7 @@ import HeaderRight from './components/HeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
 import { set_banner } from '../../services/utils/actions';
 import { UnderlineHeader } from '../../utils/components';
-import ProfileContent from './components/ProfileContent';
+import ProfileContent from './components/Content';
 import { TopProfileBackground } from '../../utils/svgs';
 import { windowWidth } from '../../utils/variables';
 import { update_block_user } from '../../services/user/actions';
@@ -62,7 +62,7 @@ const Profile = (props: ProfileProps) => {
 
     const handleUpdateBlockUser = async () => {
         if (!profileUser) return
-        return await props.update_block_user(profileUser.uid)
+        return await props.update_block_user({ uid: profileUser.uid, username: profileUser.username })
     }
 
     const handleUnfriendUser = async () => {

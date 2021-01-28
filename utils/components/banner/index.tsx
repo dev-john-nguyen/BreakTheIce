@@ -19,7 +19,6 @@ export default ({ remove_banner, banner }: BannerProps) => {
                     remove_banner={remove_banner}
                     item={item}
                     styles={itemStyles}
-                    index={index}
                 />
             })}
         </View>
@@ -31,7 +30,8 @@ export default ({ remove_banner, banner }: BannerProps) => {
 const styles = StyleSheet.create({
     banner_container: {
         position: 'absolute',
-        top: 40,
+        flexDirection: 'column-reverse',
+        bottom: 40,
         zIndex: 100,
         width: Math.round(Dimensions.get('window').width)
     },

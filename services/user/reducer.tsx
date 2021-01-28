@@ -1,4 +1,4 @@
-import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, UPDATE_BLOCKED_USERS } from './actionTypes';
+import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS } from './actionTypes';
 import { UserActionProps } from './types';
 import _ from 'lodash';
 
@@ -84,10 +84,15 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
                 ...state,
                 offline: false
             }
-        case UPDATE_BLOCKED_USERS:
+        case REMOVE_BLOCKED_USERS:
             return {
                 ...state,
-                blockedUsers: action.payload
+                blockedUsers: _.filter(state.blockedUsers, (user) => user.uid !== action.payload.uid)
+            }
+        case ADD_BLOCKED_USERS:
+            return {
+                ...state,
+                blockedUsers: [...state.blockedUsers, action.payload]
             }
         case UPDATE_PROFILE:
         case UPDATE_PRIVACY:

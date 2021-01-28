@@ -17,7 +17,7 @@ export const colors = {
     lightWhite: '#fff4e0',
     lightWhite_rgb: '255, 244, 244',
     lightOrange: '#f58634',
-    yellow: '#fddb3a',
+    yellow: '#ffcc29',
     green: '#28DF99',
 
     white: '#ffffff',
@@ -181,12 +181,11 @@ export const underline_header_styles: StyleProp<any> = {
         letterSpacing: 2,
         position: 'relative',
         bottom: 5,
-        color: colors.primary
+        zIndex: 10
     },
     underline: {
         position: 'absolute',
-        backgroundColor: colors.primary,
-        opacity: .5,
+        opacity: .9,
         height: 15,
         borderRadius: 5,
         bottom: 3,

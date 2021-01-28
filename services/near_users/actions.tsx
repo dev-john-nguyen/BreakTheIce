@@ -3,7 +3,7 @@ import { AppDispatch } from '../../App';
 import { fireDb } from '../firebase';
 import { LocationObject } from 'expo-location';
 import { LocationsDb, acceptedRadius } from '../../utils/variables';
-import { CtryStateCityProps } from '../user/types';
+import { CtryStateCityProps, BlockUserProps } from '../user/types';
 import { NearByUsersProps } from './types';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
@@ -21,8 +21,6 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
         return;
     }
 
-    console.log(ctryStateCity)
-
     var nearUsersListener = fireDb
         .collection(LocationsDb)
         .doc(ctryStateCity.ctryState)
@@ -39,7 +37,9 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
                 if (!doc.exists) continue;
 
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                const { username, location, bioShort, age, hideOnMap, profileImg } = doc.data()
+                const { username, location, bioShort, age, hideOnMap, profileImg, blockedUsers } = doc.data()
+
+                if (blockedUsers && blockedUsers.find((user: BlockUserProps) => user.uid === uid)) continue
 
                 var userData: NearByUsersProps = {
                     uid: doc.id,

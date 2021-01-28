@@ -36,22 +36,29 @@ export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, 
     >
         {(props) => (
             <View style={{ flexDirection: 'row' }}>
-                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <BodyText text={text} styles={props.pressed ? pressed.text : unpressed.text} />}
+                {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} /> : <BodyText text={text} style={props.pressed ? pressed.text : unpressed.text} />}
             </View>
         )}
     </Pressable>
 }
 
-export const UnderlineHeader = ({ text, styles }: { text: string, styles?: StyleProp<any> }) => (
-    <View style={[underline_header_styles.section, styles]}>
+interface UnderLineHeaderProps {
+    underlineStyle: StyleProp<{ backgroundColor: string, height?: number }>
+    textStyle: StyleProp<{ color: string, fontSize: number }>
+    style?: StyleProp<any>
+    children: StyleProp<any>
+}
+
+export const UnderlineHeader = ({ underlineStyle, textStyle, style, children }: UnderLineHeaderProps) => (
+    <View style={[underline_header_styles.section, style]}>
         <View style={underline_header_styles.container}>
-            <HeaderText styles={underline_header_styles.text} text={text} />
-            <View style={underline_header_styles.underline} />
+            <HeaderText style={[underline_header_styles.text, textStyle]}>{children}</HeaderText>
+            <View style={[underline_header_styles.underline, underlineStyle]} />
         </View>
     </View>
 )
 
-export const BodyText = ({ styles, text }: { styles?: StyleProp<any>, text: string }) => {
+export const BodyText = ({ style, text, children }: { style?: StyleProp<any>, text?: string, children?: any }) => {
     let [fontsLoaded] = useFonts({
         Roboto_400Regular
     });
@@ -60,11 +67,11 @@ export const BodyText = ({ styles, text }: { styles?: StyleProp<any>, text: stri
         return <ActivityIndicator />;
     }
 
-    return <Text style={[{ fontFamily: 'Roboto_400Regular' }, text_styles.body, styles]}>{text}</Text>;
+    return <Text style={[{ fontFamily: 'Roboto_400Regular' }, text_styles.body, style]}>{text ? text : children}</Text>;
 
 }
 
-export const HeaderText = ({ styles, text }: { styles?: StyleProp<any>, text: string }) => {
+export const HeaderText = ({ style, children }: { style?: StyleProp<any>, children: string }) => {
     let [fontsLoaded] = useFonts({
         Rubik_500Medium
     });
@@ -73,11 +80,11 @@ export const HeaderText = ({ styles, text }: { styles?: StyleProp<any>, text: st
         return <ActivityIndicator />;
     }
 
-    return <Text style={[{ fontFamily: 'Rubik_500Medium' }, text_styles.header, styles]}>{text}</Text>;
+    return <Text style={[{ fontFamily: 'Rubik_500Medium' }, text_styles.header, style]}>{children}</Text>;
 }
 
 interface CustomInput {
-    styles?: StyleProp<any>;
+    style?: StyleProp<any>;
     placeholder: string;
     multiline?: boolean;
     maxLength: number;
@@ -88,9 +95,9 @@ interface CustomInput {
     autoCapitalize?: 'none'
 }
 
-export const CustomInput = ({ styles, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize }: CustomInput) => {
+export const CustomInput = ({ style, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize }: CustomInput) => {
     let [fontsLoaded] = useFonts({
-        Rubik_500Medium
+        Roboto_400Regular
     });
 
     if (!fontsLoaded) {
@@ -98,7 +105,7 @@ export const CustomInput = ({ styles, placeholder, multiline, maxLength, value, 
     }
 
     return <TextInput
-        style={[styles, text_styles.input, { fontFamily: 'Rubik_500Medium' }]}
+        style={[style, text_styles.input, { fontFamily: 'Roboto_400Regular' }]}
         placeholder={placeholder}
         multiline={multiline}
         maxLength={maxLength}

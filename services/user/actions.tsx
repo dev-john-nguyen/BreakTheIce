@@ -1,7 +1,7 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, SET_GALLERY, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, UPDATE_BLOCKED_USERS } from './actionTypes';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, SET_GALLERY, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS } from './actionTypes';
 import { set_loading, remove_loading, set_banner } from '../utils/actions';
 import { AppDispatch } from '../../App';
-import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, ProfileImgProps, BlockUsersProps } from './types';
+import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, BlockUserProps } from './types';
 import { LocationObject } from 'expo-location';
 import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, cache_user_images } from './utils';
 import { validate_near_users, reset_near_users } from '../near_users/actions';
@@ -316,34 +316,25 @@ export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => as
     dispatch(set_banner('Saved', 'success'));
 }
 
-export const update_block_user = (blockedUserId: string) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+export const update_block_user = (blockedUser: BlockUserProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
     const { uid, blockedUsers } = getState().user;
 
-    if (!blockedUserId) {
+    if (!blockedUser || !blockedUser.uid || !blockedUser.username) {
         dispatch(set_banner("Unable to find the user's information.", 'error'))
         return;
     }
 
-    const foundBlockedUser = blockedUsers.find(user => user.uid == blockedUserId)
-    var updatedBlockedUsers: BlockUsersProps[];
+    const foundBlockedUser = blockedUsers.find(user => user.uid == blockedUser.uid)
 
-    if (foundBlockedUser) {
-        updatedBlockedUsers = _.filter(blockedUsers, (user) => user.uid !== blockedUserId)
-    } else {
-        updatedBlockedUsers = [...blockedUsers, {
-            uid: blockedUserId,
-            updatedAt: new Date()
-        }]
-    }
+    const action = foundBlockedUser ? firebase.firestore.FieldValue.arrayRemove(foundBlockedUser) : firebase.firestore.FieldValue.arrayUnion(blockedUser);
 
     await fireDb.collection(UsersDb).doc(uid).update({
-        blockedUsers: updatedBlockedUsers
+        blockedUsers: action
     })
         .then(() => {
-
             dispatch({
-                type: UPDATE_BLOCKED_USERS,
-                payload: updatedBlockedUsers
+                type: foundBlockedUser ? REMOVE_BLOCKED_USERS : ADD_BLOCKED_USERS,
+                payload: blockedUser
             })
         })
         .catch((err) => {

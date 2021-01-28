@@ -45,7 +45,7 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, ct
         updatedAt: new Date()
     }
 
-    const { uid, username, bioShort, age, hideOnMap } = userData
+    const { uid, username, bioShort, age, hideOnMap, blockedUsers } = userData
 
     const profilePreview: UserProfilePreviewProps = {
         uid,
@@ -53,6 +53,7 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, ct
         bioShort,
         age,
         hideOnMap,
+        blockedUsers,
         profileImg: profileImg,
         location: location
     }

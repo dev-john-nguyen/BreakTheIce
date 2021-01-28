@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Modal, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, Dimensions } from 'react-native';
 import { colors } from '../../utils/styles';
 import { connect } from 'react-redux';
@@ -8,7 +8,7 @@ import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/types';
 import { UserRootStateProps } from '../../services/user/types';
 import { RootProps } from '../../services';
-import { CustomButton, Icon } from '../../utils/components';
+import { CustomButton, Icon, BodyText, UnderlineHeader } from '../../utils/components';
 
 interface MyModalProps {
     visible: boolean;
@@ -18,24 +18,23 @@ interface MyModalProps {
     user: UserRootStateProps;
 }
 
-const InviteModal = (props: MyModalProps) => {
+const InviteModal = ({ visible, handleClose, send_invitation, targetUser, user }: MyModalProps) => {
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [errMsg, setErrMsg] = useState<string>('');
 
-    const handleClose = () => {
+    useEffect(() => {
+        setLoading(false)
         setMessage('')
-        props.handleClose()
-    }
+        setErrMsg('')
+    }, [targetUser, visible])
 
     const handleSendInvitation = async () => {
-        if (message.length < 10) return console.log('not long enough bitch')
-        if (!props.targetUser) return console.log('no user targeted')
-        if (!props.targetUser.uid || !props.user.uid) return console.log('not able to get uid');
-        //init invitation object
+        if (message.length < 1) return setErrMsg('Empty message')
+        if (!targetUser) return setErrMsg('Trouble identifying the target user')
+        if (!targetUser || !targetUser.uid || !user.uid) return setErrMsg('Trouble identifying the target user')
 
         setLoading(true)
-
-        const { targetUser, user } = props;
 
         const userProfileImg = user.profileImg ? {
             uri: user.profileImg.uri,
@@ -70,21 +69,21 @@ const InviteModal = (props: MyModalProps) => {
             updatedAt: new Date(),
         }
 
-        await props.send_invitation(invitationContent)
+        await send_invitation(invitationContent)
             .then(() => {
-                setLoading(false)
-                setMessage('');
-                props.handleClose()
+                if (visible) {
+                    handleClose()
+                }
             })
             .catch((err) => {
                 console.log(err)
-                setLoading(false)
+                visible && setLoading(false)
             })
     }
 
     return (
         <Modal
-            visible={props.visible}
+            visible={visible}
             animationType='fade'
             transparent={true}
             onRequestClose={handleClose}
@@ -93,11 +92,17 @@ const InviteModal = (props: MyModalProps) => {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.center_view}>
                         <View style={styles.modal_view}>
+                            <UnderlineHeader
+                                style={{ marginTop: 10 }}
+                                underlineStyle={styles.header_underline}
+                                textStyle={styles.header_text}
+                            >Break The Ice</UnderlineHeader>
+                            <BodyText style={styles.header_sub_text}>with {targetUser?.username}</BodyText>
                             <Icon type='x' size={20} color={colors.white} pressColor={colors.secondary} onPress={handleClose} style={styles.close_button} />
-                            <Text style={styles.header_text}>Be Icy</Text>
+                            {!!errMsg && <BodyText style={styles.err}>{errMsg}</BodyText>}
                             <TextInput
                                 multiline
-                                placeholder={'100 character limit'}
+                                placeholder={'Send a breif message ... 100 character limit'}
                                 numberOfLines={4}
                                 onChangeText={text => setMessage(text)}
                                 value={message}
@@ -123,13 +128,28 @@ const styles = StyleSheet.create({
         height: Math.round(Dimensions.get('window').height),
         width: Math.round(Dimensions.get('window').width)
     },
+    header_text: {
+        fontSize: 22,
+        color: colors.white,
+    },
+    header_underline: {
+        backgroundColor: colors.secondary,
+        height: 15
+    },
+    header_sub_text: {
+        fontSize: 12,
+        color: colors.white,
+        alignSelf: 'center',
+        marginTop: 5,
+        marginBottom: 10
+    },
     modal_view: {
         position: 'relative',
-        margin: 20,
         backgroundColor: colors.primary,
         borderRadius: 5,
-        padding: 35,
-        alignItems: "center",
+        alignItems: "stretch",
+        justifyContent: 'center',
+        padding: 40,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -137,11 +157,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        elevation: 5,
-        width: '60%',
-        maxWidth: 250,
-        minHeight: 250,
-        justifyContent: 'space-between'
+        elevation: 5
     },
     text_area: {
         backgroundColor: colors.white,
@@ -152,20 +168,19 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         paddingTop: 15,
         paddingBottom: 15,
-        flex: 1,
-        margin: 20,
-        width: '100%'
-    },
-    header_text: {
-        fontSize: 22,
-        color: colors.white,
-        fontWeight: '500',
-        letterSpacing: .5
+        marginBottom: 20,
+        height: 100,
+        width: 200
     },
     close_button: {
         position: 'absolute',
         right: 10,
         top: 10,
+    },
+    err: {
+        fontSize: 10,
+        color: colors.red,
+        marginBottom: 5
     }
 })
 

@@ -7,15 +7,18 @@ import { UtilsDispatchActionProps } from '../../../../services/utils/tsTypes';
 import { MeStackNavigationProp } from '../../../navigation/utils/types';
 import { isEqual } from 'lodash';
 import EditProfileImg from './components/EditProfileImg';
+import { ageArr } from '../../../../utils/variables';
+import { BodyText, CustomInput } from '../../../../utils/components';
 
 interface EditProfileProps {
     user: UserRootStateProps;
     update_profile: UserDispatchActionsProps['update_profile'];
     set_banner: UtilsDispatchActionProps['set_banner'];
-    navigation: MeStackNavigationProp
+    navigation: MeStackNavigationProp;
+    handleCameraRollPermission: () => Promise<boolean>
 }
 
-const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfileProps) => {
+const EditProfile = ({ user, update_profile, set_banner, navigation, handleCameraRollPermission }: EditProfileProps) => {
     const [profileImg, setProfileImg] = useState<NewProfileImgProps>();
     const [profileVals, setProfileVals] = useState<UpdateUserProfileProps>()
 
@@ -124,24 +127,32 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                     <ScrollView contentContainerStyle={styles.scrollView}>
 
                         <View style={styles.profile_image_container}>
-                            <EditProfileImg set_banner={set_banner} profileImg={user.profileImg} setImgObj={setProfileImg} imgObj={profileImg} />
+                            <EditProfileImg
+                                set_banner={set_banner}
+                                profileImg={user.profileImg}
+                                setImgObj={setProfileImg}
+                                imgObj={profileImg}
+                                handleCameraRollPermission={handleCameraRollPermission}
+                            />
                         </View>
 
                         <View style={styles.text_input_container}>
-                            <Text style={styles.text_input_label}>Name:</Text>
-                            <TextInput
+                            <BodyText style={styles.text_input_label}>Name:</BodyText>
+                            <CustomInput
                                 placeholder='Name'
                                 value={profileVals.name}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, name: text })}
-                                style={styles.text_input} />
+                                style={styles.text_input}
+                                maxLength={200}
+                            />
                         </View>
 
                         <View style={styles.text_input_container}>
-                            <Text style={styles.text_input_label}>Short Bio:</Text>
-                            <Text style={styles.text_input_info}>
+                            <BodyText style={styles.text_input_label}>Short Bio:</BodyText>
+                            <BodyText style={styles.text_input_info}>
                                 <Feather name="info" size={10} color={colors.primary} /> Other will initially see this. Make a good first impression. Max character length is 100.
-                            </Text>
-                            <TextInput
+                            </BodyText>
+                            <CustomInput
                                 placeholder='Short Bio'
                                 multiline
                                 maxLength={100}
@@ -151,11 +162,11 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                         </View>
 
                         <View style={styles.text_input_container}>
-                            <Text style={styles.text_input_label}>Long Bio:</Text>
-                            <Text style={styles.text_input_info}>
+                            <BodyText style={styles.text_input_label}>Long Bio:</BodyText>
+                            <BodyText style={styles.text_input_info}>
                                 <Feather name="info" size={10} color={colors.primary} /> Will be displayed on your profile. Max character length is 200.
-                            </Text>
-                            <TextInput
+                            </BodyText>
+                            <CustomInput
                                 placeholder='Long Bio'
                                 multiline
                                 maxLength={200}
@@ -164,31 +175,41 @@ const EditProfile = ({ user, update_profile, set_banner, navigation }: EditProfi
                                 style={styles.text_input} />
                         </View>
 
-                        <View style={styles.text_input_container}>
-                            <Text style={styles.text_input_label}>Age:</Text>
-                            <TextInput
-                                keyboardType='numeric'
-                                maxLength={3}
-                                value={profileVals.age.toString()}
-                                onChangeText={(text) => setProfileVals({ ...profileVals, age: parseInt(text) ? parseInt(text) : 0 })}
-                                style={styles.text_input} />
+                        <View style={styles.pickers_container}>
+                            <View style={styles.text_input_container}>
+                                <BodyText
+                                    style={styles.text_input_label}
+                                >Age:</BodyText>
+                                <Picker
+                                    enabled={false}
+                                    selectedValue={profileVals.age}
+                                    onValueChange={(num) => setProfileVals({ ...profileVals, age: parseInt(num) ? parseInt(num) : 0 })}
+                                    style={styles.picker}
+                                    itemStyle={styles.picker_item}
+                                >
+                                    {ageArr.map((age, index) => <Picker.Item key={index} label={index.toString()} value={index} />)}
+                                </Picker>
+                            </View>
+
+
+                            <View style={styles.text_input_container}>
+                                <BodyText style={styles.text_input_label}>Gender:</BodyText>
+                                <Picker
+                                    enabled={false}
+                                    selectedValue={profileVals.gender}
+                                    onValueChange={(itemValue) => {
+                                        setProfileVals({ ...profileVals, gender: itemValue.toString() })
+                                    }}
+                                    style={styles.picker}
+                                    itemStyle={styles.picker_item}
+                                >
+                                    <Picker.Item label='Man' value='man' />
+                                    <Picker.Item label='Woman' value='woman' />
+                                    <Picker.Item label="Other" value='other' />
+                                </Picker>
+                            </View>
                         </View>
-                        <View style={styles.text_input_container}>
-                            <Text style={styles.text_input_label}>Gender:</Text>
-                            <Picker
-                                enabled={false}
-                                selectedValue={profileVals.gender}
-                                onValueChange={(itemValue) => {
-                                    setProfileVals({ ...profileVals, gender: itemValue.toString() })
-                                }}
-                                style={styles.picker}
-                                itemStyle={styles.picker_item}
-                            >
-                                <Picker.Item label='Man' value='man' />
-                                <Picker.Item label='Woman' value='woman' />
-                                <Picker.Item label="Other" value='other' />
-                            </Picker>
-                        </View>
+
                     </ScrollView>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
@@ -219,7 +240,7 @@ const styles = StyleSheet.create({
         fontSize: 10
     },
     text_input_label: {
-        fontSize: 10,
+        fontSize: 12,
         color: colors.primary,
         marginBottom: 5,
         marginLeft: 2
@@ -230,6 +251,11 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginLeft: 4,
         alignItems: 'center'
+    },
+    pickers_container: {
+        flexDirection: 'row',
+        margin: 10,
+        alignSelf: 'stretch'
     },
     picker: {
         width: 100,

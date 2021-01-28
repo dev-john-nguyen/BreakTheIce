@@ -11,6 +11,8 @@ import { UserRootStateProps, UserDispatchActionsProps } from '../../services/use
 import { set_banner } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import EditGallery from '../gallery/components/Edit';
+import * as ImagePicker from 'expo-image-picker';
+import { BodyText } from '../../utils/components';
 
 interface SettingsProps {
     navigation: MeStackNavigationProp;
@@ -37,10 +39,26 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
             case TargetOptions.privacy:
                 return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
             case TargetOptions.gallery:
-                return <EditGallery navigation={navigation} />
+                return <EditGallery navigation={navigation} handleCameraRollPermission={handleCameraRollPermission} />
             case TargetOptions.profile:
             default:
-                return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} />
+                return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} handleCameraRollPermission={handleCameraRollPermission} />
+        }
+    }
+
+    const handleCameraRollPermission = async (): Promise<boolean> => {
+        try {
+            const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync();
+
+            if (CameraRollStatus !== 'granted') {
+                set_banner('Camera roll access denied', 'warning')
+                return false;
+            }
+
+            return true;
+        } catch (e) {
+            set_banner('Oops! Something went wrong accessing your camera roll.', 'error')
+            return false;
         }
     }
 
@@ -49,33 +67,45 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
     return (
         <View style={styles.container}>
             <View style={styles.options_content}>
+
+                <TouchableHighlight
+                    style={[styles.item_container, target === TargetOptions.profile && styles.active]}
+                    onPress={() => set_banner('fdsafadsf ', 'error')}
+                    underlayColor={colors.tertiary}
+                >
+                    <View style={styles.content}>
+                        <BodyText style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Error</BodyText>
+                    </View>
+                </TouchableHighlight>
+
+
                 <TouchableHighlight
                     style={[styles.item_container, target === TargetOptions.profile && styles.active]}
                     onPress={() => setTarget(TargetOptions.profile)}
-                    underlayColor={colors.secondary}
+                    underlayColor={colors.tertiary}
                 >
                     <View style={styles.content}>
-                        <Text style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Edit Profile</Text>
+                        <BodyText style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Edit Profile</BodyText>
                     </View>
                 </TouchableHighlight>
 
                 <TouchableHighlight
                     style={[styles.item_container, target === TargetOptions.privacy && styles.active]}
                     onPress={() => setTarget(TargetOptions.privacy)}
-                    underlayColor={colors.secondary}
+                    underlayColor={colors.tertiary}
                 >
                     <View style={styles.content}>
-                        <Text style={[styles.text, target === TargetOptions.privacy && styles.active_text]}>Privacy</Text>
+                        <BodyText style={[styles.text, target === TargetOptions.privacy && styles.active_text]}>Privacy</BodyText>
                     </View>
                 </TouchableHighlight>
 
                 <TouchableHighlight
                     style={styles.item_container}
                     onPress={() => setTarget(TargetOptions.gallery)}
-                    underlayColor={colors.secondary}
+                    underlayColor={colors.tertiary}
                 >
                     <View style={styles.content}>
-                        <Text style={styles.text}>Edit Gallery</Text>
+                        <BodyText style={styles.text}>Edit Gallery</BodyText>
                     </View>
                 </TouchableHighlight>
 
@@ -83,10 +113,10 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 <TouchableHighlight
                     style={styles.item_container}
                     onPress={handleSignOut}
-                    underlayColor={colors.secondary}
+                    underlayColor={colors.tertiary}
                 >
                     <View style={styles.content}>
-                        <Text style={styles.text}>Sign Out</Text>
+                        <BodyText style={styles.text}>Sign Out</BodyText>
                     </View>
                 </TouchableHighlight>
             </View>

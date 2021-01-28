@@ -13,7 +13,7 @@ export interface NearUsersActionProps {
     }
 }
 
-export interface NearByUsersProps extends UserProfilePreviewProps {
+export interface NearByUsersProps extends Omit<UserProfilePreviewProps, 'blockedUsers'> {
     friend: boolean;
     distance: number;
     sentInvite: boolean;

@@ -14,27 +14,15 @@ interface EditProfileImage {
     profileImg: ProfileImgProps | null;
     imgObj?: NewProfileImgProps;
     setImgObj: (imgObj: NewProfileImgProps) => void;
+    handleCameraRollPermission: () => Promise<boolean>
 }
 
-export default ({ set_banner, profileImg, imgObj, setImgObj }: EditProfileImage) => {
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync();
-
-                if (CameraRollStatus !== 'granted') {
-                    set_banner('Camera roll access denied. Will need access to edit gallery.', 'warning')
-                }
-            } catch (e) {
-                set_banner('Oops! Something went wrong accessing your camera roll.', 'error')
-            }
-        })()
-
-    }, [profileImg])
-
+export default ({ set_banner, profileImg, imgObj, setImgObj, handleCameraRollPermission }: EditProfileImage) => {
 
     const pickImage = async () => {
+
+        if (!await handleCameraRollPermission()) return;
+
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,

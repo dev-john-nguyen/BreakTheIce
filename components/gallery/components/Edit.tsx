@@ -27,9 +27,10 @@ interface UploadImageProps {
     gallery: UserRootStateProps['gallery'];
     navigation: MeStackNavigationProp;
     set_banner: UtilsDispatchActionProps['set_banner'];
+    handleCameraRollPermission: () => Promise<boolean>
 }
 
-const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadImageProps) => {
+const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCameraRollPermission }: UploadImageProps) => {
     const [imgObjs, setImgObjs] = useState<NewGalleryItemProps[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -69,20 +70,8 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
     }, [loading, imgObjs])
 
     useEffect(() => {
-        (async () => {
-            //need to reverse the order of the images to display correctly
-            gallery && setImgObjs(_.cloneDeep(gallery).reverse());
-
-            try {
-                const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync();
-
-                if (CameraRollStatus !== 'granted') {
-                    set_banner('Camera roll access denied. Will need access to edit gallery.', 'warning')
-                }
-            } catch (e) {
-                set_banner('Oops! Something went wrong accessing your camera roll.', 'error')
-            }
-        })()
+        //need to reverse the order of the images to display correctly
+        gallery && setImgObjs(_.cloneDeep(gallery).reverse());
 
     }, [gallery])
 
@@ -112,6 +101,9 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
     }
 
     const pickImage = async () => {
+
+        if (!await handleCameraRollPermission()) return;
+
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -190,7 +182,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner }: UploadIm
                 />
 
                 <CustomInput
-                    styles={styles.image_description_input}
+                    style={styles.image_description_input}
                     placeholder="Add a description... (100 character limit)"
                     multiline={true}
                     maxLength={100}

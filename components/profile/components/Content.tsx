@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { colors } from '../../../utils/styles';
-import { MeStackNavigationProp } from '../../navigation/utils/types';
 import Gallery from '../../gallery';
 import ProfileImage from './ProfileImage';
-import { CustomButton, HeaderText, BodyText, Icon } from '../../../utils/components';
+import { CustomButton, HeaderText, BodyText } from '../../../utils/components';
 import { TopProfileBackground } from '../../../utils/svgs';
 import { GalleryItemProps } from '../../../services/user/types';
 import RespondButton from '../../../utils/components/RespondButton';
@@ -63,14 +62,14 @@ export default ({ user, directToMessage, directToFriends, handleInvitationUpdate
                     <View style={styles.header_section_content}>
                         <View style={styles.header_content_text}>
                             <HeaderText text={user.name} styles={styles.header_text} />
-                            <BodyText text={`${user.age} years old`} styles={styles.sub_header_text} />
+                            <BodyText text={`${user.age} years old`} style={styles.sub_header_text} />
                         </View>
                         {renderButton()}
                     </View>
                 </View>
 
                 <View style={styles.bio}>
-                    <BodyText text={user.bioLong} styles={styles.bio_text} />
+                    <BodyText text={user.bioLong} style={styles.bio_text} />
                 </View>
                 <Gallery gallery={user.gallery} />
             </View>

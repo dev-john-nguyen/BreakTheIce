@@ -8,6 +8,7 @@ import { NearByUsersProps } from '../near_users/types';
 import _ from 'lodash';
 import { cacheImage } from '../../utils/functions';
 import { cache_user_images } from '../user/utils';
+import { BlockUserProps } from '../user/types';
 
 export const set_current_profile = (profileUid: string) => async (dispatch: AppDispatch, getState: () => RootProps) => {
     //find user in nearUsers
@@ -50,7 +51,12 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
             if (!docData) throw 'No data exists';
 
-            const { location, name, bioShort, bioLong, ctryStateCity, gender, age, username, gallery, hideOnMap, offline, profileImg } = docData
+            const { location, name, bioShort, bioLong, ctryStateCity, gender, age, username, gallery, hideOnMap, offline, profileImg, blockedUsers } = docData
+
+            if (blockedUsers) {
+                const { uid } = getState().user
+                if (blockedUsers.find((user: BlockUserProps) => user.uid === uid)) throw 'Access Denied'
+            }
 
             const profileData: ProfileUserProps = {
                 uid: doc.id,

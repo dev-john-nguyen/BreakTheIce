@@ -72,7 +72,12 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
         <ActivityIndicator />
     </View>
 
-    if (chatPreviews.length < 1) return <UnderlineHeader text='Go Break The Ice' styles={{ marginTop: 20 }} />
+    if (chatPreviews.length < 1) return (
+        <UnderlineHeader
+            textStyle={styles.underline_header_text}
+            underlineStyle={styles.underline_header_underline}
+            style={{ marginTop: 20 }}>No Messages Found</UnderlineHeader>
+    )
 
     return (
         <FlatList
@@ -138,6 +143,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         backgroundColor: colors.red,
+    },
+    underline_header_text: {
+        color: colors.primary,
+        fontSize: 24
+    },
+    underline_header_underline: {
+        backgroundColor: colors.secondary
     },
 })
 

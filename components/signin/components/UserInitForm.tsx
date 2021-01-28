@@ -3,14 +3,11 @@ import { StyleSheet, View, Picker } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { CustomButton, CustomInput, BodyText, UnderlineHeader } from '../../../utils/components';
 import { SigninDispatchActionProps } from '../../../services/signin/types';
-import { regexName, regexUsername } from '../../../utils/variables';
-import { validate_form_values } from '../../../services/signin/actions';
+import { ageArr } from '../../../utils/variables';
 
 interface SignUpFormProps {
     init_user: SigninDispatchActionProps['init_user'];
 }
-
-const ageArr = new Array(100).fill(null)
 
 const usernameParams = [
     'username has to be 8-20 characters long',
@@ -46,13 +43,13 @@ export default ({ init_user }: SignUpFormProps) => {
                 <View style={styles.params_container}>
                     <BodyText
                         text='username parameters'
-                        styles={styles.params_header_text}
+                        style={styles.params_header_text}
                     />
                     {usernameParams.map((param, index) => (
                         <BodyText
                             key={index}
                             text={'- ' + param}
-                            styles={styles.params_text}
+                            style={styles.params_text}
                         />
                     ))}
                 </View>
@@ -61,10 +58,10 @@ export default ({ init_user }: SignUpFormProps) => {
                 <View style={styles.text_input_container}>
                     <BodyText
                         text='Username:'
-                        styles={styles.label}
+                        style={styles.label}
                     />
                     <CustomInput
-                        styles={styles.text_input}
+                        style={styles.text_input}
                         placeholder="username"
                         onChangeText={(text) => setUsername(text)}
                         maxLength={100}
@@ -76,10 +73,10 @@ export default ({ init_user }: SignUpFormProps) => {
                 <View style={styles.text_input_container}>
                     <BodyText
                         text='Name:'
-                        styles={styles.label}
+                        style={styles.label}
                     />
                     <CustomInput
-                        styles={styles.text_input}
+                        style={styles.text_input}
                         placeholder="name"
                         textContentType="name"
                         onChangeText={(text) => setName(text)}
@@ -92,7 +89,7 @@ export default ({ init_user }: SignUpFormProps) => {
                 <View style={styles.age_container}>
                     <BodyText
                         text='Age:'
-                        styles={styles.label}
+                        style={styles.label}
                     />
                     <Picker
                         enabled={false}

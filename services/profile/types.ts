@@ -12,7 +12,7 @@ export interface ProfileActionProps {
 }
 
 
-export interface ProfileUserProps extends UserRootStateProps, NearByUsersProps { }
+export interface ProfileUserProps extends Omit<UserRootStateProps, 'blockedUsers'>, NearByUsersProps { }
 
 export interface ProfileRootProps {
     history: ProfileUserProps[];

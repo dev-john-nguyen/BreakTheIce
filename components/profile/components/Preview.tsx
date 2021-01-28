@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, StyleProp, Dimensions } from 'react-native';
-import { NearByUsersProps } from '../../services/near_users/types';
-import { colors } from '../styles';
-import { HomeToChatNavProp } from '../../components/navigation/utils/types';
-import { CustomButton } from '.';
-import ProfileImage from '../../components/profile/components/ProfileImage';
-import RespondButton from './RespondButton';
-import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../services/invitations/types';
+import { NearByUsersProps } from '../../../services/near_users/types';
+import { colors } from '../../../utils/styles';
+import { HomeToChatNavProp } from '../../navigation/utils/types';
+import { CustomButton } from '../../../utils/components';
+import ProfileImage from './ProfileImage';
+import RespondButton from '../../../utils/components/RespondButton';
+import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../../services/invitations/types';
 
 interface PreviewProps {
     nearUser: NearByUsersProps,

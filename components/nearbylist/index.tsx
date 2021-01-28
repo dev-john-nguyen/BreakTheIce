@@ -7,7 +7,7 @@ import { HomeToChatNavProp } from '../navigation/utils/types';
 import { ProfilePage } from '../../utils/variables';
 import { colors } from '../../utils/styles';
 import InvitationModal from '../modal/InvitationModal';
-import Preview from '../../utils/components/Preview';
+import Preview from '../profile/components/Preview';
 import { update_invitation } from '../../services/invitations/actions';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { UnderlineHeader } from '../../utils/components';

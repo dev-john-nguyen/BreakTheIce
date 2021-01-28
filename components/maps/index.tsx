@@ -9,7 +9,7 @@ import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/
 import { UserRootStateProps } from '../../services/user/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import { CustomButton } from '../../utils/components';
-import Preview from '../../utils/components/Preview';
+import Preview from '../profile/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
 import ProfileImage from '../profile/components/ProfileImage';
 import { colors } from '../../utils/styles';

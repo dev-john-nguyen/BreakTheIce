@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
 import { colors } from '../../utils/styles';
-import { Icon, HeaderText } from '../../utils/components';
+import { Icon, UnderlineHeader } from '../../utils/components';
 
 interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
@@ -26,12 +26,15 @@ const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
 
 export const screenOptions = ({ route, navigation }: { navigation: any, route: RouteProps['props'] }) => ({
     headerTitle: () => {
-        return (
-            <View style={styles.container}>
-                <HeaderText styles={styles.header_text} text={route.params?.title ? route.params.title : ''} />
-                <View style={styles.underline} />
-            </View>
-        )
+        if (route.params?.title) {
+            return (
+                <UnderlineHeader
+                    style={styles.underline_style}
+                    underlineStyle={styles.underline_header_underline}
+                    textStyle={styles.underline_header_text}
+                >{route.params.title}</UnderlineHeader>
+            )
+        }
     },
     headerRight: () => renderHeaderRight(route, navigation),
     headerStyle: styles.header_style,
@@ -50,22 +53,16 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
     },
-    header_text: {
-        fontSize: 27,
-        position: 'relative',
-        bottom: 5,
-        color: colors.white
+    underline_style: {
+        top: 5,
     },
-    underline: {
-        position: 'absolute',
-        backgroundColor: colors.primary,
-        opacity: .8,
-        height: 15,
-        borderRadius: 5,
-        bottom: 3,
-        alignSelf: 'center',
-        width: '120%',
-        zIndex: -1
+    underline_header_underline: {
+        backgroundColor: `rgba(${colors.primary_rgb},.8)`,
+    },
+    underline_header_text: {
+        color: colors.white,
+        fontSize: 27,
+        textTransform: 'lowercase'
     },
     header_style: {
         backgroundColor: `rgba(${colors.lightWhite_rgb},.9)`,
