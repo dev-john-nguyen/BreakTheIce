@@ -8,11 +8,11 @@ import { validate_near_users } from '../../services/near_users/actions';
 import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/types';
 import { UserRootStateProps } from '../../services/user/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
-import { CustomButton } from '../../utils/components';
+import { CustomButton } from '../utils';
 import Preview from '../profile/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
 import ProfileImage from '../profile/components/ProfileImage';
-import { colors } from '../../utils/styles';
+import { colors } from '../utils/styles';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { update_invitation } from '../../services/invitations/actions';
 
@@ -181,7 +181,6 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             onAction={this.handleOnActionPress}
                             onSendInvite={() => this.setState({ sendInvite: true })}
                             containerStyle={styles.preview_container}
-                            containerPressStyle={{ ...styles.preview_container, backgroundColor: colors.tertiary }}
                             onInvitationUpdate={update_invitation}
                         />
                     </View>
@@ -217,8 +216,7 @@ const styles = StyleSheet.create({
     },
     preview_container: {
         position: 'absolute',
-        top: 40,
-        backgroundColor: colors.secondary,
+        top: 60,
         zIndex: 100
     }
 });

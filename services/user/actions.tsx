@@ -7,7 +7,7 @@ import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, 
 import { validate_near_users, reset_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
-import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, LocationsUsersDb, LocationsDb, UsersDb } from '../../utils/variables'
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, LocationsUsersDb, LocationsDb, UsersDb, timestamp } from '../../utils/variables'
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
 import { cacheImage } from '../../utils/functions';
@@ -116,7 +116,7 @@ export const set_and_listen_user_location = (ctryStateCity: CtryStateCityProps, 
         //update user location in the server
 
         try {
-            await fireDb_update_user_location(user.uid, user.ctryStateCity, newLocation);
+            await fireDb_update_user_location(user, newLocation);
         } catch (e) {
             console.log(e)
             dispatch(set_banner('Oops! Failed to update your location', 'error'))
@@ -203,7 +203,7 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
     await fireDb.collection(UsersDb).doc(uid).set({
         gallery: gallery,
         updatedAt: new Date(),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: timestamp
     }, { merge: true })
         .then(async () => {
             //cache images and update gallery
@@ -218,6 +218,7 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
             dispatch(set_banner('Gallery successfully updated!', 'success'));
         })
         .catch(err => {
+            console.log(err)
             dispatch(set_banner('Images failed to save', 'error'));
         })
 }

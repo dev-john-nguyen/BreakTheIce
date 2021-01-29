@@ -5,12 +5,13 @@ import { RootProps } from '../../services';
 import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import { ProfilePage } from '../../utils/variables';
-import { colors } from '../../utils/styles';
+import { colors } from '../utils/styles';
 import InvitationModal from '../modal/InvitationModal';
 import Preview from '../profile/components/Preview';
 import { update_invitation } from '../../services/invitations/actions';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
-import { UnderlineHeader } from '../../utils/components';
+import { UnderlineHeader } from '../utils';
+import Empty from '../utils/components/Empty';
 
 
 interface NearByListProps {
@@ -47,7 +48,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
         this.props.navigation.navigate('Chat', {
             screen: 'Message',
             initial: false,
-            params: { targetUser: nearUser, title: nearUser.username }
+            params: { targetUser: nearUser }
         })
     }
 
@@ -60,7 +61,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
 
         if (!nearUsersFetched) return <ActivityIndicator />
 
-        if (nearUsers.length < 1) return <UnderlineHeader text='No Users Near By' styles={{ marginTop: 20 }} />
+        if (nearUsers.length < 1) return <Empty style={{ marginTop: 20 }}>No Users Nearby</Empty>
 
         return (
             <View style={{ flex: 1 }}>
@@ -75,7 +76,6 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                             onSendInvite={() => this.handleSendInvite(item)}
                             onInvitationUpdate={update_invitation}
                             containerStyle={styles.preview_container}
-                            containerPressStyle={styles.preview_container_pressed}
                         />
                     )}
                     keyExtractor={(item) => item.uid}
@@ -102,19 +102,7 @@ const styles = StyleSheet.create({
         paddingBottom: 20
     },
     preview_container: {
-        marginTop: 20,
-        borderTopColor: colors.primary,
-        borderBottomColor: colors.primary,
-        borderBottomWidth: 1,
-        borderTopWidth: 1
-    },
-    preview_container_pressed: {
-        marginTop: 20,
-        borderTopColor: colors.primary,
-        borderBottomColor: colors.primary,
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        backgroundColor: colors.secondary
+        marginTop: 20
     }
 })
 

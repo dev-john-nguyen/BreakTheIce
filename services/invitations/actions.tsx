@@ -2,7 +2,7 @@ import { SEND_INVITATION, SET_INVITATIONS_INBOUND, SET_INVITATIONS_OUTBOUND, SET
 import { AppDispatch } from '../../App';
 import { InvitationObject, InvitationStatusOptions } from './types';
 import { fireDb } from '../firebase';
-import { InvitationsDb, FriendsDb, FriendsUsersDb } from '../../utils/variables';
+import { InvitationsDb, timestamp } from '../../utils/variables';
 import { RootProps } from '..';
 import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER } from '../near_users/actionTypes';
 import { set_banner } from '../utils/actions';
@@ -14,7 +14,7 @@ import firebase from 'firebase';
 
 export const send_invitation = (invitationObj: Omit<InvitationObject, 'docId'>) => async (dispatch: AppDispatch) => {
     try {
-        await fireDb.collection(InvitationsDb).add({ ...invitationObj, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+        await fireDb.collection(InvitationsDb).add({ ...invitationObj, timestamp })
     } catch (e) {
         console.log(e)
         dispatch(set_banner("Oops! Something went wrong sending your invitation.", 'error'))

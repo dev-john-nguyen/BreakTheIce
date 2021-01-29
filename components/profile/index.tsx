@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation/utils/types';
-import { colors } from '../../utils/styles';
+import { colors } from '../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation, update_invitation } from '../../services/invitations/actions';
 import { InvitationsRootProps, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/types';
@@ -17,9 +17,9 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import HeaderRight from './components/HeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
 import { set_banner } from '../../services/utils/actions';
-import { UnderlineHeader } from '../../utils/components';
+import { UnderlineHeader } from '../utils';
 import ProfileContent from './components/Content';
-import { TopProfileBackground } from '../../utils/svgs';
+import { TopProfileBackground } from '../utils/svgs';
 import { windowWidth } from '../../utils/variables';
 import { update_block_user } from '../../services/user/actions';
 
@@ -116,8 +116,7 @@ const Profile = (props: ProfileProps) => {
             screen: 'Message',
             initial: false,
             params: {
-                targetUser,
-                title: targetUser.username
+                targetUser
             }
         })
     }
@@ -128,7 +127,10 @@ const Profile = (props: ProfileProps) => {
             return (
                 <View style={styles.utils_container}>
                     <TopProfileBackground style={styles.header_background} height={'180'} width={windowWidth.toString()} />
-                    {notFound ? <UnderlineHeader text='User Not Found' /> : <ActivityIndicator size='large' color={colors.primary} />}
+                    {notFound ? <UnderlineHeader
+                        textStyle={styles.underline_header_text}
+                        underlineStyle={styles.underline_header_underline}
+                        style={{ marginTop: 20 }}>User Not Found</UnderlineHeader> : <ActivityIndicator size='large' color={colors.primary} />}
                 </View>
             )
 
@@ -161,6 +163,13 @@ const Profile = (props: ProfileProps) => {
 }
 
 const styles = StyleSheet.create({
+    underline_header_text: {
+        color: colors.primary,
+        fontSize: 24
+    },
+    underline_header_underline: {
+        backgroundColor: colors.secondary
+    },
     container: {
         flex: 1,
     },

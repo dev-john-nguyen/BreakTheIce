@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator, Keyboard } from 'react-native';
-import { button_styles, underline_header_styles } from '../styles';
+import { button_styles, underline_header_styles } from './styles';
 import { Feather } from '@expo/vector-icons';
 import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';

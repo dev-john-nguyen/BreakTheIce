@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Picker } from 'react-native';
-import { colors } from '../../../utils/styles';
-import { CustomButton, CustomInput, BodyText, UnderlineHeader } from '../../../utils/components';
+import { colors } from '../../utils/styles';
+import { CustomButton, CustomInput, BodyText, UnderlineHeader } from '../../utils';
 import { SigninDispatchActionProps } from '../../../services/signin/types';
 import { ageArr } from '../../../utils/variables';
 
@@ -38,7 +38,7 @@ export default ({ init_user }: SignUpFormProps) => {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <UnderlineHeader text='Complete Your Profile' styles={{ marginBottom: 20 }} />
+                <UnderlineHeader style={{ marginBottom: 20 }} textStyle={styles.underline_header_text} underlineStyle={styles.underline_header_underline}>Complete Your Profile</UnderlineHeader>
 
                 <View style={styles.params_container}>
                     <BodyText
@@ -63,7 +63,7 @@ export default ({ init_user }: SignUpFormProps) => {
                     <CustomInput
                         style={styles.text_input}
                         placeholder="username"
-                        onChangeText={(text) => setUsername(text)}
+                        onChangeText={(text) => setUsername(text.toLowerCase())}
                         maxLength={100}
                         value={username}
                         autoCapitalize='none'
@@ -112,6 +112,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    underline_header_text: {
+        color: colors.primary,
+        fontSize: 24
+    },
+    underline_header_underline: {
+        backgroundColor: colors.secondary
     },
     content: {
         width: '80%',

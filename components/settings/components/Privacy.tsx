@@ -4,7 +4,7 @@ import { UpdateUserPrivacyProps, UserRootStateProps, UserDispatchActionsProps } 
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
 import { MeStackNavigationProp } from '../../navigation/utils/types';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../utils/styles';
 import { isEqual } from 'lodash';
 
 interface PrivacyProps {

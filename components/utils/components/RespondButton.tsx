@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { CustomButton, Icon } from '.';
+import { View, StyleSheet, ActivityIndicator, StyleProp } from 'react-native';
+import { CustomButton, Icon } from '..';
 import { colors } from '../styles';
-import { InvitationStatusOptions } from '../../services/invitations/types';
+import { InvitationStatusOptions } from '../../../services/invitations/types';
 
 interface InvitationButtonsProps {
     handleInvitationUpdate: (status: InvitationStatusOptions) => Promise<void>;
     setLoading: (value: boolean) => void;
     loading: boolean;
+    style?: StyleProp<any>
 }
 
-export default ({ handleInvitationUpdate, loading, setLoading }: InvitationButtonsProps) => {
+export default ({ handleInvitationUpdate, loading, setLoading, style }: InvitationButtonsProps) => {
     const [showOptions, setShowOptions] = useState<boolean>(false)
 
     const handleRespondOnPress = () => setShowOptions(showOptions ? false : true)
@@ -43,7 +44,7 @@ export default ({ handleInvitationUpdate, loading, setLoading }: InvitationButto
         </View>
     )
     return (
-        <View>
+        <View style={style}>
             {showOptions ? renderOptions() : <CustomButton text='Respond' type='primary' onPress={handleRespondOnPress} />}
         </View>
     )

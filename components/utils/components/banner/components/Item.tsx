@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleProp } from "react-native"
-import { UtilsDispatchActionProps, BannerItemProps } from '../../../../services/utils/tsTypes';
-import { BodyText } from '../..';
+import { UtilsDispatchActionProps, BannerItemProps } from '../../../../../services/utils/tsTypes';
+import { BodyText } from '../../..';
 
 interface ItemProps {
     item: BannerItemProps;

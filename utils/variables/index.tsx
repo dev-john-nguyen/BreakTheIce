@@ -42,7 +42,7 @@ export const timestamp = firebase.firestore.FieldValue.serverTimestamp()
 export const windowWidth = Dimensions.get('window').width
 export const windowHeight = Dimensions.get('window').height
 
-export var regexName = new RegExp(/^[A-Za-z\s]+$/);
+export const regexName = new RegExp(/^[A-Za-z\s]+$/);
 export const regexUsername = new RegExp(/^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/);
 export const ageArr = new Array(100).fill(null)
 //states

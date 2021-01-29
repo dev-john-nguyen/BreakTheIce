@@ -1,7 +1,5 @@
 import * as FileSystem from 'expo-file-system'
-import { NearByUsersProps } from '../../services/near_users/types';
 import { InvitationStatusOptions } from '../../services/invitations/types';
-import { ProfileUserProps } from '../../services/profile/types';
 
 export class AutoId {
     static newId(len?: number): string {
@@ -16,7 +14,6 @@ export class AutoId {
         return autoId;
     }
 }
-
 
 export async function cacheImage(image: string) {
     if (!image) return;
@@ -44,7 +41,6 @@ export async function cacheImage(image: string) {
         })
 }
 
-
 export function hashCode(string: string) {
     var hash = 0, i, chr;
     for (i = 0; i < string.length; i++) {
@@ -61,6 +57,7 @@ interface ItemsProps {
     sentInvite: Boolean,
     uid: string
 }
+
 export function update_nearBy(items: any, uid: string, status?: InvitationStatusOptions) {
     return items.map((user: ItemsProps) => {
         if (user.uid === uid) {

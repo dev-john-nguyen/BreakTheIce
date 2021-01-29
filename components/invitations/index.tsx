@@ -5,11 +5,12 @@ import { RootProps } from '../../services';
 import { InvitationsStackNavigationProp } from '../navigation/utils/types';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/types';
 import { update_invitation_from_invitations } from '../../services/invitations/actions';
-import { colors } from '../../utils/styles';
-import { UnderlineHeader } from '../../utils/components';
+import { colors, opacity_colors } from '../utils/styles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { renderDate } from '../chat/utils';
 import ProfileImage from '../profile/components/ProfileImage';
+import Empty from '../utils/components/Empty';
+import { BlurView } from 'expo-blur';
 
 interface Invitations {
     navigation: InvitationsStackNavigationProp;
@@ -72,12 +73,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     }
 
     const renderInvitationList = () => {
-        if (!invitation.inbound || invitation.inbound.length < 1) return (
-            <UnderlineHeader
-                textStyle={styles.underline_header_text}
-                underlineStyle={styles.underline_header_underline}
-                style={{ marginTop: 20 }}>No Invitations Found</UnderlineHeader>
-        )
+        if (!invitation.inbound || invitation.inbound.length < 1) return <Empty style={{ marginTop: 20 }}>No Invitations</Empty>
 
         return <FlatList
             data={invitation.inbound}
@@ -89,17 +85,19 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                     onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
                     containerStyle={styles.container}
                 >
-                    <Pressable style={styles.content} onPress={() => alert('swipe youngblod!')}>
-                        <View style={styles.profile_section}>
-                            <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
-                            <View style={styles.profile_section_text}>
-                                <Text style={styles.username}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
+                    <Pressable style={styles.content_container} onPress={() => alert('swipe youngblod!')}>
+                        <View style={styles.content_wrapper}>
+                            <View style={styles.profile_section}>
+                                <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
+                                <View style={styles.profile_section_text}>
+                                    <Text style={styles.username}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.content_section}>
-                            <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
-                            <View style={styles.content_section_small}>
-                                <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
+                            <View style={styles.content_section}>
+                                <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
+                                <View style={styles.content_section_small}>
+                                    <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
+                                </View>
                             </View>
                         </View>
                     </Pressable>
@@ -120,13 +118,6 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
 }
 
 const styles = StyleSheet.create({
-    underline_header_text: {
-        color: colors.primary,
-        fontSize: 24
-    },
-    underline_header_underline: {
-        backgroundColor: colors.secondary
-    },
     leftAction: {
         flex: 1,
         backgroundColor: colors.green,
@@ -150,12 +141,17 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
+        backgroundColor: colors.white,
         position: 'relative',
         marginBottom: 20
     },
-    content: {
+    content_container: {
         flex: 1,
         backgroundColor: colors.white,
+    },
+    content_wrapper: {
+        flex: 1,
+        backgroundColor: opacity_colors.secondary_light,
         flexDirection: 'row',
         paddingLeft: 30,
         paddingRight: 20,

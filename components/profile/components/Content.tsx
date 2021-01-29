@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../utils/styles';
 import Gallery from '../../gallery';
 import ProfileImage from './ProfileImage';
-import { CustomButton, HeaderText, BodyText } from '../../../utils/components';
-import { TopProfileBackground } from '../../../utils/svgs';
+import { CustomButton, HeaderText, BodyText } from '../../utils';
+import { TopProfileBackground } from '../../utils/svgs';
 import { GalleryItemProps } from '../../../services/user/types';
-import RespondButton from '../../../utils/components/RespondButton';
+import RespondButton from '../../utils/components/RespondButton';
 import { InvitationStatusOptions } from '../../../services/invitations/types';
 import { windowWidth } from '../../../utils/variables';
 
@@ -43,6 +43,7 @@ export default ({ user, directToMessage, directToFriends, handleInvitationUpdate
         if (user.receivedInvite && handleInvitationUpdate) return <RespondButton handleInvitationUpdate={handleInvitationUpdate}
             setLoading={setInviteStatusLoading}
             loading={inviteStatusLoading}
+
         />
 
         if (setShowModalInvite) return <CustomButton onPress={() => setShowModalInvite(true)} text='Invite' type='primary' moreStyles={styles.header_button} />
@@ -61,7 +62,7 @@ export default ({ user, directToMessage, directToFriends, handleInvitationUpdate
 
                     <View style={styles.header_section_content}>
                         <View style={styles.header_content_text}>
-                            <HeaderText text={user.name} styles={styles.header_text} />
+                            <HeaderText style={styles.header_text} >{user.name}</HeaderText>
                             <BodyText text={`${user.age} years old`} style={styles.sub_header_text} />
                         </View>
                         {renderButton()}

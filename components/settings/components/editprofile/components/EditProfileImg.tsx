@@ -5,8 +5,8 @@ import { UtilsDispatchActionProps } from '../../../../../services/utils/tsTypes'
 import { ProfileImgProps, NewProfileImgProps } from '../../../../../services/user/types';
 import { hashCode } from '../../../../../utils/functions';
 import { galleryImgSizeLimit } from '../../../../../utils/variables';
-import { Icon } from '../../../../../utils/components';
-import { colors } from '../../../../../utils/styles';
+import { Icon } from '../../../../utils';
+import { colors } from '../../../../utils/styles';
 import ProfileImage from '../../../../profile/components/ProfileImage';
 
 interface EditProfileImage {

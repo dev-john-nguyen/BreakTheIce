@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { connect } from 'react-redux';
 import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../utils/styles';
 import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils/types';
 import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
@@ -10,10 +10,11 @@ import { MessageProps, ChatPreviewProps, ChatRootProps } from '../../../services
 import { RootProps } from '../../../services';
 import { set_banner } from '../../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
-import { CustomButton } from '../../../utils/components';
+import { CustomButton, BodyText, HeaderText } from '../../utils';
 import { handleUpdateUnread, searchReduxChat } from '../utils';
 import { ProfileImgProps } from '../../../services/user/types';
 import { timestamp } from '../../../utils/variables';
+import ProfileImage from '../../profile/components/ProfileImage';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
@@ -155,6 +156,17 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
         return initChatListener(docId, false)
     }
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: () => (
+                <View>
+                    <ProfileImage size='regular' image={route.params.targetUser.profileImg} />
+                    <HeaderText>{route.params.targetUser.username}</HeaderText>
+                </View>
+            )
+        })
+    }, [route.params])
 
     useEffect(() => {
         let isMounted = true;
@@ -305,13 +317,13 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                 if (item.sentBy === user.uid) {
                     return (
                         <View key={item.docId} style={styles.message_right}>
-                            <Text style={styles.message_right_text}>{item.message}</Text>
+                            <BodyText style={styles.message_right_text}>{item.message}</BodyText>
                         </View>
                     )
                 } else {
                     return (
                         <View key={item.docId} style={styles.message_left}>
-                            <Text style={styles.message_left_text}>{item.message}</Text>
+                            <BodyText style={styles.message_left_text}>{item.message}</BodyText>
                         </View>
                     )
                 }
@@ -354,19 +366,19 @@ const styles = StyleSheet.create({
     },
     message_form: {
         borderTopColor: colors.primary,
-        borderTopWidth: 2,
+        borderTopWidth: 1,
     },
     message_form_content: {
         flexDirection: 'row',
         paddingLeft: 10,
         paddingRight: 10,
         paddingTop: 20,
-        paddingBottom: 20,
+        paddingBottom: 30,
         alignItems: 'center'
     },
     message_form_input: {
         flexBasis: '70%',
-        borderWidth: 2,
+        borderWidth: 1,
         borderRadius: 20,
         marginRight: 10,
         padding: 5,
@@ -415,7 +427,7 @@ const styles = StyleSheet.create({
         width: '70%',
         padding: 20,
         paddingRight: 30,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: colors.primary,
         backgroundColor: colors.primary,
         borderRadius: 20

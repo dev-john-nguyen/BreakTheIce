@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
-import { colors } from '../../utils/styles';
-import { Icon, UnderlineHeader } from '../../utils/components';
+import { Icon, UnderlineHeader } from '../utils';
+import { colors } from '../utils/styles';
 
 interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp

@@ -1,10 +1,12 @@
 
 import React, { useRef } from 'react';
-import { View, Image, Animated, PanResponder, StyleSheet, Pressable } from 'react-native';
+import { View, Animated, PanResponder, StyleSheet } from 'react-native';
 import { windowWidth } from '../../../utils/variables';
 import { GalleryItemProps } from '../../../services/user/types';
-import { BodyText } from '../../../utils/components';
-import { colors } from '../../../utils/styles';
+import { BodyText } from '../../utils';
+import { colors, drop_shadow, opacity_colors } from '../../utils/styles';
+import { PinchGestureHandler, PinchGestureHandlerStateChangeEvent, State } from 'react-native-gesture-handler';
+import { BlurView } from 'expo-blur';
 
 interface CardProps {
     item: GalleryItemProps;
@@ -16,6 +18,9 @@ export default ({ item, index, uri }: CardProps) => {
     const pan: any = useRef(new Animated.ValueXY()).current;
     const cardIndex: any = useRef(new Animated.Value(index)).current;
     const textOpacity: Animated.Value = useRef(new Animated.Value(0)).current;
+    const baseScale = new Animated.Value(1);
+    const pinchScale: Animated.Value = useRef(new Animated.Value(1)).current;
+    const scale = Animated.multiply(baseScale, pinchScale)
 
     const panResponder = useRef(
         PanResponder.create({
@@ -66,6 +71,23 @@ export default ({ item, index, uri }: CardProps) => {
         })
     ).current;
 
+    const onPinchGestureEvent = Animated.event(
+        [{ nativeEvent: { scale: pinchScale } }],
+        { useNativeDriver: true }
+    )
+
+    const onPinchHandlerStateChange = (event: PinchGestureHandlerStateChangeEvent) => {
+        hideText()
+
+        if (event.nativeEvent.oldState === State.ACTIVE) {
+            pinchScale.setValue(1)
+            Animated.spring(pan, {
+                toValue: { x: 0, y: 0 },
+                useNativeDriver: false,
+            }).start();
+        }
+    }
+
     const showText = () => {
         Animated.timing(textOpacity, {
             toValue: 1,
@@ -82,12 +104,14 @@ export default ({ item, index, uri }: CardProps) => {
         }).start()
     }
 
+
     return (
         <Animated.View
             key={index}
             {...panResponder.panHandlers}
             style={[
                 styles.container,
+                drop_shadow,
                 {
                     transform: [{ translateX: pan.x }, { translateY: pan.y }],
                     zIndex: cardIndex
@@ -98,14 +122,31 @@ export default ({ item, index, uri }: CardProps) => {
             onTouchEnd={hideText}
 
         >
-            <View style={styles.content_container}>
-                <Image source={{ uri, cache: 'force-cache' }} style={styles.image} />
-                <Animated.View style={[styles.text_container, { opacity: textOpacity }]}>
-                    <View style={styles.text_content}>
-                        <BodyText text={item.description} styles={styles.text} />
-                    </View>
+            <PinchGestureHandler
+                onGestureEvent={onPinchGestureEvent}
+                onHandlerStateChange={onPinchHandlerStateChange}
+            >
+                <Animated.View style={styles.content_container} collapsable={false}>
+                    <Animated.Image
+                        source={{ uri, cache: 'force-cache' }}
+                        style={[styles.image,
+                        {
+                            transform: [{ scale: scale }]
+                        }
+                        ]}
+                    />
+                    {!!item.description &&
+                        <Animated.View style={[styles.text_container, drop_shadow, { opacity: textOpacity }]}>
+                            <BlurView style={styles.text_blur} intensity={70}>
+                                <View style={styles.text_content} >
+                                    <BodyText style={styles.text}>{item.description}</BodyText>
+                                </View>
+                            </BlurView>
+                        </Animated.View>
+                    }
                 </Animated.View>
-            </View>
+
+            </PinchGestureHandler>
         </Animated.View>
     )
 }
@@ -115,16 +156,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         marginRight: 40,
         marginLeft: 40,
-        borderRadius: 5,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-
-        elevation: 5,
+        borderRadius: 5
     },
     content_container: {
         position: 'relative'
@@ -140,17 +172,18 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: '100%',
     },
+    text_blur: {
+        flex: 1,
+        marginBottom: 20
+    },
     text_content: {
-        backgroundColor: `rgba(${colors.secondary_rgb}, .9)`,
-        borderColor: colors.primary,
-        borderWidth: 1,
+        flex: 1,
         padding: 20,
-        margin: 10,
-        borderRadius: 5
+        backgroundColor: opacity_colors.secondary_medium
     },
     text: {
         color: colors.white,
-        fontSize: 12
+        fontSize: 14
     }
 })
 

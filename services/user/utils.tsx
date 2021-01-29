@@ -63,12 +63,23 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, ct
     return await batch.commit()
 }
 
-export const fireDb_update_user_location = async (uid: string, ctryStateCity: CtryStateCityProps, newLocation: LocationObject) => {
-    await fireDb.collection(LocationsDb).doc(ctryStateCity.ctryState).collection(ctryStateCity.city).doc(uid).set({
-        location: newLocation,
+export const fireDb_update_user_location = async (user: UserRootStateProps, newLocation: LocationObject) => {
+    const { ctryStateCity, uid, bioShort, age, hideOnMap, blockedUsers, profileImg } = user;
+
+    const updatedProfilePreivew: Omit<UserProfilePreviewProps, 'username'> = {
+        uid,
+        bioShort,
+        age,
+        hideOnMap,
+        blockedUsers,
+        profileImg: profileImg,
+        location: newLocation
+    }
+    await fireDb.collection(LocationsDb).doc(ctryStateCity.ctryState).collection(ctryStateCity.city).doc(uid).update({
+        ...updatedProfilePreivew,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: new Date()
-    }, { merge: true })
+    })
 }
 
 export const fetch_profile = async (uid: string) => {

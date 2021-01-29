@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import { colors } from '../../../utils/styles';
-import { Icon, CustomButton } from '../../../utils/components';
+import { colors } from '../../utils/styles';
+import { Icon, CustomButton } from '../../utils';
 
 interface ProfileHeaderRightProps {
     handleUnfriendUser: () => Promise<void | undefined>;

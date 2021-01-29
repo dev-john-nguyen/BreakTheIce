@@ -28,7 +28,13 @@ export const colors = {
     darkRed: '#c70039',
     darkGreen: '#16c79a',
     lightGrey: '#dddddd',
-    black: '#1a1c20'
+    black: '#1a1c20',
+    black_rgb: '26, 28, 32'
+}
+
+export const opacity_colors = {
+    secondary_light: `rgba(${colors.secondary_rgb}, .1)`,
+    secondary_medium: `rgba(${colors.secondary_rgb}, .5)`
 }
 
 
@@ -123,8 +129,8 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
             unpressed.text.color = colors.lightRed;
             break;
         case 'white_outline':
-            pressed.button.backgroundColor = colors.primary;
-            pressed.button.borderColor = colors.primary;
+            pressed.button.backgroundColor = colors.tertiary;
+            pressed.button.borderColor = colors.white;
             pressed.text.color = colors.white;
 
             unpressed.button.backgroundColor = 'transparent';
@@ -226,4 +232,15 @@ export const bannerStyles = (type: string) => {
             styles.text.color = colors.white
     }
     return styles
+}
+
+export const drop_shadow: StyleProp<any> = {
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
 }

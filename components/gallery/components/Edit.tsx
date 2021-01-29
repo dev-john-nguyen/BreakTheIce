@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ReactNode, useLayoutEffect } from 'react';
-import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, ActivityIndicator, Keyboard } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../utils/styles';
 import { galleryImgSizeLimit } from '../../../utils/variables';
 import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/types';
 import { connect } from 'react-redux';
@@ -17,7 +17,7 @@ import { set_banner } from '../../../services/utils/actions';
 import { Feather } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { hashCode } from '../../../utils/functions';
-import { Icon, CustomInput } from '../../../utils/components';
+import { Icon, CustomInput } from '../../utils';
 
 //Summary
 //image limit will be set to 10000000 byte = 10mb
@@ -76,6 +76,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCame
     }, [gallery])
 
     const handleSaveGallery = (mount: boolean) => {
+        Keyboard.dismiss();
         //allow description to be empty
         //check if any changes were made
         const imgObjRev = _.cloneDeep(imgObjs).reverse();

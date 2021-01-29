@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { GalleryItemProps } from '../../services/user/types';
-import { colors } from '../../utils/styles';
-import { BodyText, UnderlineHeader } from '../../utils/components';
+import { colors } from '../utils/styles';
 import Card from './components/Card';
+import Empty from '../utils/components/Empty';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
@@ -13,7 +13,7 @@ interface GalleryComProps {
 export default ({ gallery }: GalleryComProps) => {
     if (!gallery.length) return (
         <View style={styles.container}>
-            <UnderlineHeader text='No Images' />
+            <Empty style={{ marginTop: 20 }}>No Images</Empty>
         </View>
     )
 
@@ -40,6 +40,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         position: 'relative'
-    }
+    },
+    underline_header_text: {
+        color: colors.primary,
+        fontSize: 24
+    },
+    underline_header_underline: {
+        backgroundColor: colors.secondary
+    },
 })
 

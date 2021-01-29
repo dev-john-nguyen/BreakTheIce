@@ -14,7 +14,8 @@ export interface InitFormValues {
     age: number;
 }
 
-export interface InitUserProps extends Omit<UserProfilePreviewProps, 'location'> {
+export interface InitUserProps extends Omit<UserProfilePreviewProps, 'location'
+    | 'blockedUsers'> {
     gallery: []
 }
 

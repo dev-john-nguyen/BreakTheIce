@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { CustomButton } from '../../../utils/components';
+import { CustomButton } from '../../utils';
 
 export default ({ signout }: { signout: () => void }) => {
     return (

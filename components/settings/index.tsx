@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, Pressable, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out } from '../../services/user/actions';
-import { colors } from '../../utils/styles';
+import { colors } from '../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils/types';
 import EditProfile from './components/editprofile';
 import Privacy from './components/Privacy';
@@ -12,7 +12,7 @@ import { set_banner } from '../../services/utils/actions';
 import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
 import EditGallery from '../gallery/components/Edit';
 import * as ImagePicker from 'expo-image-picker';
-import { BodyText } from '../../utils/components';
+import { BodyText } from '../utils';
 
 interface SettingsProps {
     navigation: MeStackNavigationProp;

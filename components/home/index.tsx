@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { colors } from '../../utils/styles'
+import { colors } from '../utils/styles'
 import Maps from '../maps';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
@@ -10,7 +10,7 @@ import { UserRootStateProps, UserDispatchActionsProps, CtryStateCityProps, } fro
 import { NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import * as Location from 'expo-location';
-import { CustomButton } from '../../utils/components';
+import { CustomButton } from '../utils';
 import { getBucket } from './utils';
 
 interface HomeProps {

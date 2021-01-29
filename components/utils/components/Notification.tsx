@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Animated, StyleSheet, Dimensions } from 'react-native'
-import { BodyText } from '.';
+import { BodyText } from '..';
 import { colors } from '../styles';
 
 
@@ -30,7 +30,7 @@ export default ({ notification }: { notification: string }) => {
                 { opacity: fadeAnim }
             ]}
         >
-            <BodyText text={notification} styles={styles.notification_text} />
+            <BodyText style={styles.notification_text}>{notification}</BodyText>
         </Animated.View>
     )
 }

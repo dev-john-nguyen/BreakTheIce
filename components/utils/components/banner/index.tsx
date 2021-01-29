@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Dimensions, View } from "react-native"
 import Item from './components/Item';
 import { bannerStyles, colors } from '../../styles';
-import { UtilsDispatchActionProps, BannerItemProps } from '../../../services/utils/tsTypes';
+import { UtilsDispatchActionProps, BannerItemProps } from '../../../../services/utils/tsTypes';
 
 interface BannerProps {
     remove_banner: UtilsDispatchActionProps['remove_banner']

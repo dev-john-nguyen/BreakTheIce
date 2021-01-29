@@ -52,8 +52,7 @@ export type RootBottomParamList = {
                 uid: string,
                 username: string,
                 profileImg: ProfileImgProps | null
-            };
-            title: string;
+            }
         }
     };
     Invitations: undefined
@@ -89,7 +88,7 @@ export type ChatStackParams = {
             username: string,
             profileImg: ProfileImgProps | null
         },
-        title?: string
+        title?: undefined
     },
     Profile: ProfileRouteParams
 }
@@ -174,7 +173,7 @@ export const MeStackScreen = (props: any) => {
 export const ChatStackScreen = () => (
     <ChatStack.Navigator screenOptions={screenOptions}>
         <ChatStack.Screen name="Chat" component={Chat} />
-        <ChatStack.Screen name="Message" component={Message} />
+        <ChatStack.Screen name="Message" component={Message} options={{ cardStyle: { marginTop: 0 } }} />
         <ChatStack.Screen
             name="Profile"
             component={Profile}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Modal, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, Dimensions } from 'react-native';
-import { colors } from '../../utils/styles';
+import { colors } from '../utils/styles';
 import { connect } from 'react-redux';
 import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationUserInfo } from '../../services/invitations/types';
 import { send_invitation } from '../../services/invitations/actions';
@@ -8,7 +8,7 @@ import { messageMaxLen } from '../../utils/variables';
 import { NearByUsersProps } from '../../services/near_users/types';
 import { UserRootStateProps } from '../../services/user/types';
 import { RootProps } from '../../services';
-import { CustomButton, Icon, BodyText, UnderlineHeader } from '../../utils/components';
+import { CustomButton, Icon, BodyText, UnderlineHeader } from '../utils';
 
 interface MyModalProps {
     visible: boolean;

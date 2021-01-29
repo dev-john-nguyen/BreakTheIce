@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Picker, ScrollView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, ActivityIndicator } from 'react-native';
-import { colors } from '../../../../utils/styles';
+import { colors } from '../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
 import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps } from '../../../../services/user/types';
 import { UtilsDispatchActionProps } from '../../../../services/utils/tsTypes';
@@ -8,7 +8,7 @@ import { MeStackNavigationProp } from '../../../navigation/utils/types';
 import { isEqual } from 'lodash';
 import EditProfileImg from './components/EditProfileImg';
 import { ageArr } from '../../../../utils/variables';
-import { BodyText, CustomInput } from '../../../../utils/components';
+import { BodyText, CustomInput } from '../../../utils';
 
 interface EditProfileProps {
     user: UserRootStateProps;
@@ -103,6 +103,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
 
 
     const handleSave = (mount: boolean) => {
+        Keyboard.dismiss()
 
         mount && setLoading(true)
         if (!profileImg) {

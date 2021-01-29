@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableHighlight, ActivityIndicator, StyleProp, StyleSheet, Animated, Pressable } from 'react-native';
-import { colors } from '../../utils/styles';
+import { View, Text, FlatList, ActivityIndicator, StyleProp, StyleSheet, Animated, Pressable } from 'react-native';
+import { colors, opacity_colors } from '../utils/styles';
 import { connect } from 'react-redux';
 import { ChatStackNavigationProp } from '../navigation/utils/types'
 import { RootProps } from '../../services';
@@ -8,9 +8,10 @@ import { ChatPreviewProps, ChatDispatchActionsProps } from '../../services/chat/
 import ProfileImage from '../profile/components/ProfileImage';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
-import { Icon, UnderlineHeader } from '../../utils/components';
+import { Icon } from '../utils';
 import { delete_chat } from '../../services/chat/actions';
 import { renderOtherUser, renderDateDiff } from './utils';
+import Empty from '../utils/components/Empty';
 
 interface ChatProps {
     navigation: ChatStackNavigationProp;
@@ -43,7 +44,7 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
         //figure out if unread should be updated ....
         const setRead = preview.unread && user.uid !== preview.recentUid ? true : false
 
-        navigation.push('Message', { msgDocId: preview.docId, setRead, title, targetUser });
+        navigation.push('Message', { msgDocId: preview.docId, setRead, targetUser });
     }
 
     const renderRightActions = (progress: Animated.AnimatedInterpolation) => {
@@ -72,12 +73,7 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
         <ActivityIndicator />
     </View>
 
-    if (chatPreviews.length < 1) return (
-        <UnderlineHeader
-            textStyle={styles.underline_header_text}
-            underlineStyle={styles.underline_header_underline}
-            style={{ marginTop: 20 }}>No Messages Found</UnderlineHeader>
-    )
+    if (chatPreviews.length < 1) return <Empty style={{ marginTop: 20 }}>No Messages</Empty>
 
     return (
         <FlatList
@@ -88,10 +84,10 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
 
                 var otherUser = renderOtherUser(item.usersInfo, user.uid);
 
-                var otherOtherProfileImg = null;
+                var otherUserImg = null;
 
                 if (otherUser) {
-                    otherOtherProfileImg = item.profileImgs[otherUser.uid]
+                    otherUserImg = item.profileImgs[otherUser.uid]
                 }
 
                 const list_style = chat_styles(unread)
@@ -103,19 +99,21 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
                         containerStyle={list_style.container}
                         onSwipeableRightOpen={() => delete_chat(item.docId)}
                     >
-                        <Pressable style={({ pressed }) => [list_style.content, pressed && { backgroundColor: colors.tertiary }]} onPress={() => directToMessage(item)}>
-                            <View style={list_style.profile_section}>
-                                <ProfileImage friend={true} size='regular' image={otherOtherProfileImg} />
-                                <View style={list_style.profile_section_text}>
-                                    <Text style={list_style.username}>{otherUser ? otherUser.username : 'RandomUser'}</Text>
+                        <Pressable style={({ pressed }) => [list_style.content_container, pressed && { backgroundColor: opacity_colors.secondary_medium }]} onPress={() => directToMessage(item)}>
+                            <View style={list_style.content_wrapper}>
+                                <View style={list_style.profile_section}>
+                                    <ProfileImage friend={true} size='regular' image={otherUserImg} />
+                                    <View style={list_style.profile_section_text}>
+                                        <Text style={list_style.username}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</Text>
+                                    </View>
                                 </View>
-                            </View>
-                            <View style={list_style.content_section}>
-                                <Text style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
-                                <View style={list_style.content_section_small}>
-                                    <Text style={list_style.content_section_small_text}>{renderDateDiff(item.dateSent)}</Text>
-                                </View>
+                                <View style={list_style.content_section}>
+                                    <Text style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
+                                    <View style={list_style.content_section_small}>
+                                        <Text style={list_style.content_section_small_text}>{renderDateDiff(item.dateSent)}</Text>
+                                    </View>
 
+                                </View>
                             </View>
                         </Pressable>
                     </Swipeable>
@@ -143,14 +141,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         backgroundColor: colors.red,
-    },
-    underline_header_text: {
-        color: colors.primary,
-        fontSize: 24
-    },
-    underline_header_underline: {
-        backgroundColor: colors.secondary
-    },
+    }
 })
 
 const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
@@ -162,9 +153,13 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
         position: 'relative',
         marginBottom: 20
     },
-    content: {
+    content_container: {
         flex: 1,
-        backgroundColor: unread ? colors.secondary : colors.white,
+        backgroundColor: colors.white,
+    },
+    content_wrapper: {
+        flex: 1,
+        backgroundColor: unread ? colors.secondary : opacity_colors.secondary_light,
         flexDirection: 'row',
         paddingLeft: 30,
         paddingRight: 20,

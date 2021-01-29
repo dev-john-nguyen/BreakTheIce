@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { FriendsRootProps, FriendObjProps } from '../../services/friends/types';
 import { MeStackNavigationProp } from '../navigation/utils/types';
-import { colors } from '../../utils/styles';
-import { UnderlineHeader } from '../../utils/components';
+import { colors, opacity_colors } from '../utils/styles';
+import { UnderlineHeader } from '../utils';
 import ProfileImage from '../profile/components/ProfileImage';
 
 interface FriendsProps {
@@ -31,18 +31,21 @@ const Friends = ({ friends, navigation }: FriendsProps) => {
                             <TouchableHighlight
                                 key={item.uid ? item.uid : index.toString()}
                                 onPress={() => handleOnFriendPress(item)}
-                                underlayColor={colors.secondary}
+                                underlayColor={opacity_colors.secondary_medium}
                                 style={styles.friend_container}
                             >
                                 <View style={styles.content}>
-                                    <ProfileImage friend={true} size='regular' image={item.profileImg} />
+                                    <ProfileImage friend={true} size='regular' image={item.profileImg} onImagePress={() => handleOnFriendPress(item)} />
                                     <Text style={styles.username}>{item.username}</Text>
                                 </View>
                             </TouchableHighlight>
                         )}
                         keyExtractor={(item, index) => item.uid ? item.uid : index.toString()}
                     /> :
-                    <UnderlineHeader text='Get Out There!' styles={{ marginTop: 20 }} />
+                    <UnderlineHeader
+                        textStyle={styles.underline_header_text}
+                        underlineStyle={styles.underline_header_underline}
+                        style={{ marginTop: 20 }}>Get Out There!</UnderlineHeader>
             }
         </View>
     )
@@ -56,6 +59,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
+    underline_header_text: {
+        color: colors.primary,
+        fontSize: 24
+    },
+    underline_header_underline: {
+        backgroundColor: colors.secondary
+    },
     friend_container: {
         padding: 10,
         paddingLeft: 110,
@@ -63,12 +73,13 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
+        backgroundColor: opacity_colors.secondary_light,
         marginBottom: 20
     },
     content: {
         position: 'relative',
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     username: {
         marginLeft: 20,

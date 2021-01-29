@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, StyleProp, Pressable } from 'react-native';
 import { ProfileImgProps, NewProfileImgProps } from '../../../services/user/types';
 import { FontAwesome } from '@expo/vector-icons';
-import { colors } from '../../../utils/styles';
+import { colors } from '../../utils/styles';
 import { Image } from 'react-native';
-import { Icon } from '../../../utils/components';
+import { Icon } from '../../utils';
 
 interface ProfileImageProp {
     image: ProfileImgProps | NewProfileImgProps | null;
@@ -14,6 +14,7 @@ interface ProfileImageProp {
 }
 
 export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
+    const [errImg, setErrImg] = useState<boolean>(false);
 
     var styles: any, iconSize: number;
 
@@ -33,12 +34,22 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
 
 
     const renderImage = () => {
+
+        if (errImg) return (
+            <FontAwesome
+                name="user-circle-o"
+                color={colors.primary}
+                style={styles.icon}
+            />
+        )
+
         if (image && image.uri) {
             return (
                 <View style={styles.image_container}>
                     <Image
                         source={{ uri: image.uri, cache: 'force-cache' }}
                         style={baseStyles.image}
+                        onError={() => setErrImg(true)}
                     />
                 </View>
             )

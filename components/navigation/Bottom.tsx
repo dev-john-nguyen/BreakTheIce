@@ -2,14 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { colors } from '../../utils/styles';
+import { colors } from '../utils/styles';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
 import { Feather } from '@expo/vector-icons';
 import { RootProps } from '../../services';
 import { InvitationsRootProps, InvitationStatusOptions } from '../../services/invitations/types';
 import { ChatRootProps } from '../../services/chat/types';
-import { BodyText } from '../../utils/components';
-import { BottomNavBackground } from '../../utils/svgs';
+import { BodyText } from '../utils';
+import { BottomNavBackground } from '../utils/svgs';
 
 
 interface BottomNavProps {
@@ -104,7 +104,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
                     <Pressable key={index} onPress={onPress} style={styles.item}>
                         {({ pressed }) => (
                             <View>
-                                <Feather name={type} size={size} color={isFocused ? colors.primary : pressed ? colors.tertiary : colors.white} />
+                                <Feather name={type} size={size} color={isFocused ? colors.secondary : pressed ? colors.tertiary : colors.white} />
                                 {notificationNum > 0 &&
                                     <View style={styles.notification_container}>
                                         <BodyText style={styles.notification_text}>{notificationNum.toString()}</BodyText>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     notification_container: {
         borderRadius: 100,
         padding: 6,
-        backgroundColor: colors.primary,
+        backgroundColor: colors.secondary,
         position: 'absolute',
         right: -5,
         top: -5
