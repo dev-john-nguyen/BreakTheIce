@@ -44,12 +44,16 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
         )
 
         if (image && image.uri) {
+            const uri = image.cachedUrl ? image.cachedUrl : image.uri
             return (
                 <View style={styles.image_container}>
                     <Image
-                        source={{ uri: image.uri, cache: 'force-cache' }}
+                        source={{ uri, cache: 'force-cache' }}
                         style={baseStyles.image}
-                        onError={() => setErrImg(true)}
+                        onError={(err) => {
+                            console.log(err)
+                            setErrImg(true)
+                        }}
                     />
                 </View>
             )

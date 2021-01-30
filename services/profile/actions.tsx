@@ -77,8 +77,9 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 distance: distance ? distance : 0,
                 sentInvite: sentInvite ? sentInvite : false,
             }
+
             ///cache gallery images
-            if (profileData.gallery.length > 0) {
+            if (profileData.gallery && profileData.gallery.length > 0) {
                 await cache_user_images(profileData.gallery)
             }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, useLayoutEffect } from 'react';
+import React, { useState, useEffect, ReactNode, useLayoutEffect, useRef } from 'react';
 import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, ActivityIndicator, Keyboard } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../utils/styles';
@@ -8,12 +8,12 @@ import { connect } from 'react-redux';
 import { RootProps } from '../../../services';
 import { save_gallery } from '../../../services/user/actions';
 import { UserDispatchActionsProps } from '../../../services/user/types';
-import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
+import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { AutoId } from '../../../utils/functions';
 import _ from 'lodash'
 import { MeStackNavigationProp } from '../../navigation/utils/types';
-import { set_banner } from '../../../services/utils/actions';
+import { set_banner } from '../../../services/banner/actions';
 import { Feather } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { hashCode } from '../../../utils/functions';
@@ -22,20 +22,21 @@ import { Icon, CustomInput } from '../../utils';
 //Summary
 //image limit will be set to 10000000 byte = 10mb
 //need to lower the size
-interface UploadImageProps {
+interface EditGalleryProps {
     save_gallery: UserDispatchActionsProps['save_gallery'];
     gallery: UserRootStateProps['gallery'];
     navigation: MeStackNavigationProp;
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     handleCameraRollPermission: () => Promise<boolean>
 }
 
-const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCameraRollPermission }: UploadImageProps) => {
+const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCameraRollPermission }: EditGalleryProps) => {
     const [imgObjs, setImgObjs] = useState<NewGalleryItemProps[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    var mount = useRef<boolean>()
 
     useLayoutEffect(() => {
-        var mount = true
+        mount.current = true;
 
         navigation.setOptions({
             headerRight: () => {
@@ -54,7 +55,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCame
                                     </Pressable >
                                 }
                                 {imgObjsLen > 0 &&
-                                    <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={() => handleSaveGallery(mount)} />
+                                    <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
                                 }
                             </>
                         }
@@ -65,7 +66,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCame
         })
 
         return () => {
-            mount = false;
+            mount.current = false;
         }
     }, [loading, imgObjs])
 
@@ -75,7 +76,7 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCame
 
     }, [gallery])
 
-    const handleSaveGallery = (mount: boolean) => {
+    const handleSaveGallery = () => {
         Keyboard.dismiss();
         //allow description to be empty
         //check if any changes were made
@@ -94,10 +95,12 @@ const UploadImage = ({ save_gallery, gallery, navigation, set_banner, handleCame
         setLoading(true)
 
         save_gallery(imgObjRev)
-            .then(() => mount && setLoading(false))
+            .then(() => {
+                mount.current && setLoading(false)
+            })
             .catch((err) => {
                 console.log(err)
-                mount && setLoading(false)
+                mount.current && setLoading(false)
             })
     }
 
@@ -315,4 +318,4 @@ const mapStateToProps = (state: RootProps) => ({
     gallery: state.user.gallery
 })
 
-export default connect(mapStateToProps, { save_gallery, set_banner })(UploadImage);
+export default connect(mapStateToProps, { save_gallery, set_banner })(EditGallery);

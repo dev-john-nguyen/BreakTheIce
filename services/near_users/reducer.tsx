@@ -1,6 +1,10 @@
-import { SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, RESET_NEAR_USERS, UNFRIEND_USER, INIT_NEAR_USERS } from './actionTypes'
+import {
+    SET_NEAR_USERS, REMOVE_NEAR_USERS, UPDATE_NEAR_USERS, SENT_INVITE_NEAR_USER, UPDATE_INVITE_STATUS_NEAR_USER, RESET_NEAR_USERS, UNFRIEND_USER, INIT_NEAR_USERS,
+    UPDATE_RECEIVED_INVITE_NEAR_USERS,
+    UPDATE_FRIENDS_NEAR_USERS
+} from './actionTypes'
 import { NearUsersActionProps, NearByUsersProps } from './types';
-import { update_nearBy } from '../../utils/functions';
+import { update_invite_status, update_received_status, update_friends_status } from '../utils';
 
 const INITIAL_STATE = {
     nearBy: [],
@@ -35,12 +39,12 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
         case UPDATE_INVITE_STATUS_NEAR_USER:
             return {
                 ...state,
-                nearBy: update_nearBy(state.nearBy, action.payload.uid, action.payload.status)
+                nearBy: update_invite_status(state.nearBy, action.payload.uid, action.payload.status)
             }
         case SENT_INVITE_NEAR_USER:
             return {
                 ...state,
-                nearBy: update_nearBy(state.nearBy, action.payload.uid)
+                nearBy: update_invite_status(state.nearBy, action.payload.uid)
             }
         case UNFRIEND_USER:
             const unfriendNearBy: NearByUsersProps[] = state.nearBy.map((user: NearByUsersProps) => {
@@ -52,6 +56,16 @@ export default (state: any = INITIAL_STATE, action: NearUsersActionProps) => {
             return {
                 ...state,
                 nearBy: unfriendNearBy
+            }
+        case UPDATE_RECEIVED_INVITE_NEAR_USERS:
+            return {
+                ...state,
+                nearBy: update_received_status(state.nearBy, action.payload.invitations)
+            }
+        case UPDATE_FRIENDS_NEAR_USERS:
+            return {
+                ...state,
+                nearBy: update_friends_status(state.nearBy, action.payload.friends)
             }
         case RESET_NEAR_USERS:
             return INITIAL_STATE

@@ -11,7 +11,7 @@ interface GalleryComProps {
 
 
 export default ({ gallery }: GalleryComProps) => {
-    if (!gallery.length) return (
+    if (!gallery || !gallery.length) return (
         <View style={styles.container}>
             <Empty style={{ marginTop: 20 }}>No Images</Empty>
         </View>

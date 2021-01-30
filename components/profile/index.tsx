@@ -12,11 +12,11 @@ import { RootProps } from '../../services';
 import InvitationModal from '../modal/InvitationModal';
 import { set_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, ProfileUserProps, ProfileRootProps } from '../../services/profile/types';
-import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
+import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import HeaderRight from './components/HeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
-import { set_banner } from '../../services/utils/actions';
+import { set_banner } from '../../services/banner/actions';
 import { UnderlineHeader } from '../utils';
 import ProfileContent from './components/Content';
 import { TopProfileBackground } from '../utils/svgs';
@@ -34,7 +34,7 @@ interface ProfileProps {
     set_current_profile: ProfileDispatchActionProps['set_current_profile'];
     update_invitation: InvitationsDispatchActionProps['update_invitation'];
     unfriend_user: FriendDispatchActionProps['unfriend_user'];
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     update_block_user: UserDispatchActionsProps['update_block_user'];
 }
 

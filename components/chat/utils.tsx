@@ -27,24 +27,3 @@ export const renderDate = (date: Date) => {
 export const renderOtherUser = (userInfo: ChatPreviewProps['usersInfo'], uid: string) => {
     return userInfo.find(user => uid !== user.uid)
 }
-
-export const handleUpdateUnread = (docId: string, unread: boolean, recentUid: string, userId: string) => {
-    if (unread && recentUid !== userId) {
-        //update unread status to false;
-        fireDb.collection(ChatDb).doc(docId).update({ unread: false })
-            .then(() => {
-                console.log('unread status updated!')
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
-}
-
-
-export const searchReduxChat = (targetUser: TargetUserProps, chatPreviews: ChatPreviewProps[]) => {
-    return chatPreviews.find((chat) => {
-        const chatUser = chat.usersInfo.find(user => user.uid === targetUser.uid)
-        if (chatUser) return chat;
-    })
-}

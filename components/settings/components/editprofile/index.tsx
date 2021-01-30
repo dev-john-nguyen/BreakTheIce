@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, Picker, ScrollView, KeyboardAvoiding
 import { colors } from '../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
 import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps } from '../../../../services/user/types';
-import { UtilsDispatchActionProps } from '../../../../services/utils/tsTypes';
+import { BannerDispatchActionProps } from '../../../../services/banner/tsTypes';
 import { MeStackNavigationProp } from '../../../navigation/utils/types';
 import { isEqual } from 'lodash';
 import EditProfileImg from './components/EditProfileImg';
@@ -13,7 +13,7 @@ import { BodyText, CustomInput } from '../../../utils';
 interface EditProfileProps {
     user: UserRootStateProps;
     update_profile: UserDispatchActionsProps['update_profile'];
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     navigation: MeStackNavigationProp;
     handleCameraRollPermission: () => Promise<boolean>
 }

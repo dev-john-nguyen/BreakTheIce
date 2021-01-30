@@ -67,6 +67,7 @@ export default ({ init_user }: SignUpFormProps) => {
                         maxLength={100}
                         value={username}
                         autoCapitalize='none'
+                        autoCorrect={false}
                     />
                 </View>
 

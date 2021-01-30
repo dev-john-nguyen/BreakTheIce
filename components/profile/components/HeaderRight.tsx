@@ -12,7 +12,8 @@ interface ProfileHeaderRightProps {
 
 export default ({ handleUnfriendUser, handleBlockUser, blocked, friend }: ProfileHeaderRightProps) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [linkloading, setLinkLoading] = useState<boolean>(false);
+    const [blockLoading, setBlockLoading] = useState<boolean>(false);
     const mount = useRef<boolean>();
 
     useEffect(() => {
@@ -26,23 +27,23 @@ export default ({ handleUnfriendUser, handleBlockUser, blocked, friend }: Profil
     const handleShowMenu = () => setShowMenu(showMenu ? false : true)
 
     const handleUnlinkPress = () => {
-        setLoading(true);
+        setLinkLoading(true);
         handleUnfriendUser()
-            .then(() => mount && setLoading(false))
+            .then(() => mount && setLinkLoading(false))
     }
 
     const handleBlockPress = () => {
-        setLoading(true);
+        setBlockLoading(true);
         handleBlockUser()
-            .then(() => mount && setLoading(false))
+            .then(() => mount && setBlockLoading(false))
     }
 
     if (showMenu) return (
         <View style={{ marginRight: 10, flexDirection: 'row', alignItems: 'center' }}>
-            <CustomButton type='red' text={blocked ? 'unblock' : 'block'} size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} indicatorColor={loading && colors.white} />
+            <CustomButton type='red' text={blocked ? 'unblock' : 'block'} size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} indicatorColor={blockLoading && colors.white} />
 
             {
-                friend && <CustomButton type='white' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={loading && colors.primary} />
+                friend && <CustomButton type='white' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={linkloading && colors.primary} />
             }
             <Icon
                 type='more-horizontal'

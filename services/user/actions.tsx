@@ -1,5 +1,5 @@
 import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, SET_GALLERY, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS } from './actionTypes';
-import { set_loading, remove_loading, set_banner } from '../utils/actions';
+import { set_loading, remove_loading, set_banner } from '../banner/actions';
 import { AppDispatch } from '../../App';
 import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, BlockUserProps } from './types';
 import { LocationObject } from 'expo-location';
@@ -7,7 +7,7 @@ import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, 
 import { validate_near_users, reset_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
-import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, LocationsUsersDb, LocationsDb, UsersDb, timestamp } from '../../utils/variables'
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb, timestamp } from '../../utils/variables'
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
 import { cacheImage } from '../../utils/functions';

@@ -6,21 +6,21 @@ import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils
 import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
 import { ChatDb, ChatMessageDb } from '../../../utils/variables';
-import { MessageProps, ChatPreviewProps, ChatRootProps } from '../../../services/chat/types';
+import { MessageProps, ChatRootProps } from '../../../services/chat/types';
 import { RootProps } from '../../../services';
-import { set_banner } from '../../../services/utils/actions';
-import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
+import { set_banner } from '../../../services/banner/actions';
+import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import { CustomButton, BodyText, HeaderText } from '../../utils';
-import { handleUpdateUnread, searchReduxChat } from '../utils';
 import { ProfileImgProps } from '../../../services/user/types';
 import { timestamp } from '../../../utils/variables';
 import ProfileImage from '../../profile/components/ProfileImage';
+import { update_if_read, search_redux_chat, set_if_read, database_fetch_chat } from './utils';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
     navigation: ChatStackNavigationProp;
     user: RootProps['user'];
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     chatPreviews: ChatRootProps['previews'];
 }
 
@@ -38,30 +38,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
 
     const initChatListener = (msgDocId: string, setRead: boolean) => {
-
-
-        if (setRead) {
-            //set message read
-            //update usersInfo with profileImg
-
-            var updatedObj: {
-                unread: boolean,
-                [uid: string]: any
-            } = {
-                unread: false,
-                timestamp,
-                updatedAt: new Date()
-            }
-
-            if (user.profileImg) {
-                updatedObj[`profileImgs.${user.uid}`] = {
-                    uri: user.profileImg.uri,
-                    updatedAt: new Date()
-                }
-            }
-
-            fireDb.collection(ChatDb).doc(msgDocId).update(updatedObj)
-        }
+        //check to see if read needs to be updated and updates profile image
+        update_if_read(user, msgDocId, setRead);
 
         return fireDb.collection(ChatDb).doc(msgDocId).collection(ChatMessageDb).onSnapshot((querySnapshot) => {
             var messages: MessageProps[] = [];
@@ -86,56 +64,13 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         )
     }
 
-    const fetchDbChat = async (targetUser: TargetUserProps) => {
-        return fireDb.collection(ChatDb)
-            .where('usersInfo', 'array-contains', { uid: user.uid, username: user.username })
-            .get()
-            .then(querySnapShot => {
-                const { docs } = querySnapShot;
-
-                const chatDoc = docs.find(doc => {
-                    var chatFound: boolean = false
-                    if (doc.exists) {
-                        const { usersInfo } = doc.data() as ChatPreviewProps;
-
-                        usersInfo.forEach(userInfo => {
-                            if (userInfo.uid === targetUser.uid) {
-                                chatFound = true
-                            }
-                        })
-                    }
-
-                    if (chatFound) {
-                        return doc
-                    }
-                })
-
-                if (chatDoc) {
-
-                    const { unread, recentUid } = chatDoc.data() as ChatPreviewProps;
-
-                    handleUpdateUnread(chatDoc.id, unread, recentUid, user.uid)
-
-                    return { docId: chatDoc.id }
-                }
-
-                setMessages('empty')
-            })
-            .catch((err) => {
-                console.log(err)
-                set_banner('Oops! Something went wrong getting the chat messages.', 'error')
-                setMessages('empty')
-            })
-
-    }
-
-    const fetchChat = async (targetUser: TargetUserProps) => {
+    const fetchChatAndListen = async (targetUser: TargetUserProps) => {
         var docId: string | undefined;
 
-        const foundChat = searchReduxChat(targetUser, chatPreviews);
+        const foundChat = search_redux_chat(targetUser, chatPreviews);
 
         if (!foundChat) {
-            const fetchedDocId = await fetchDbChat(targetUser)
+            const fetchedDocId = await database_fetch_chat(targetUser, user, setMessages, set_banner)
                 .catch(err => {
                     console.log(err)
                 })
@@ -149,7 +84,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         } else {
             docId = foundChat.docId
             const { unread, recentUid } = foundChat
-            handleUpdateUnread(docId, unread, recentUid, user.uid)
+            set_if_read(docId, unread, recentUid, user.uid)
         }
 
         setTargetChatDocId(docId);
@@ -169,8 +104,6 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
     }, [route.params])
 
     useEffect(() => {
-        let isMounted = true;
-
         var unsubscribeMessages: () => void | undefined;
 
         const { targetUser, msgDocId, setRead } = route.params;
@@ -180,7 +113,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             unsubscribeMessages = initChatListener(msgDocId, setRead)
         } else if (targetUser) {
 
-            fetchChat(targetUser)
+            fetchChatAndListen(targetUser)
                 .then((chatListener) => {
                     if (chatListener) {
                         unsubscribeMessages = chatListener
@@ -197,7 +130,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         };
     }, [route.params, targetChatDocId])
 
-    const handleSentMessage = () => {
+    const handleSendMessage = () => {
 
         if (messageTxt.length < 1) return set_banner('Say something cool.', 'warning')
 
@@ -222,15 +155,15 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         var newChatId: string;
 
         if (targetChatDocId) {
-            //listener was set so targetChatDocId
+            //the chat was found
             chatRef = fireDb.collection(ChatDb).doc(targetChatDocId);
         } else if (route.params.targetUser) {
-            //listener or targetChatDocId 
+            //create new chat
             chatRef = fireDb.collection(ChatDb).doc();
 
             const { targetUser } = route.params;
 
-
+            //init chat data
             chatObj.dateCreated = new Date();
 
             chatObj.usersInfo = [{
@@ -272,6 +205,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             batch.set(chatRef, chatObj, { merge: true })
         } catch (err) {
             console.log(err)
+            set_banner("Failed to initate the chat", 'error')
         }
 
 
@@ -299,7 +233,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
     }
 
 
-    const TextMsgs = () => {
+    const renderTextMsgs = () => {
         if (!messages) return <ActivityIndicator size='large' color={colors.primary} style={{ flex: 1 }} />
 
         if (messages === 'empty') {
@@ -335,8 +269,8 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
     return (
         <View style={styles.container}>
-            <TextMsgs />
-            <KeyboardAvoidingView keyboardVerticalOffset={120} behavior={'padding'} style={styles.message_form}>
+            {renderTextMsgs()}
+            <KeyboardAvoidingView keyboardVerticalOffset={0} behavior={'padding'} style={styles.message_form}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.message_form_content}>
                         <ScrollView style={styles.message_form_input}>
@@ -346,7 +280,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                                 value={messageTxt}
                                 multiline />
                         </ScrollView>
-                        <CustomButton type='primary' onPress={handleSentMessage} text='Send' />
+                        <CustomButton type='primary' onPress={handleSendMessage} text='Send' />
                     </View>
                 </ TouchableWithoutFeedback>
             </KeyboardAvoidingView>

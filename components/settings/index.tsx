@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Pressable, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out } from '../../services/user/actions';
 import { colors } from '../utils/styles';
@@ -8,9 +8,9 @@ import EditProfile from './components/editprofile';
 import Privacy from './components/Privacy';
 import { RootProps } from '../../services';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
-import { set_banner } from '../../services/utils/actions';
-import { UtilsDispatchActionProps } from '../../services/utils/tsTypes';
-import EditGallery from '../gallery/components/Edit';
+import { set_banner } from '../../services/banner/actions';
+import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
+import EditGallery from './components/EditGallery';
 import * as ImagePicker from 'expo-image-picker';
 import { BodyText } from '../utils';
 
@@ -19,7 +19,7 @@ interface SettingsProps {
     user: UserRootStateProps;
     update_profile: UserDispatchActionsProps['update_profile'];
     update_privacy: UserDispatchActionsProps['update_privacy'];
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     sign_out: UserDispatchActionsProps['sign_out'];
 }
 

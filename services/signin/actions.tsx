@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { AppDispatch } from '../../App';
-import { set_banner } from '../utils/actions';
+import { set_banner } from '../banner/actions';
 import { SignUpValuesProps, InitFormValues, InitUserProps } from './types';
 import { fireDb } from '../firebase';
 import { UsersDb, regexName, regexUsername } from '../../utils/variables';

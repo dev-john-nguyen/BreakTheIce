@@ -4,9 +4,9 @@ import { fireDb } from '../firebase';
 import { FriendsDb, FriendsUsersDb } from '../../utils/variables';
 import { FriendObjProps } from './types';
 import { RootProps } from '..';
-import { set_banner } from '../utils/actions';
-import { UNFRIEND_USER } from '../near_users/actionTypes';
-import { UPDATE_UNFRIEND_PROFILE } from '../profile/actionTypes';
+import { set_banner } from '../banner/actions';
+import { UNFRIEND_USER, UPDATE_FRIENDS_NEAR_USERS } from '../near_users/actionTypes';
+import { UPDATE_UNFRIEND_PROFILE, UPDATE_FRIENDS_PROFILES } from '../profile/actionTypes';
 import { cacheImage } from '../../utils/functions';
 import firebase from 'firebase';
 
@@ -50,10 +50,10 @@ export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: ()
             }
         }
 
-        dispatch({
-            type: SET_FRIENDS,
-            payload: friendsArr
-        })
+        dispatch({ type: UPDATE_FRIENDS_PROFILES, payload: { friends: friendsArr } })
+        dispatch({ type: UPDATE_FRIENDS_NEAR_USERS, payload: { friends: friendsArr } })
+
+        dispatch({ type: SET_FRIENDS, payload: friendsArr })
     }, err => {
         console.log(err)
         dispatch(set_banner('Oops! Something went wrong with getting your friends.', 'error'))

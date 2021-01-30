@@ -1,6 +1,7 @@
 import { LocationObject } from 'expo-location';
 import { CtryStateCityProps, UserRootStateProps, UserProfilePreviewProps } from '../user/types';
-import { InvitationStatusOptions } from '../invitations/types';
+import { InvitationStatusOptions, InvitationObject } from '../invitations/types';
+import { FriendObjProps } from '../friends/types';
 
 export interface NearUsersActionProps {
     type: string;
@@ -9,6 +10,8 @@ export interface NearUsersActionProps {
         status: InvitationStatusOptions,
         nearBy: Array<NearByUsersProps>;
         all: Array<NearByUsersProps>;
+        invitations: InvitationObject[];
+        friends: FriendObjProps[];
         nearUsersListener: () => void;
     }
 }

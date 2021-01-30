@@ -4,9 +4,9 @@ import { InvitationObject, InvitationStatusOptions } from './types';
 import { fireDb } from '../firebase';
 import { InvitationsDb, timestamp } from '../../utils/variables';
 import { RootProps } from '..';
-import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER } from '../near_users/actionTypes';
-import { set_banner } from '../utils/actions';
-import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
+import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER, UPDATE_RECEIVED_INVITE_NEAR_USERS } from '../near_users/actionTypes';
+import { set_banner } from '../banner/actions';
+import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY, UPDATE_RECEIVED_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
 import { handleInvitations, handle_invitation_status } from './utils';
 import firebase from 'firebase';
 
@@ -66,9 +66,21 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
         .where("sentTo.uid", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
         .onSnapshot(async (querySnapshot) => {
+            const invitations: InvitationObject[] = await handleInvitations(querySnapshot)
+
+            dispatch({
+                type: UPDATE_RECEIVED_INVITE_NEAR_USERS,
+                payload: { invitations }
+            })
+
+            dispatch({
+                type: UPDATE_RECEIVED_INVITE_PROFILE_HISTORY,
+                payload: { invitations }
+            })
+
             dispatch({
                 type: SET_INVITATIONS_INBOUND,
-                payload: await handleInvitations(querySnapshot)
+                payload: invitations
             })
         },
             err => {

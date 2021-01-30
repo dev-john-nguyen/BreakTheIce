@@ -2,8 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
-import { remove_banner, remove_notification } from '../services/utils/actions';
-import { UtilsRootStateProps, UtilsDispatchActionProps } from '../services/utils/tsTypes';
+import { remove_banner, remove_notification } from '../services/banner/actions';
+import { BannerRootStateProps, BannerDispatchActionProps } from '../services/banner/tsTypes';
 import SignIn from './signin';
 import BottomNav from './navigation/Bottom';
 import { RootProps } from '../services';
@@ -26,9 +26,9 @@ import { SigninDispatchActionProps } from '../services/signin/types';
 const BottomTabs = createBottomTabNavigator();
 
 interface Base {
-    utils: UtilsRootStateProps;
+    banner: BannerRootStateProps;
     remove_error: () => void;
-    remove_banner: UtilsDispatchActionProps['remove_banner']
+    remove_banner: BannerDispatchActionProps['remove_banner']
     user: RootProps['user'];
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
@@ -39,7 +39,7 @@ interface Base {
 
 const Base = (props: Base) => {
     const handleRender = () => {
-        if (props.utils.loading) return <ActivityIndicator />
+        if (props.banner.loading) return <ActivityIndicator />
         if (props.user.fetchFail) return <Text>Oops! We couldn't retrieve your profile.</Text>
 
         if (props.user.uid) {
@@ -90,14 +90,14 @@ const Base = (props: Base) => {
         <View style={styles.container}>
             <StatusBar style='dark' />
             {
-                props.utils.notification.length > 0 &&
-                <Notification notification={props.utils.notification} />
+                props.banner.notification.length > 0 &&
+                <Notification notification={props.banner.notification} />
             }
             {
-                props.utils.banner.length > 0 &&
+                props.banner.banner.length > 0 &&
                 <Banner
                     remove_banner={props.remove_banner}
-                    banner={props.utils.banner}
+                    banner={props.banner.banner}
                 />
             }
             {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: RootProps) => ({
-    utils: state.utils,
+    banner: state.banner,
     user: state.user
 })
 

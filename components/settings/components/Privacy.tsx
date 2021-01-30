@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Pressable, Switch, StyleSheet } from 'react-native';
 import { UpdateUserPrivacyProps, UserRootStateProps, UserDispatchActionsProps } from '../../../services/user/types';
-import { UtilsDispatchActionProps } from '../../../services/utils/tsTypes';
+import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import { MeStackNavigationProp } from '../../navigation/utils/types';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../utils/styles';
@@ -10,7 +10,7 @@ import { isEqual } from 'lodash';
 interface PrivacyProps {
     user: UserRootStateProps;
     update_privacy: UserDispatchActionsProps['update_privacy'];
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     navigation: MeStackNavigationProp
 }
 

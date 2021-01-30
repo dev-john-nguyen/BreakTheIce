@@ -8,8 +8,9 @@ import { NearByUsersProps } from './types';
 import { getDistance } from 'geolib';
 import { RootProps } from '..';
 import firebase from 'firebase';
-import { set_banner } from '../utils/actions';
+import { set_banner } from '../banner/actions';
 import { cacheImage } from '../../utils/functions';
+import { UPDATE_PROFILE_HISTORY } from '../profile/actionTypes';
 
 //find near by users
 export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
@@ -102,6 +103,11 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
             }
 
             dispatch({
+                type: UPDATE_PROFILE_HISTORY,
+                payload: nearByUsers
+            })
+
+            dispatch({
                 type: SET_NEAR_USERS,
                 payload: {
                     nearBy: nearByUsers,
@@ -167,6 +173,11 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
     }
 
     if (!updated) return
+
+    dispatch({
+        type: UPDATE_PROFILE_HISTORY,
+        payload: nearByUsers
+    })
 
     dispatch({
         type: UPDATE_NEAR_USERS,

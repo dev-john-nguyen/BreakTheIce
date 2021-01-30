@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleProp } from "react-native"
-import { UtilsDispatchActionProps, BannerItemProps } from '../../../../../services/utils/tsTypes';
+import { BannerDispatchActionProps, BannerItemProps } from '../../../../../services/banner/tsTypes';
 import { BodyText } from '../../..';
 
 interface ItemProps {
     item: BannerItemProps;
     styles: StyleProp<any>
-    remove_banner: UtilsDispatchActionProps['remove_banner'];
+    remove_banner: BannerDispatchActionProps['remove_banner'];
 }
 
 export default ({ item, styles, remove_banner }: ItemProps) => {

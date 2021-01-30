@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import userReducer from './user/reducer';
-import utilsReducer from './utils/reducer';
+import bannerReducer from './banner/reducer';
 import nearUserReducer from './near_users/reducer';
 import invitationsReducer from './invitations/reducer';
 import friendsReducer from './friends/reducer';
@@ -8,7 +8,7 @@ import chatReducer from './chat/reducer';
 import profileReducer from './profile/reducer';
 
 import { NearUsersRootProps } from './near_users/types';
-import { UtilsRootStateProps } from './utils/tsTypes';
+import { BannerRootStateProps } from './banner/tsTypes';
 import { UserRootStateProps } from './user/types';
 import { InvitationsRootProps } from './invitations/types';
 import { FriendsRootProps } from './friends/types';
@@ -17,7 +17,7 @@ import { ProfileRootProps } from './profile/types';
 
 export default combineReducers({
     user: userReducer,
-    utils: utilsReducer,
+    banner: bannerReducer,
     nearUsers: nearUserReducer,
     invitations: invitationsReducer,
     friends: friendsReducer,
@@ -27,7 +27,7 @@ export default combineReducers({
 
 export interface RootProps {
     user: UserRootStateProps;
-    utils: UtilsRootStateProps;
+    banner: BannerRootStateProps;
     nearUsers: NearUsersRootProps;
     invitations: InvitationsRootProps;
     friends: FriendsRootProps;

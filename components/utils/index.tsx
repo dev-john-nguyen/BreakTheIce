@@ -92,10 +92,11 @@ interface CustomInput {
     onChangeText: (text: string) => void,
     keyboardType?: 'numeric';
     textContentType?: 'name'
-    autoCapitalize?: 'none'
+    autoCapitalize?: 'none';
+    autoCorrect?: boolean;
 }
 
-export const CustomInput = ({ style, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize }: CustomInput) => {
+export const CustomInput = ({ style, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize, autoCorrect }: CustomInput) => {
     let [fontsLoaded] = useFonts({
         Roboto_400Regular
     });
@@ -114,6 +115,7 @@ export const CustomInput = ({ style, placeholder, multiline, maxLength, value, o
         keyboardType={keyboardType}
         textContentType={textContentType}
         autoCapitalize={autoCapitalize}
+        autoCorrect={autoCorrect}
     />
 }
 

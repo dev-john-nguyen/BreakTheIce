@@ -4,7 +4,8 @@ import { AppDispatch } from '../../App';
 import { RootProps } from '../';
 import { ChatDb } from '../../utils/variables';
 import { ChatPreviewProps } from './types';
-import { set_banner } from '../utils/actions';
+import { set_banner } from '../banner/actions';
+import { cacheImage } from '../../utils/functions';
 
 export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: () => RootProps) => {
 
@@ -15,12 +16,21 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
         return;
     }
 
-    var chatListener = fireDb.collection(ChatDb).where('usersInfo', 'array-contains', { uid, username }).onSnapshot(querySnapshot => {
+    var chatListener = fireDb.collection(ChatDb).where('usersInfo', 'array-contains', { uid, username }).onSnapshot(async (querySnapshot) => {
         var chatPreviews: ChatPreviewProps[] = [];
 
-        querySnapshot.docs.forEach(doc => {
+        const { docs } = querySnapshot;
+
+        for (let i = 0; i < docs.length; i++) {
+            const doc = docs[i]
+
             if (doc.exists) {
-                const { unread, recentUid, recentMsg, dateSent, usersInfo, dateCreated, profileImgs } = doc.data()
+                var { unread, recentUid, recentMsg, dateSent, usersInfo, dateCreated, profileImgs } = doc.data()
+
+                //need to get cached image
+                for (let key in profileImgs) {
+                    profileImgs[key].cachedUrl = await cacheImage(profileImgs[key].uri)
+                }
 
                 chatPreviews.push({
                     docId: doc.id,
@@ -33,7 +43,8 @@ export const set_and_listen_messages = () => (dispatch: AppDispatch, getState: (
                     profileImgs
                 })
             }
-        })
+
+        }
 
         dispatch({
             type: SET_CHAT_PREVIEWS,

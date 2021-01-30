@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { UtilsDispatchActionProps } from '../../../../../services/utils/tsTypes';
+import { BannerDispatchActionProps } from '../../../../../services/banner/tsTypes';
 import { ProfileImgProps, NewProfileImgProps } from '../../../../../services/user/types';
 import { hashCode } from '../../../../../utils/functions';
 import { galleryImgSizeLimit } from '../../../../../utils/variables';
@@ -10,7 +10,7 @@ import { colors } from '../../../../utils/styles';
 import ProfileImage from '../../../../profile/components/ProfileImage';
 
 interface EditProfileImage {
-    set_banner: UtilsDispatchActionProps['set_banner'];
+    set_banner: BannerDispatchActionProps['set_banner'];
     profileImg: ProfileImgProps | null;
     imgObj?: NewProfileImgProps;
     setImgObj: (imgObj: NewProfileImgProps) => void;
