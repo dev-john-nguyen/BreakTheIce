@@ -52,6 +52,7 @@ export const init_user = (userFormValues: InitFormValues) => async (dispatch: Ap
                 bioShort: '',
                 hideOnMap: false,
                 profileImg: null,
+                blockedUsers: [],
                 gallery: []
             }
 

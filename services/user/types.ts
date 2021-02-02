@@ -47,7 +47,8 @@ export interface UserProfilePreviewProps {
     age: number;
     hideOnMap: boolean;
     profileImg: ProfileImgProps | null;
-    blockedUsers: BlockUserProps[] | []
+    blockedUsers: BlockUserProps[] | [],
+    updatedAt: Date
 }
 
 export interface BlockUserProps {
@@ -86,7 +87,8 @@ export interface UserRootStateProps {
     fetchFail?: boolean;
     init?: boolean;
     locationListener?: { remove: () => void };
-    blockedUsers: BlockUserProps[]
+    updatedAt: Date;
+    blockedUsers: BlockUserProps[];
 }
 
 export interface UpdateUserProfileProps {
@@ -108,6 +110,7 @@ export interface UserDispatchActionsProps {
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => Promise<void | undefined>;
     update_block_user: (blockedUser: BlockUserProps) => Promise<void | undefined>;
+    remove_account: (phoneNumber: string, ctryCode: string | number) => Promise<void | undefined>;
     go_online: () => void;
     sign_out: () => void;
 }

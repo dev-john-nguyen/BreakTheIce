@@ -6,7 +6,6 @@ import { colors } from '../styles';
 export default ({ style, children }: { style: StyleProp<any>, children: string }) => (
     <UnderlineHeader
         textStyle={styles.underline_header_text}
-        underlineStyle={styles.underline_header_underline}
         style={style}>{children}</UnderlineHeader>
 )
 
@@ -16,6 +15,6 @@ const styles = StyleSheet.create({
         fontSize: 24
     },
     underline_header_underline: {
-        backgroundColor: colors.secondary
+        backgroundColor: colors.tertiary
     },
 })

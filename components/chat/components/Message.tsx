@@ -95,9 +95,9 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: () => (
-                <View>
+                <View style={{ alignItems: 'center' }}>
                     <ProfileImage size='regular' image={route.params.targetUser.profileImg} />
-                    <HeaderText>{route.params.targetUser.username}</HeaderText>
+                    <HeaderText style={{ color: colors.primary, fontSize: 12 }}>{route.params.targetUser.username}</HeaderText>
                 </View>
             )
         })
@@ -270,16 +270,14 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
     return (
         <View style={styles.container}>
             {renderTextMsgs()}
-            <KeyboardAvoidingView keyboardVerticalOffset={0} behavior={'padding'} style={styles.message_form}>
+            <KeyboardAvoidingView keyboardVerticalOffset={100} behavior={'padding'} style={styles.message_form}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.message_form_content}>
-                        <ScrollView style={styles.message_form_input}>
-                            <TextInput
-                                style={styles.message_form_input_text}
-                                onChangeText={text => setMessageTxt(text)}
-                                value={messageTxt}
-                                multiline />
-                        </ScrollView>
+                        <TextInput
+                            style={styles.message_form_input}
+                            onChangeText={text => setMessageTxt(text)}
+                            value={messageTxt}
+                            multiline />
                         <CustomButton type='primary' onPress={handleSendMessage} text='Send' />
                     </View>
                 </ TouchableWithoutFeedback>
@@ -311,18 +309,15 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     message_form_input: {
+        color: 'black',
         flexBasis: '70%',
         borderWidth: 1,
-        borderRadius: 20,
+        borderRadius: 5,
         marginRight: 10,
         padding: 5,
         paddingLeft: 10,
         paddingRight: 10,
-        borderColor: colors.primary,
-        maxHeight: 80
-    },
-    message_form_input_text: {
-        color: 'black'
+        borderColor: colors.primary
     },
     profile_content: {
         marginTop: 20,

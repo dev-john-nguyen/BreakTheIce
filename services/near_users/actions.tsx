@@ -38,7 +38,7 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
                 if (!doc.exists) continue;
 
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                const { username, location, bioShort, age, hideOnMap, profileImg, blockedUsers } = doc.data()
+                const { username, location, bioShort, age, hideOnMap, profileImg, blockedUsers, updatedAt } = doc.data()
 
                 if (blockedUsers && blockedUsers.find((user: BlockUserProps) => user.uid === uid)) continue
 
@@ -54,6 +54,7 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
                     sentInvite: false,
                     receivedInvite: false,
                     friend: false,
+                    updatedAt: updatedAt.toDate()
                 }
 
                 //check if the coords are missing
@@ -131,8 +132,6 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
 
     var userLocation = { longitude, latitude };
 
-    var updated = false
-
     for (let i = 0; i < allUsers.length; i++) {
         var nearUserLocation = { longitude: allUsers[i].location.coords.longitude, latitude: allUsers[i].location.coords.latitude }
 
@@ -141,19 +140,13 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
         if (distanceBetweenPoints < acceptedRadius) {
             //if within radius check if user is already in the nearByUsers state
             // ? do nothing : push the user into the nearByUsers state
+            var foundNearBy = nearByUsers.find(user => user.uid === allUsers[i].uid)
 
-            var addUser = true;
+            allUsers[i].distance = distanceBetweenPoints;
 
-            for (let j = 0; j < nearByUsers.length; j++) {
-                if (nearByUsers[j].uid === allUsers[i].uid) {
-                    addUser = false
-                    break;
-                }
-            }
-
-            if (addUser) {
+            if (!foundNearBy) {
+                //push it into nearByUsers array
                 nearByUsers.push(allUsers[i]);
-                updated = true;
             }
 
         } else {
@@ -161,18 +154,14 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
             //loop through nearByUsers arr and see if the user exist
             //? remove the user : do nothing
 
-            for (let j = 0; j < nearByUsers.length; j++) {
-                if (nearByUsers[j].uid === allUsers[i].uid) {
-                    nearByUsers.splice(j, 1);
-                    updated = true;
-                    break;
-                }
+            var nearByIndex = nearByUsers.findIndex(user => user.uid === allUsers[i].uid)
+
+            if (nearByIndex) {
+                nearByUsers.splice(nearByIndex, 1);
             }
         }
 
     }
-
-    if (!updated) return
 
     dispatch({
         type: UPDATE_PROFILE_HISTORY,

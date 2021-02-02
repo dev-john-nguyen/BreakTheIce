@@ -55,10 +55,11 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, ct
         hideOnMap,
         blockedUsers,
         profileImg: profileImg,
-        location: location
+        location: location,
+        updatedAt: new Date()
     }
 
-    batch.set(LocationRef, { ...profilePreview, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() })
+    batch.set(LocationRef, { ...profilePreview, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
 
     return await batch.commit()
 }
@@ -73,12 +74,12 @@ export const fireDb_update_user_location = async (user: UserRootStateProps, newL
         hideOnMap,
         blockedUsers,
         profileImg: profileImg,
-        location: newLocation
+        location: newLocation,
+        updatedAt: new Date()
     }
     await fireDb.collection(LocationsDb).doc(ctryStateCity.ctryState).collection(ctryStateCity.city).doc(uid).update({
         ...updatedProfilePreivew,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: new Date()
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
     })
 }
 
@@ -110,7 +111,8 @@ export const fetch_profile = async (uid: string) => {
                     gallery: data.gallery ? data.gallery : [],
                     offline: data.offline === undefined ? false : data.offline,
                     profileImg: data.profileImg ? data.profileImg : null,
-                    blockedUsers: data.blockedUsers ? data.blockedUsers : []
+                    blockedUsers: data.blockedUsers ? data.blockedUsers : [],
+                    updatedAt: new Date()
                 }
 
                 return { profile: profileObj }

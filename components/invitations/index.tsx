@@ -85,22 +85,20 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                     onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
                     containerStyle={styles.container}
                 >
-                    <Pressable style={styles.content_container} onPress={() => alert('swipe youngblod!')}>
-                        <View style={styles.content_wrapper}>
-                            <View style={styles.profile_section}>
-                                <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
-                                <View style={styles.profile_section_text}>
-                                    <Text style={styles.username}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
-                                </View>
-                            </View>
-                            <View style={styles.content_section}>
-                                <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
-                                <View style={styles.content_section_small}>
-                                    <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
-                                </View>
+                    <View style={styles.content_container}>
+                        <View style={styles.profile_section}>
+                            <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
+                            <View style={styles.profile_section_text}>
+                                <Text style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
                             </View>
                         </View>
-                    </Pressable>
+                        <View style={styles.content_section}>
+                            <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
+                            <View style={styles.content_section_small}>
+                                <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
+                            </View>
+                        </View>
+                    </View>
                 </Swipeable>
             )}
             keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
@@ -126,9 +124,9 @@ const styles = StyleSheet.create({
     },
     actionText: {
         color: colors.white,
-        fontSize: 16,
+        fontSize: 14,
         backgroundColor: 'transparent',
-        padding: 10,
+        padding: 10
     },
     rightAction: {
         alignItems: 'flex-end',
@@ -147,11 +145,7 @@ const styles = StyleSheet.create({
     },
     content_container: {
         flex: 1,
-        backgroundColor: colors.white,
-    },
-    content_wrapper: {
-        flex: 1,
-        backgroundColor: opacity_colors.secondary_light,
+        backgroundColor: colors.secondaryLight,
         flexDirection: 'row',
         paddingLeft: 30,
         paddingRight: 20,
@@ -159,8 +153,8 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
     profile_section: {
-        flex: .5,
-        marginRight: 10,
+        flexBasis: '30%',
+        marginRight: 5,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center'
@@ -170,7 +164,7 @@ const styles = StyleSheet.create({
     },
     username: {
         marginTop: 15,
-        fontSize: 16,
+        fontSize: 14,
         color: colors.primary,
         textAlign: 'center',
         overflow: 'visible'

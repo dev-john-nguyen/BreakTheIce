@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet, StyleProp, Dimensions } from 'react-
 import { NearByUsersProps } from '../../../services/near_users/types';
 import { colors, opacity_colors } from '../../utils/styles';
 import { HomeToChatNavProp } from '../../navigation/utils/types';
-import { CustomButton } from '../../utils';
+import { CustomButton, Icon } from '../../utils';
 import ProfileImage from './ProfileImage';
 import RespondButton from '../../utils/components/RespondButton';
 import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../../services/invitations/types';
@@ -17,9 +17,11 @@ interface PreviewProps {
     onAction?: () => void;
     containerStyle: StyleProp<any>;
     onInvitationUpdate: InvitationsDispatchActionProps['update_invitation'];
+    x?: boolean;
+    handleX?: () => void;
 }
 
-export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, onInvitationUpdate }: PreviewProps) => {
+export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, onInvitationUpdate, x, handleX }: PreviewProps) => {
     const [respondLoading, setRespondLoading] = useState<boolean>(false);
 
     const handleMessageOnPress = () => {
@@ -47,15 +49,15 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
 
 
     const renderButton = () => {
-        if (nearUser.friend) return <CustomButton type='secondary' text='Message' onPress={handleMessageOnPress} />
+        if (nearUser.friend) return <CustomButton type='primary' text='Message' onPress={handleMessageOnPress} />
 
         if (nearUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
 
         if (nearUser.receivedInvite) return <RespondButton setLoading={setRespondLoading} loading={respondLoading} handleInvitationUpdate={handleInvitationUpdate} />
 
-        if (me && !nearUser.sentInvite) return <CustomButton type='white_outline' text='Close' onPress={onAction} />
+        if (me && !nearUser.sentInvite) return;
 
-        return <CustomButton type='secondary' text='Invite' onPress={onSendInvite} />
+        return <CustomButton type='primary' text='Invite' onPress={onSendInvite} />
     }
 
 
@@ -67,6 +69,11 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
                         <View style={styles.topLeft}>
                             <Text style={styles.topLeft_text}>{nearUser.distance ? nearUser.distance : 0} meters away</Text>
                         </View>
+                        {
+                            !!x && <View style={styles.topRight}>
+                                <Icon type='x' onPress={handleX} color={colors.primary} pressColor={colors.secondary} size={16} />
+                            </View>
+                        }
                         <View style={styles.profile_section}>
                             <ProfileImage image={nearUser.profileImg} size='regular' onImagePress={handleDirectToProfile} friend={nearUser.friend} />
                             <View style={styles.profile_section_text}>
@@ -93,15 +100,15 @@ const styles = StyleSheet.create({
     },
     content: {
         width: '100%',
-        borderTopColor: colors.secondary,
-        borderBottomColor: colors.secondary,
+        borderTopColor: colors.primary,
+        borderBottomColor: colors.primary,
         borderBottomWidth: 1,
         borderTopWidth: 1,
         backgroundColor: opacity_colors.secondary_light
     },
     content_pressed: {
         width: '100%',
-        borderTopColor: colors.secondary,
+        borderTopColor: colors.primary,
         borderBottomColor: colors.secondary,
         borderBottomWidth: 1,
         borderTopWidth: 1,
@@ -118,6 +125,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
+    },
+    topRight: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
     },
     profile_section: {
         flex: .5,
@@ -137,7 +149,7 @@ const styles = StyleSheet.create({
     },
     username: {
         marginTop: 15,
-        fontSize: 16,
+        fontSize: 14,
         color: colors.primary,
         textAlign: 'center',
         overflow: 'visible'

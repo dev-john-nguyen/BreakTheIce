@@ -33,7 +33,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
     var friend = false;
 
     if (profilePreviewData) {
-        var { sentInvite, distance, receivedInvite } = profilePreviewData
+        var { sentInvite, distance, receivedInvite, updatedAt } = profilePreviewData
         friend = profilePreviewData.friend
     } else {
         //search friends list
@@ -76,6 +76,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 friend: friend ? friend : false,
                 distance: distance ? distance : 0,
                 sentInvite: sentInvite ? sentInvite : false,
+                updatedAt
             }
 
             ///cache gallery images

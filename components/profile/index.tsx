@@ -129,7 +129,6 @@ const Profile = (props: ProfileProps) => {
                     <TopProfileBackground style={styles.header_background} height={'180'} width={windowWidth.toString()} />
                     {notFound ? <UnderlineHeader
                         textStyle={styles.underline_header_text}
-                        underlineStyle={styles.underline_header_underline}
                         style={{ marginTop: 20 }}>User Not Found</UnderlineHeader> : <ActivityIndicator size='large' color={colors.primary} />}
                 </View>
             )

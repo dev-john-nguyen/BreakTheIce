@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, StyleProp } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
 import { Icon, UnderlineHeader } from '../utils';
 import { colors } from '../utils/styles';
@@ -27,11 +27,21 @@ const renderHeaderRight = (route: RouteProps['props'], navigation: any) => {
 export const screenOptions = ({ route, navigation }: { navigation: any, route: RouteProps['props'] }) => ({
     headerTitle: () => {
         if (route.params?.title) {
+            var textStyle: StyleProp<any> = {
+                color: colors.white,
+                textTransform: 'lowercase'
+            };
+
+            if (route.params.title.length > 10) {
+                textStyle.fontSize = 24
+            } else {
+                textStyle.fontSize = 27
+            }
+
+
             return (
                 <UnderlineHeader
-                    style={styles.underline_style}
-                    underlineStyle={styles.underline_header_underline}
-                    textStyle={styles.underline_header_text}
+                    textStyle={textStyle}
                 >{route.params.title}</UnderlineHeader>
             )
         }
@@ -53,16 +63,8 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
     },
-    underline_style: {
-        top: 5,
-    },
     underline_header_underline: {
-        backgroundColor: `rgba(${colors.primary_rgb},.8)`,
-    },
-    underline_header_text: {
-        color: colors.white,
-        fontSize: 27,
-        textTransform: 'lowercase'
+        backgroundColor: colors.tertiary
     },
     header_style: {
         backgroundColor: `rgba(${colors.lightWhite_rgb},.9)`,

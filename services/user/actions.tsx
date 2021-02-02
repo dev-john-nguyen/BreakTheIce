@@ -7,7 +7,7 @@ import { fireDb_init_user_location, fetch_profile, fireDb_update_user_location, 
 import { validate_near_users, reset_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
-import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb, timestamp } from '../../utils/variables'
+import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb, timestamp, LocationsDb, FriendsDb } from '../../utils/variables'
 import { fireStorage, fireDb, myFire } from '../firebase';
 import firebase from 'firebase';
 import { cacheImage } from '../../utils/functions';
@@ -352,5 +352,59 @@ export const sign_out = () => async (dispatch: AppDispatch) => {
         .catch((err) => {
             console.log(err)
             dispatch(set_banner('Oops! Something happened trying to sign out', 'error'))
+        })
+}
+
+export const remove_account = (phoneNumber: string, ctryCode: string | number) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid, ctryStateCity, location } = getState().user;
+    const user = myFire.auth().currentUser
+
+
+    if (!uid || !user) {
+        dispatch(set_banner("We can't find your user id right now. Please try again", "error"))
+        return;
+    }
+
+    const formattedPhoneNum = ctryCode + phoneNumber.replace(/[^0-9]/g, '');
+    console.log(formattedPhoneNum)
+
+    if (formattedPhoneNum.length < 3) {
+        dispatch(set_banner("Please enter a valid number.", "error"))
+        return;
+    }
+
+    if (formattedPhoneNum !== user.phoneNumber) {
+        dispatch(set_banner("Incorrect phone number. Please try again.", "error"))
+        return;
+    }
+
+    var batch = fireDb.batch();
+
+    var UsersDbRef = fireDb.collection(UsersDb).doc(uid)
+    batch.delete(UsersDbRef)
+
+    var FriendsRef = fireDb.collection(FriendsDb).doc(uid)
+    batch.delete(FriendsRef)
+
+    if (ctryStateCity && location) {
+        var LocationsRef = fireDb.collection(LocationsDb).doc(ctryStateCity.ctryState).collection(ctryStateCity.city).doc(uid)
+        batch.delete(LocationsRef)
+    }
+
+    try {
+        await batch.commit()
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner("Oops! Failed to delete your account. Please contact us directly to remove your account or try again", "error"))
+        return;
+    }
+
+
+    myFire.auth().signOut().then(() => {
+        dispatch(set_banner('Acount successfully removed.', 'success'))
+    })
+        .catch((err) => {
+            console.log(err)
+            dispatch(set_banner("Oops! Failed to delete your account. Please contact us directly to remove your account or try again", "error"))
         })
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import MapView, { Marker, Region } from 'react-native-maps';
-import { StyleSheet, View, Dimensions, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, View, Dimensions, ActivityIndicator } from 'react-native';
 import { ProfilePage } from '../../utils/variables';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
@@ -12,6 +12,7 @@ import { CustomButton } from '../utils';
 import Preview from '../profile/components/Preview';
 import InvitationModal from '../modal/InvitationModal';
 import ProfileImage from '../profile/components/ProfileImage';
+import { FontAwesome } from '@expo/vector-icons';
 import { colors } from '../utils/styles';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { update_invitation } from '../../services/invitations/actions';
@@ -42,7 +43,7 @@ interface MapsProps {
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.003;
+const LATITUDE_DELTA = 0.0020;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 //location and ctryStateCity are checked are parent element so this won't render unless those are checked
@@ -97,7 +98,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     }
 
     handleViewMe = () => {
-        const { uid, username, bioShort, location, age, hideOnMap, profileImg } = this.props.user;
+        const { uid, username, bioShort, location, age, hideOnMap, profileImg, updatedAt } = this.props.user;
 
         const mePreview: NearByUsersProps = {
             uid,
@@ -110,6 +111,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             friend: false,
             distance: 0,
             sentInvite: false,
+            updatedAt,
             receivedInvite: false
         }
 
@@ -120,14 +122,22 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     }
 
     handleMarkerOnPress = (nearUser: NearByUsersProps) => {
-        this.setState({ previewUser: nearUser })
+        this.setState({ previewUser: nearUser, previewMe: false })
     }
 
-    handleOnActionPress = () => this.setState({
+    handlePreviewClose = () => this.setState({
         previewUser: null,
         sendInvite: false,
         previewMe: false
     })
+
+    handleOnActionPress = () => {
+        if (this.state.previewMe) {
+            this.props.navigation.navigate('Me')
+        } else if (this.state.previewUser) {
+            this.handleNearUsersOnPress(this.state.previewUser)
+        }
+    }
 
     render() {
 
@@ -139,6 +149,17 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                 showsUserLocation={true}
                 onPress={(e) => console.log(e.nativeEvent)}
             >
+                {
+                    <Marker
+                        key={this.props.user.uid}
+                        coordinate={{
+                            latitude: this.props.user.location.coords.latitude,
+                            longitude: this.props.user.location.coords.longitude,
+                        }}
+                    >
+                        <FontAwesome name="dot-circle-o" size={10} color={colors.primary} />
+                    </Marker>
+                }
                 {
                     this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: NearByUsersProps) => {
 
@@ -182,11 +203,16 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             onSendInvite={() => this.setState({ sendInvite: true })}
                             containerStyle={styles.preview_container}
                             onInvitationUpdate={update_invitation}
+                            x={true}
+                            handleX={this.handlePreviewClose}
                         />
                     </View>
                 }
 
                 <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} moreStyles={styles.my_location} />
+                {user.hideOnMap &&
+                    <FontAwesome name="user-secret" size={30} color={colors.primary} style={styles.user_secret_icon} />
+                }
                 <CustomButton text='View Me' type='primary' onPress={this.handleViewMe} moreStyles={styles.view_me} />
             </View>
         )
@@ -206,18 +232,23 @@ const styles = StyleSheet.create({
     },
     my_location: {
         position: 'absolute',
-        top: 50,
+        top: 52,
         alignSelf: 'center',
     },
     view_me: {
         position: 'absolute',
-        bottom: 15,
+        bottom: 30,
         right: 10
     },
     preview_container: {
         position: 'absolute',
         top: 60,
         zIndex: 100
+    },
+    user_secret_icon: {
+        position: 'absolute',
+        top: 52,
+        left: 20
     }
 });
 

@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useRef, useEffect, useCallback } from 'react';
+import { View, StyleSheet, Animated } from 'react-native';
 import { GalleryItemProps } from '../../services/user/types';
 import { colors } from '../utils/styles';
 import Card from './components/Card';
 import Empty from '../utils/components/Empty';
+import { cloneDeepWith } from 'lodash'
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
@@ -17,6 +18,32 @@ export default ({ gallery }: GalleryComProps) => {
         </View>
     )
 
+    const animatedValues = gallery.map((gal, index) => new Animated.Value(index * 15))
+    const animatedPad = gallery.map((gal, index) => new Animated.Value(index * 5))
+
+    const topRef = useRef(animatedValues).current
+    const padRef = useRef(animatedPad.reverse()).current
+
+    const handleUpdateAnimatedRef = (clonedTopRef: number[]) => {
+
+        clonedTopRef.push(clonedTopRef.shift() as number);
+
+        topRef.forEach((top, i) => {
+            top.setValue(clonedTopRef[i])
+        })
+
+
+        var clonePadRef: any = cloneDeepWith(padRef, (pad) => {
+            return pad._value
+        })
+
+        clonePadRef.push(clonePadRef.shift() as number);
+
+        padRef.forEach((pad, i) => {
+            pad.setValue(clonePadRef[i])
+        })
+
+    }
 
     return (
         <View style={styles.container}>
@@ -29,6 +56,10 @@ export default ({ gallery }: GalleryComProps) => {
                     index={index}
                     key={index}
                     uri={uri}
+                    topRef={topRef}
+                    handleUpdateAnimatedRef={handleUpdateAnimatedRef}
+                    galleryLen={gallery.length}
+                    padRef={padRef}
                 />
             })}
         </View>

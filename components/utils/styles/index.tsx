@@ -12,6 +12,10 @@ export const colors = {
     primary_rgb: '38, 186, 238',
     secondary: '#73d2f3',
     secondary_rgb: '115, 210, 243',
+    secondaryLight: '#e8f8fd',
+    secondaryLightRgb: '232, 248, 253',
+    secondaryMedium: '#abe4f8',
+    secondaryMediumRgb: '171, 228, 248',
     tertiary: '#9fe8fa',
     tertiary_rgb: '159, 232, 250',
     lightWhite: '#fff4e0',
@@ -29,12 +33,36 @@ export const colors = {
     darkGreen: '#16c79a',
     lightGrey: '#dddddd',
     black: '#1a1c20',
+    blackLight: '#454a54',
     black_rgb: '26, 28, 32'
 }
 
 export const opacity_colors = {
     secondary_light: `rgba(${colors.secondary_rgb}, .1)`,
     secondary_medium: `rgba(${colors.secondary_rgb}, .5)`
+}
+
+export const drop_shadow: StyleProp<any> = {
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+}
+
+export const drop_shadow_light: StyleProp<any> = {
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 1,
+    },
+    shadowOpacity: 0.20,
+    shadowRadius: 1.41,
+
+    elevation: 2,
 }
 
 
@@ -51,7 +79,7 @@ const buttonBase: StyleProp<any> = {
 }
 
 const smallButtonBase: StyleProp<any> = {
-    borderRadius: 20,
+    borderRadius: 5,
     paddingLeft: 15,
     paddingRight: 15,
     paddingTop: 5,
@@ -149,20 +177,20 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
         case 'disabled':
             pressed.button.backgroundColor = colors.lightGrey;
             pressed.button.borderColor = colors.lightGrey;
-            pressed.text.color = colors.white;
+            pressed.text.color = colors.blackLight;
 
             unpressed.button.backgroundColor = colors.lightGrey;
             unpressed.button.borderColor = colors.lightGrey;
-            unpressed.text.color = colors.white;
+            unpressed.text.color = colors.blackLight;
             break;
         case 'primary':
         default:
-            pressed.button.backgroundColor = colors.tertiary;
+            pressed.button.backgroundColor = colors.secondary;
             pressed.button.borderColor = colors.primary;
             pressed.text.color = colors.white;
 
-            unpressed.button.backgroundColor = colors.secondary;
-            unpressed.button.borderColor = colors.primary;
+            unpressed.button.backgroundColor = colors.primary;
+            unpressed.button.borderColor = colors.secondary;
             unpressed.text.color = colors.white;
     }
 
@@ -196,7 +224,8 @@ export const underline_header_styles: StyleProp<any> = {
         borderRadius: 5,
         bottom: 3,
         alignSelf: 'center',
-        width: '120%'
+        width: '120%',
+        backgroundColor: colors.tertiary
     }
 }
 
@@ -232,15 +261,4 @@ export const bannerStyles = (type: string) => {
             styles.text.color = colors.white
     }
     return styles
-}
-
-export const drop_shadow: StyleProp<any> = {
-    shadowColor: "#000",
-    shadowOffset: {
-        width: 0,
-        height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
 }

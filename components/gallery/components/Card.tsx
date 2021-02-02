@@ -12,12 +12,16 @@ interface CardProps {
     item: GalleryItemProps;
     index: number;
     uri: string;
+    topRef: any;
+    handleUpdateAnimatedRef: (clonedTopRef: number[]) => void
+    galleryLen: number
+    padRef: Animated.Value[]
 }
 
-export default ({ item, index, uri }: CardProps) => {
+export default ({ item, index, uri, topRef, handleUpdateAnimatedRef, galleryLen, padRef }: CardProps) => {
     const pan: any = useRef(new Animated.ValueXY()).current;
-    const cardIndex: any = useRef(new Animated.Value(index)).current;
-    const textOpacity: Animated.Value = useRef(new Animated.Value(0)).current;
+    const zIndexRef: any = useRef(new Animated.Value(index)).current;
+    const opacityRef: Animated.Value = useRef(new Animated.Value(0)).current;
     const baseScale = new Animated.Value(1);
     const pinchScale: Animated.Value = useRef(new Animated.Value(1)).current;
     const scale = Animated.multiply(baseScale, pinchScale)
@@ -39,7 +43,15 @@ export default ({ item, index, uri }: CardProps) => {
                 { useNativeDriver: false }
             ),
             onPanResponderRelease: (event, gestureState) => {
-                if (pan.x._value > 120 || pan.x._value < -120) {
+                //only handle the front image
+                // find the max topRef value
+                const clonedTopRef: any = topRef.map((top: any) => {
+                    return top._value
+                })
+
+                const maxTopVal = Math.max(...clonedTopRef)
+
+                if ((pan.x._value > 120 || pan.x._value < -120) && maxTopVal === topRef[index]._value) {
 
                     Animated.spring(pan, {
                         toValue: {
@@ -59,7 +71,9 @@ export default ({ item, index, uri }: CardProps) => {
                         useNativeDriver: false
                     }).start()
 
-                    cardIndex.setValue(cardIndex._value - 3)
+                    zIndexRef.setValue(zIndexRef._value - galleryLen)
+
+                    handleUpdateAnimatedRef(clonedTopRef)
 
                 } else {
                     Animated.spring(pan, {
@@ -89,7 +103,7 @@ export default ({ item, index, uri }: CardProps) => {
     }
 
     const showText = () => {
-        Animated.timing(textOpacity, {
+        Animated.timing(opacityRef, {
             toValue: 1,
             duration: 200,
             useNativeDriver: false
@@ -97,7 +111,7 @@ export default ({ item, index, uri }: CardProps) => {
     }
 
     const hideText = () => {
-        Animated.timing(textOpacity, {
+        Animated.timing(opacityRef, {
             toValue: 0,
             duration: 200,
             useNativeDriver: false
@@ -114,7 +128,10 @@ export default ({ item, index, uri }: CardProps) => {
                 drop_shadow,
                 {
                     transform: [{ translateX: pan.x }, { translateY: pan.y }],
-                    zIndex: cardIndex
+                    zIndex: zIndexRef,
+                    top: topRef[index],
+                    paddingRight: padRef[index],
+                    paddingLeft: padRef[index]
                 }
             ]
             }
@@ -136,7 +153,7 @@ export default ({ item, index, uri }: CardProps) => {
                         ]}
                     />
                     {!!item.description &&
-                        <Animated.View style={[styles.text_container, drop_shadow, { opacity: textOpacity }]}>
+                        <Animated.View style={[styles.text_container, drop_shadow, { opacity: opacityRef }]}>
                             <BlurView style={styles.text_blur} intensity={70}>
                                 <View style={styles.text_content} >
                                     <BodyText style={styles.text}>{item.description}</BodyText>

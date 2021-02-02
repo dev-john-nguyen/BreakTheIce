@@ -49,3 +49,18 @@ export function hashCode(string: string) {
     }
     return hash.toString();
 }
+
+export const calcDateDiff = (date: any) => {
+    if (!date) return;
+
+    const date1: any = new Date();
+    const diffTime = Math.abs(date1 - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 1) return diffDays + " days ago"
+    const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+    if (diffHours < 24 && diffHours > 1) return diffHours + " hours ago"
+    const diffMins = Math.ceil(diffTime / (1000 * 60));
+    if (diffMins < 60 && diffMins > 1) return diffMins + " mins ago"
+    const diffSec = Math.ceil(diffTime / (1000));
+    return diffSec + " secs ago";
+}

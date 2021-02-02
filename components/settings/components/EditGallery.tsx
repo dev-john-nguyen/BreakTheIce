@@ -67,6 +67,7 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
 
         return () => {
             mount.current = false;
+            navigation.setOptions({ headerRight: undefined })
         }
     }, [loading, imgObjs])
 

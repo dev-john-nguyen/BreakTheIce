@@ -10,7 +10,7 @@ import {
 import * as FirebaseRecaptcha from 'expo-firebase-recaptcha';
 import firebase from 'firebase';
 import { firebaseConfig } from '../../services/firebase';
-import { CustomButton, BodyText } from '../utils';
+import { CustomButton, BodyText, HeaderText } from '../utils';
 import { colors } from '../utils/styles';
 
 export default function PhoneAuthScreen() {
@@ -88,9 +88,9 @@ export default function PhoneAuthScreen() {
                     firebaseConfig={firebaseConfig}
                     attemptInvisibleVerification={true}
                 />
-                <BodyText
+                <HeaderText
                     style={styles.title}
-                >Enter Phone Number</BodyText>
+                >Enter Phone Number</HeaderText>
                 <View style={styles.phone_form}>
                     <Picker
                         enabled={false}

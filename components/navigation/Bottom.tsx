@@ -101,7 +101,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
                 }
 
                 return (
-                    <Pressable key={index} onPress={onPress} style={styles.item}>
+                    <Pressable key={index} onPress={onPress} style={styles.item} hitSlop={10}>
                         {({ pressed }) => (
                             <View>
                                 <Feather name={type} size={size} color={isFocused ? colors.secondary : pressed ? colors.tertiary : colors.white} />

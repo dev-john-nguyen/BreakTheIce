@@ -5,6 +5,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { colors } from '../../utils/styles';
 import { Image } from 'react-native';
 import { Icon } from '../../utils';
+import { windowWidth } from '../../../utils/variables';
 
 interface ProfileImageProp {
     image: ProfileImgProps | NewProfileImgProps | null;
@@ -114,8 +115,8 @@ const largeStyles = StyleSheet.create({
         fontSize: 100
     },
     image_container: {
-        width: 120,
-        height: 120,
+        width: windowWidth / 5,
+        height: windowWidth / 5,
         ...baseStyles.image_container
     }
 })

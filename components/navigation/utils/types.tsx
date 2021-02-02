@@ -55,7 +55,8 @@ export type RootBottomParamList = {
             }
         }
     };
-    Invitations: undefined
+    Invitations: undefined,
+    Me: undefined
 }
 
 type ProfileRouteParams = {
@@ -173,7 +174,7 @@ export const MeStackScreen = (props: any) => {
 export const ChatStackScreen = () => (
     <ChatStack.Navigator screenOptions={screenOptions}>
         <ChatStack.Screen name="Chat" component={Chat} />
-        <ChatStack.Screen name="Message" component={Message} options={{ cardStyle: { marginTop: 0 } }} />
+        <ChatStack.Screen name="Message" component={Message} />
         <ChatStack.Screen
             name="Profile"
             component={Profile}

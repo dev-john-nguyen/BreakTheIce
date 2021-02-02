@@ -10,8 +10,9 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
 import { Icon } from '../utils';
 import { delete_chat } from '../../services/chat/actions';
-import { renderOtherUser, renderDateDiff } from './utils';
+import { renderOtherUser } from './utils';
 import Empty from '../utils/components/Empty';
+import { calcDateDiff } from '../../utils/functions';
 
 interface ChatProps {
     navigation: ChatStackNavigationProp;
@@ -100,19 +101,16 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
                         onSwipeableRightOpen={() => delete_chat(item.docId)}
                     >
                         <Pressable style={({ pressed }) => [list_style.content_container, pressed && { backgroundColor: opacity_colors.secondary_medium }]} onPress={() => directToMessage(item)}>
-                            <View style={list_style.content_wrapper}>
-                                <View style={list_style.profile_section}>
-                                    <ProfileImage friend={true} size='regular' image={otherUserImg} />
-                                    <View style={list_style.profile_section_text}>
-                                        <Text style={list_style.username}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</Text>
-                                    </View>
+                            <View style={list_style.profile_section}>
+                                <ProfileImage friend={true} size='regular' image={otherUserImg} />
+                                <View style={list_style.profile_section_text}>
+                                    <Text style={list_style.username} numberOfLines={1}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</Text>
                                 </View>
-                                <View style={list_style.content_section}>
-                                    <Text style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
-                                    <View style={list_style.content_section_small}>
-                                        <Text style={list_style.content_section_small_text}>{renderDateDiff(item.dateSent)}</Text>
-                                    </View>
-
+                            </View>
+                            <View style={list_style.content_section}>
+                                <Text style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
+                                <View style={list_style.content_section_small}>
+                                    <Text style={list_style.content_section_small_text}>{calcDateDiff(item.dateSent)}</Text>
                                 </View>
                             </View>
                         </Pressable>
@@ -155,11 +153,7 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
     },
     content_container: {
         flex: 1,
-        backgroundColor: colors.white,
-    },
-    content_wrapper: {
-        flex: 1,
-        backgroundColor: unread ? colors.secondary : opacity_colors.secondary_light,
+        backgroundColor: unread ? colors.secondaryMedium : colors.secondaryLight,
         flexDirection: 'row',
         paddingLeft: 30,
         paddingRight: 20,
@@ -167,8 +161,8 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
         paddingBottom: 10
     },
     profile_section: {
-        flex: .5,
-        marginRight: 10,
+        flexBasis: '30%',
+        marginRight: 5,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center'

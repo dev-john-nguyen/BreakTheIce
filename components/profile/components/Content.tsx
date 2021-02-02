@@ -9,6 +9,7 @@ import { GalleryItemProps } from '../../../services/user/types';
 import RespondButton from '../../utils/components/RespondButton';
 import { InvitationStatusOptions } from '../../../services/invitations/types';
 import { windowWidth } from '../../../utils/variables';
+import { calcDateDiff } from '../../../utils/functions';
 
 interface UserProps {
     profileImg: any;
@@ -19,6 +20,8 @@ interface UserProps {
     friend?: boolean;
     sentInvite?: boolean;
     receivedInvite?: boolean;
+    distance: number;
+    updatedAt?: Date;
 }
 
 interface ProfileProps {
@@ -40,11 +43,15 @@ export default ({ user, directToMessage, directToFriends, handleInvitationUpdate
 
         if (user.sentInvite) return <CustomButton type='disabled' text='Pending' moreStyles={styles.header_button} />
 
-        if (user.receivedInvite && handleInvitationUpdate) return <RespondButton handleInvitationUpdate={handleInvitationUpdate}
-            setLoading={setInviteStatusLoading}
-            loading={inviteStatusLoading}
-
-        />
+        if (user.receivedInvite && handleInvitationUpdate) return (
+            <View style={[styles.header_button, { flexDirection: 'row' }]}>
+                <RespondButton
+                    handleInvitationUpdate={handleInvitationUpdate}
+                    setLoading={setInviteStatusLoading}
+                    loading={inviteStatusLoading}
+                />
+            </View>
+        )
 
         if (setShowModalInvite) return <CustomButton onPress={() => setShowModalInvite(true)} text='Invite' type='primary' moreStyles={styles.header_button} />
 
@@ -52,10 +59,18 @@ export default ({ user, directToMessage, directToFriends, handleInvitationUpdate
 
     }
 
+    var dateDiff = calcDateDiff(user.updatedAt)
+
     return (
         <>
-            <TopProfileBackground style={styles.header_background} height={'180'} width={windowWidth.toString()} />
+            <TopProfileBackground style={styles.header_background} height={'14%'} width={windowWidth.toString()} />
             <View style={styles.container}>
+                <View style={styles.distance}>
+                    <BodyText style={styles.text}>About {user.distance ? user.distance : 0} meters away</BodyText>
+                </View>
+                <View style={styles.seen}>
+                    <BodyText style={styles.text}>Last seen {dateDiff ? dateDiff : 'now'}</BodyText>
+                </View>
                 <View style={styles.header_section}>
 
                     <ProfileImage image={user.profileImg} size='large' />
@@ -83,15 +98,28 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingRight: 20,
         paddingLeft: 20,
-        paddingTop: 80
+        paddingTop: 10,
+        position: 'relative'
+    },
+    distance: {
+        position: 'absolute',
+        top: 20,
+        right: 30
+    },
+    seen: {
+        position: 'absolute',
+        top: 20,
+        left: 30
+    },
+    text: {
+        color: colors.secondary,
+        fontSize: 10
     },
     header_background: {
-        position: 'absolute',
-        top: 0,
+        top: -5,
         left: 0
     },
     header_section: {
-        marginTop: 30,
         alignItems: 'center'
     },
     header_section_content: {
@@ -106,7 +134,9 @@ const styles = StyleSheet.create({
         fontSize: 18
     },
     header_button: {
-        marginTop: 10
+        marginTop: 10,
+        flexDirection: 'row',
+        maxWidth: '70%'
     },
     sub_header_text: {
         fontSize: 14,
