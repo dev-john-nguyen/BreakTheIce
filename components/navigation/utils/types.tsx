@@ -14,6 +14,7 @@ import { screenOptions } from '../Header';
 import { ChatPreviewProps } from '../../../services/chat/types';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { ProfileImgProps } from '../../../services/user/types';
+import { windowHeight } from '../../../utils/variables';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -167,7 +168,7 @@ export const MeStackScreen = (props: any) => {
             component={Profile}
             options={profileOptions}
             initialParams={{ profileUid: '' }} />
-        <MeStack.Screen name="Settings" component={Settings} />
+        <MeStack.Screen name="Settings" component={Settings} options={{ cardStyle: { paddingTop: windowHeight / 9 } }} />
     </MeStack.Navigator>
 }
 

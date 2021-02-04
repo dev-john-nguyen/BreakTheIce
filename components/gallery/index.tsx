@@ -1,26 +1,22 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { GalleryItemProps } from '../../services/user/types';
-import { colors } from '../utils/styles';
+import { colors, drop_shadow } from '../utils/styles';
 import Card from './components/Card';
 import Empty from '../utils/components/Empty';
 import { cloneDeepWith } from 'lodash'
+import { windowWidth } from '../../utils/variables';
+import { getGalleryHeight, ImageWidth } from './utils';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
+    height: number
 }
 
 
-export default ({ gallery }: GalleryComProps) => {
-    if (!gallery || !gallery.length) return (
-        <View style={styles.container}>
-            <Empty style={{ marginTop: 20 }}>No Images</Empty>
-        </View>
-    )
-
+export default ({ gallery, height }: GalleryComProps) => {
     const animatedValues = gallery.map((gal, index) => new Animated.Value(index * 15))
     const animatedPad = gallery.map((gal, index) => new Animated.Value(index * 5))
-
     const topRef = useRef(animatedValues).current
     const padRef = useRef(animatedPad.reverse()).current
 
@@ -45,8 +41,21 @@ export default ({ gallery }: GalleryComProps) => {
 
     }
 
+    if (!gallery || gallery.length < 1) return (
+        <View style={[{
+            flexBasis: height,
+            width: ImageWidth
+        },
+            drop_shadow,
+        styles.empty
+        ]}>
+            <Empty>No Images</Empty>
+        </View>
+    )
+
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { flexBasis: height }]}>
             {gallery.map((item, index) => {
 
                 var uri: string = item.cachedUrl ? item.cachedUrl : item.url
@@ -54,7 +63,7 @@ export default ({ gallery }: GalleryComProps) => {
                 return <Card
                     item={item}
                     index={index}
-                    key={index}
+                    key={item.id}
                     uri={uri}
                     topRef={topRef}
                     handleUpdateAnimatedRef={handleUpdateAnimatedRef}
@@ -68,9 +77,17 @@ export default ({ gallery }: GalleryComProps) => {
 
 
 const styles = StyleSheet.create({
+    empty: {
+        backgroundColor: colors.secondary,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        borderRadius: 5,
+        marginTop: 10
+    },
     container: {
-        flex: 1,
-        position: 'relative'
+        position: 'relative',
+        alignItems: 'center',
+        marginTop: 10
     },
     underline_header_text: {
         color: colors.primary,

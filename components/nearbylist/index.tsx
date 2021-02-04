@@ -6,12 +6,13 @@ import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import { ProfilePage } from '../../utils/variables';
 import { colors } from '../utils/styles';
-import InvitationModal from '../modal/InvitationModal';
+import InvitationModal from '../modal/invitation';
 import Preview from '../profile/components/Preview';
 import { update_invitation } from '../../services/invitations/actions';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { UnderlineHeader } from '../utils';
 import Empty from '../utils/components/Empty';
+import RespondModel from '../modal/respond';
 
 
 interface NearByListProps {
@@ -22,8 +23,8 @@ interface NearByListProps {
 }
 
 interface NearByListStateProps {
-    sentInviteUser: NearByUsersProps | undefined;
-    showInviteModal: boolean;
+    inviteUser: NearByUsersProps | undefined;
+    respondUser: NearByUsersProps | undefined;
 }
 
 
@@ -32,8 +33,8 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
         super(props)
 
         this.state = {
-            sentInviteUser: undefined,
-            showInviteModal: false
+            inviteUser: undefined,
+            respondUser: undefined
         }
     }
 
@@ -52,9 +53,13 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
         })
     }
 
-    handleSendInvite = (nearUser: NearByUsersProps) => {
-        this.setState({ sentInviteUser: nearUser, showInviteModal: true })
-    }
+    handleOnSendInvite = (nearUser: NearByUsersProps) => { this.setState({ inviteUser: nearUser }) }
+
+    handleOnRespond = (nearUser: NearByUsersProps) => { this.setState({ respondUser: nearUser }) }
+
+    handleOnInviteClose = () => { this.setState({ inviteUser: undefined }) }
+
+    handleOnRespondClose = () => { this.setState({ respondUser: undefined }) }
 
     renderFlatList = () => {
         const { nearUsers, nearUsersFetched, update_invitation } = this.props
@@ -65,7 +70,16 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
 
         return (
             <View style={{ flex: 1 }}>
-                <InvitationModal visible={this.state.showInviteModal} targetUser={this.state.sentInviteUser && this.state.sentInviteUser} handleClose={() => this.setState({ showInviteModal: false, sentInviteUser: undefined })} />
+                <InvitationModal
+                    visible={!!this.state.inviteUser}
+                    targetUser={this.state.inviteUser}
+                    handleClose={this.handleOnInviteClose}
+                />
+                <RespondModel
+                    visible={!!this.state.respondUser}
+                    targetUser={this.state.respondUser}
+                    handleClose={this.handleOnRespondClose}
+                />
                 <FlatList
                     data={this.props.nearUsers}
                     renderItem={({ item, index, separators }) => (
@@ -73,9 +87,11 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                             nearUser={item}
                             navigation={this.props.navigation}
                             onAction={() => this.handleDirectToProfile(item)}
-                            onSendInvite={() => this.handleSendInvite(item)}
+                            onSendInvite={() => this.handleOnSendInvite(item)}
+                            onRespond={() => this.handleOnRespond(item)}
                             onInvitationUpdate={update_invitation}
                             containerStyle={styles.preview_container}
+                            listView={true}
                         />
                     )}
                     keyExtractor={(item) => item.uid}
@@ -102,7 +118,7 @@ const styles = StyleSheet.create({
         paddingBottom: 20
     },
     preview_container: {
-        marginTop: 20
+        marginBottom: 20
     }
 })
 

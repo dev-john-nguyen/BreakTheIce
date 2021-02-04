@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation/utils/types';
 import { colors } from '../utils/styles';
 import { connect } from 'react-redux';
-import { send_invitation, update_invitation } from '../../services/invitations/actions';
-import { InvitationsRootProps, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/types';
+import { send_invitation } from '../../services/invitations/actions';
+import { InvitationsRootProps } from '../../services/invitations/types';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
 import { NearUsersRootProps } from '../../services/near_users/types';
 import { FriendsRootProps, FriendDispatchActionProps } from '../../services/friends/types';
 import { RootProps } from '../../services';
-import InvitationModal from '../modal/InvitationModal';
+import InvitationModal from '../modal/invitation';
 import { set_current_profile } from '../../services/profile/actions';
 import { ProfileDispatchActionProps, ProfileUserProps, ProfileRootProps } from '../../services/profile/types';
 import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
@@ -17,11 +17,12 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import HeaderRight from './components/HeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
 import { set_banner } from '../../services/banner/actions';
-import { UnderlineHeader } from '../utils';
 import ProfileContent from './components/Content';
 import { TopProfileBackground } from '../utils/svgs';
 import { windowWidth } from '../../utils/variables';
 import { update_block_user } from '../../services/user/actions';
+import Empty from '../utils/components/Empty';
+import RespondModel from '../modal/respond';
 
 interface ProfileProps {
     navigation: BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp
@@ -32,7 +33,6 @@ interface ProfileProps {
     profile: ProfileRootProps;
     outboundInvitations: InvitationsRootProps['outbound'];
     set_current_profile: ProfileDispatchActionProps['set_current_profile'];
-    update_invitation: InvitationsDispatchActionProps['update_invitation'];
     unfriend_user: FriendDispatchActionProps['unfriend_user'];
     set_banner: BannerDispatchActionProps['set_banner'];
     update_block_user: UserDispatchActionsProps['update_block_user'];
@@ -43,7 +43,8 @@ interface ProfileProps {
 const Profile = (props: ProfileProps) => {
     const [profileUser, setProfileUser] = useState<ProfileUserProps>();
     const [notFound, setNotFound] = useState<boolean>(false);
-    const [showModalInvite, setShowModalInvite] = useState<boolean>(false);
+    const [modalInvite, setModalInvite] = useState<boolean>(false);
+    const [modalRespond, setModalRespond] = useState<boolean>(false);
 
     useLayoutEffect(() => {
         props.navigation.setOptions({
@@ -59,16 +60,6 @@ const Profile = (props: ProfileProps) => {
             headerTintColor: colors.white
         })
     }, [profileUser, props.unfriend_user, props.user.blockedUsers])
-
-    const handleUpdateBlockUser = async () => {
-        if (!profileUser) return
-        return await props.update_block_user({ uid: profileUser.uid, username: profileUser.username })
-    }
-
-    const handleUnfriendUser = async () => {
-        if (!profileUser) return
-        return await props.unfriend_user(profileUser.uid)
-    }
 
     useEffect(() => {
         //set redux state profile
@@ -99,10 +90,14 @@ const Profile = (props: ProfileProps) => {
 
     }, [props.route, props.outboundInvitations, props.profile.history])
 
-    const handleInvitationUpdate = async (status: InvitationStatusOptions) => {
-        if (!profileUser) return;
+    const handleUpdateBlockUser = async () => {
+        if (!profileUser) return
+        return await props.update_block_user({ uid: profileUser.uid, username: profileUser.username })
+    }
 
-        return await props.update_invitation(profileUser.uid, status)
+    const handleUnfriendUser = async () => {
+        if (!profileUser) return
+        return await props.unfriend_user(profileUser.uid)
     }
 
     const directToMessage = () => {
@@ -122,43 +117,38 @@ const Profile = (props: ProfileProps) => {
     }
 
 
-    const renderContent = () => {
-        if (notFound || !profileUser) {
-            return (
-                <View style={styles.utils_container}>
-                    <TopProfileBackground style={styles.header_background} height={'180'} width={windowWidth.toString()} />
-                    {notFound ? <UnderlineHeader
-                        textStyle={styles.underline_header_text}
-                        style={{ marginTop: 20 }}>User Not Found</UnderlineHeader> : <ActivityIndicator size='large' color={colors.primary} />}
-                </View>
-            )
-
-        }
-
+    if (notFound || !profileUser) {
         return (
-            <>
-                <InvitationModal
-                    visible={showModalInvite && !profileUser.sentInvite && !profileUser.friend}
-                    targetUser={profileUser}
-                    handleClose={() => setShowModalInvite(false)}
-                />
-                <ProfileContent
-                    user={profileUser}
-                    admin={false}
-                    directToMessage={directToMessage}
-                    handleInvitationUpdate={handleInvitationUpdate}
-                    setShowModalInvite={setShowModalInvite}
-                />
-            </>
+            <View style={styles.utils_container}>
+                <TopProfileBackground style={styles.header_background} height={'14%'} width={windowWidth.toString()} />
+                {notFound ? <Empty style={{ flex: 1 }}>User Not Found</Empty> : <ActivityIndicator size='large' color={colors.primary} />}
+            </View>
         )
 
     }
 
     return (
-        <View style={styles.container}>
-            {renderContent()}
+        <View style={{ flex: 1 }}>
+            <InvitationModal
+                visible={modalInvite && !profileUser.sentInvite && !profileUser.friend}
+                targetUser={profileUser}
+                handleClose={() => setModalInvite(false)}
+            />
+            <RespondModel
+                visible={modalRespond}
+                targetUser={profileUser}
+                handleClose={() => setModalRespond(false)}
+            />
+            <ProfileContent
+                user={profileUser}
+                admin={false}
+                directToMessage={directToMessage}
+                showInviteModal={() => setModalInvite(true)}
+                showRespondModal={() => setModalRespond(true)}
+            />
         </View>
     )
+
 }
 
 const styles = StyleSheet.create({
@@ -185,7 +175,7 @@ const styles = StyleSheet.create({
     },
     header_background: {
         position: 'absolute',
-        top: 0,
+        top: -5,
         left: 0
     },
 })
@@ -199,4 +189,4 @@ const mapStateToProps = (state: RootProps) => ({
     profile: state.profile
 })
 
-export default connect(mapStateToProps, { send_invitation, set_current_profile, update_invitation, unfriend_user, set_banner, update_block_user })(Profile);
+export default connect(mapStateToProps, { send_invitation, set_current_profile, unfriend_user, set_banner, update_block_user })(Profile);

@@ -10,12 +10,13 @@ import { UserRootStateProps } from '../../services/user/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import { CustomButton } from '../utils';
 import Preview from '../profile/components/Preview';
-import InvitationModal from '../modal/InvitationModal';
+import InvitationModal from '../modal/invitation';
 import ProfileImage from '../profile/components/ProfileImage';
 import { FontAwesome } from '@expo/vector-icons';
 import { colors } from '../utils/styles';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { update_invitation } from '../../services/invitations/actions';
+import RespondModal from '../modal/respond';
 
 interface RegionProps {
     latitude: number;
@@ -30,6 +31,7 @@ interface MapStateProps {
     previewUser: NearByUsersProps | null;
     previewMe: boolean;
     sendInvite: boolean;
+    showRespond: boolean;
 }
 
 interface MapsProps {
@@ -67,8 +69,28 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             selectedNearUser: null,
             previewMe: false,
             previewUser: null,
-            sendInvite: false
+            sendInvite: false,
+            showRespond: false
         }
+    }
+
+    componentDidMount = () => {
+        this.props.navigation.setOptions({
+            headerTitle: () => (
+                <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} />
+            ),
+            headerLeft: () => this.props.user.hideOnMap &&
+                (
+                    <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 10 }} />
+                )
+        })
+    }
+
+    componentWillUnmount() {
+        this.props.navigation.setOptions({
+            headerTitle: undefined,
+            headerLeft: undefined
+        })
     }
 
     handleNearUsersOnPress = (nearUsers: NearByUsersProps) => {
@@ -180,7 +202,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             </MapView >
         )
 
-        const { previewUser, sendInvite, previewMe } = this.state;
+        const { previewUser, sendInvite, previewMe, showRespond } = this.state;
         const { nearUsersFetched, user, navigation, update_invitation } = this.props;
 
         return (
@@ -193,6 +215,12 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                     targetUser={previewUser}
                 />
 
+                <RespondModal
+                    visible={showRespond}
+                    handleClose={() => this.setState({ showRespond: false })}
+                    targetUser={previewUser}
+                />
+
                 {previewUser &&
                     <View style={styles.preview_container}>
                         <Preview
@@ -201,17 +229,13 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             navigation={navigation}
                             onAction={this.handleOnActionPress}
                             onSendInvite={() => this.setState({ sendInvite: true })}
+                            onRespond={() => this.setState({ showRespond: true })}
                             containerStyle={styles.preview_container}
                             onInvitationUpdate={update_invitation}
                             x={true}
                             handleX={this.handlePreviewClose}
                         />
                     </View>
-                }
-
-                <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} moreStyles={styles.my_location} />
-                {user.hideOnMap &&
-                    <FontAwesome name="user-secret" size={30} color={colors.primary} style={styles.user_secret_icon} />
                 }
                 <CustomButton text='View Me' type='primary' onPress={this.handleViewMe} moreStyles={styles.view_me} />
             </View>
@@ -244,11 +268,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 60,
         zIndex: 100
-    },
-    user_secret_icon: {
-        position: 'absolute',
-        top: 52,
-        left: 20
     }
 });
 

@@ -41,9 +41,8 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: () => (
-                <UnderlineHeader
-                    textStyle={{ color: colors.primary, fontSize: 20 }}
-                    style={styles.header}>{target}</UnderlineHeader>
+                <HeaderText
+                    style={styles.header}>{target}</HeaderText>
             )
         })
     }, [target])
@@ -174,7 +173,9 @@ const styles = StyleSheet.create({
         borderTopWidth: 1
     },
     header: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        color: colors.primary,
+        fontSize: 16
     },
     container_content: {
         justifyContent: 'space-between',

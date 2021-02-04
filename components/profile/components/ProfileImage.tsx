@@ -70,7 +70,7 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
     return (
         <Pressable style={styles.container} onPress={onImagePress}>
             {renderImage()}
-            {friend && <Icon type='link' size={iconSize} color={colors.primary} style={styles.friend} />}
+            {friend && <Icon type='link' size={iconSize} color={colors.primary} pressColor={colors.secondary} style={styles.friend} />}
         </Pressable>
     )
 }
@@ -110,9 +110,9 @@ const largeStyles = StyleSheet.create({
         ...baseStyles.friend
     },
     icon: {
-        width: 100,
-        height: 100,
-        fontSize: 100
+        width: windowWidth / 5,
+        height: windowWidth / 5,
+        fontSize: windowWidth / 5
     },
     image_container: {
         width: windowWidth / 5,

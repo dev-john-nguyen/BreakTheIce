@@ -5,7 +5,7 @@ import { colors, opacity_colors } from '../../utils/styles';
 import { HomeToChatNavProp } from '../../navigation/utils/types';
 import { CustomButton, Icon } from '../../utils';
 import ProfileImage from './ProfileImage';
-import RespondButton from '../../utils/components/RespondButton';
+import RespondButton from '../../modal/respond/Slider';
 import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../../services/invitations/types';
 import { BlurView } from 'expo-blur';
 
@@ -19,10 +19,11 @@ interface PreviewProps {
     onInvitationUpdate: InvitationsDispatchActionProps['update_invitation'];
     x?: boolean;
     handleX?: () => void;
+    onRespond: () => void;
+    listView?: boolean
 }
 
-export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, onInvitationUpdate, x, handleX }: PreviewProps) => {
-    const [respondLoading, setRespondLoading] = useState<boolean>(false);
+export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, onInvitationUpdate, x, handleX, onRespond, listView }: PreviewProps) => {
 
     const handleMessageOnPress = () => {
 
@@ -43,28 +44,23 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
         })
     }
 
-    const handleInvitationUpdate = async (status: InvitationStatusOptions) => {
-        return onInvitationUpdate(nearUser.uid, status)
-    }
-
-
     const renderButton = () => {
         if (nearUser.friend) return <CustomButton type='primary' text='Message' onPress={handleMessageOnPress} />
 
         if (nearUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
 
-        if (nearUser.receivedInvite) return <RespondButton setLoading={setRespondLoading} loading={respondLoading} handleInvitationUpdate={handleInvitationUpdate} />
+        if (nearUser.receivedInvite) return <CustomButton type='primary' text='Respond' onPress={onRespond} />
 
         if (me && !nearUser.sentInvite) return;
 
-        return <CustomButton type='primary' text='Invite' onPress={onSendInvite} />
+        return <CustomButton type='secondary' text='Invite' onPress={onSendInvite} />
     }
 
 
     return (
         <Pressable onPress={onAction} style={styles.container}>
             {({ pressed }) => (
-                <View style={[pressed ? styles.content_pressed : styles.content, containerStyle]}>
+                <View style={[pressed ? styles.content_pressed : styles.content, containerStyle, listView ? colors.white : opacity_colors.secondary_light]}>
                     <BlurView style={styles.blur} intensity={70}>
                         <View style={styles.topLeft}>
                             <Text style={styles.topLeft_text}>{nearUser.distance ? nearUser.distance : 0} meters away</Text>
@@ -103,8 +99,7 @@ const styles = StyleSheet.create({
         borderTopColor: colors.primary,
         borderBottomColor: colors.primary,
         borderBottomWidth: 1,
-        borderTopWidth: 1,
-        backgroundColor: opacity_colors.secondary_light
+        borderTopWidth: 1
     },
     content_pressed: {
         width: '100%',

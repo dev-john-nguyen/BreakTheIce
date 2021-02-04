@@ -74,7 +74,6 @@ const buttonBase: StyleProp<any> = {
     paddingTop: 10,
     paddingBottom: 10,
     borderWidth: 1,
-    maxHeight: 40,
     alignItems: 'center',
 }
 
@@ -181,7 +180,7 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
 
             unpressed.button.backgroundColor = colors.lightGrey;
             unpressed.button.borderColor = colors.lightGrey;
-            unpressed.text.color = colors.blackLight;
+            unpressed.text.color = 'grey';
             break;
         case 'primary':
         default:
@@ -220,7 +219,7 @@ export const underline_header_styles: StyleProp<any> = {
     underline: {
         position: 'absolute',
         opacity: .9,
-        height: 15,
+        height: 10,
         borderRadius: 5,
         bottom: 3,
         alignSelf: 'center',

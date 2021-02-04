@@ -7,6 +7,7 @@ import { BodyText } from '../../utils';
 import { colors, drop_shadow, opacity_colors } from '../../utils/styles';
 import { PinchGestureHandler, PinchGestureHandlerStateChangeEvent, State } from 'react-native-gesture-handler';
 import { BlurView } from 'expo-blur';
+import { ImageWidth } from '../utils';
 
 interface CardProps {
     item: GalleryItemProps;
@@ -171,22 +172,20 @@ export default ({ item, index, uri, topRef, handleUpdateAnimatedRef, galleryLen,
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        marginRight: 40,
-        marginLeft: 40,
         borderRadius: 5
     },
     content_container: {
         position: 'relative'
     },
     image: {
-        width: '100%',
-        aspectRatio: 3.2 / 4,
+        width: ImageWidth,
+        aspectRatio: 3 / 4,
         borderTopLeftRadius: 2,
         borderTopRightRadius: 2
     },
     text_container: {
         position: 'absolute',
-        bottom: 0,
+        top: 50,
         width: '100%',
     },
     text_blur: {

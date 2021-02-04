@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Modal, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, Dimensions } from 'react-native';
-import { colors } from '../utils/styles';
+import { colors } from '../../utils/styles';
 import { connect } from 'react-redux';
-import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationUserInfo } from '../../services/invitations/types';
-import { send_invitation } from '../../services/invitations/actions';
-import { messageMaxLen } from '../../utils/variables';
-import { NearByUsersProps } from '../../services/near_users/types';
-import { UserRootStateProps } from '../../services/user/types';
-import { RootProps } from '../../services';
-import { CustomButton, Icon, BodyText, UnderlineHeader } from '../utils';
+import { InvitationsDispatchActionProps, InvitationObject, InvitationStatusOptions, InvitationUserInfo } from '../../../services/invitations/types';
+import { send_invitation } from '../../../services/invitations/actions';
+import { messageMaxLen } from '../../../utils/variables';
+import { NearByUsersProps } from '../../../services/near_users/types';
+import { UserRootStateProps } from '../../../services/user/types';
+import { RootProps } from '../../../services';
+import { CustomButton, Icon, BodyText, UnderlineHeader } from '../../utils';
 
 interface MyModalProps {
     visible: boolean;
@@ -94,7 +94,6 @@ const InviteModal = ({ visible, handleClose, send_invitation, targetUser, user }
                         <View style={styles.modal_view}>
                             <UnderlineHeader
                                 style={{ marginTop: 10 }}
-                                underlineStyle={styles.header_underline}
                                 textStyle={styles.header_text}
                             >Break The Ice</UnderlineHeader>
                             <BodyText style={styles.header_sub_text}>with {targetUser?.username}</BodyText>
@@ -128,24 +127,11 @@ const styles = StyleSheet.create({
         height: Math.round(Dimensions.get('window').height),
         width: Math.round(Dimensions.get('window').width)
     },
-    header_text: {
-        fontSize: 22,
-        color: colors.white,
-    },
-    header_underline: {
-        backgroundColor: colors.secondary,
-        height: 15
-    },
-    header_sub_text: {
-        fontSize: 12,
-        color: colors.white,
-        alignSelf: 'center',
-        marginTop: 5,
-        marginBottom: 10
-    },
     modal_view: {
         position: 'relative',
         backgroundColor: colors.primary,
+        borderColor: colors.secondary,
+        borderWidth: 1,
         borderRadius: 5,
         alignItems: "stretch",
         justifyContent: 'center',
@@ -158,6 +144,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5
+    },
+    header_text: {
+        fontSize: 20,
+        color: colors.white,
+    },
+    header_sub_text: {
+        fontSize: 12,
+        color: colors.white,
+        alignSelf: 'center',
+        marginTop: 5,
+        marginBottom: 10
     },
     text_area: {
         backgroundColor: colors.white,

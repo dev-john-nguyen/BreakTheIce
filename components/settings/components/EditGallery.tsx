@@ -42,6 +42,7 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
             headerRight: () => {
 
                 const imgObjsLen = imgObjs.filter(img => !img.removed).length
+                const saveVisible = imgObjs.length > 0 ? true : false
 
                 return (
                     <View style={{ flexDirection: 'row', right: loading ? 30 : 20 }}>
@@ -50,11 +51,11 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
                             <>
                                 {
                                     imgObjsLen < 5 &&
-                                    <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
+                                    <Pressable onPress={pickImage} style={{ marginRight: saveVisible ? 10 : 0 }}>
                                         {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
                                     </Pressable >
                                 }
-                                {imgObjsLen > 0 &&
+                                {saveVisible &&
                                     <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
                                 }
                             </>
@@ -112,7 +113,7 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [4, 3],
+            aspect: [3, 4],
             quality: 1
         });
 
@@ -157,12 +158,17 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
     };
 
     const handleRemoveGalleryItem = (id: string) => {
-        //find item and set removed to true
+        //find item and set removed to true or splice out the image
+        //if the image was a new
         var index = imgObjs.findIndex(item => item.id === id);
 
         if (index !== undefined) {
-            const { removed } = imgObjs[index]
-            imgObjs[index].removed = removed ? false : true
+            const { removed, url } = imgObjs[index]
+            if (url) {
+                imgObjs[index].removed = removed ? false : true
+            } else {
+                imgObjs.splice(index, 1)
+            }
         } else {
             return set_banner('Issues removing the image', 'error')
         }

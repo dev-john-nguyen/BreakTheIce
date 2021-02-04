@@ -22,12 +22,14 @@ import Notification from './utils/components/Notification';
 import UserInitForm from './signin/components/UserInitForm';
 import { init_user } from '../services/signin/actions';
 import { SigninDispatchActionProps } from '../services/signin/types';
+import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
+import { Roboto_400Regular } from '@expo-google-fonts/roboto';
+import { colors } from './utils/styles';
 
 const BottomTabs = createBottomTabNavigator();
 
 interface Base {
     banner: BannerRootStateProps;
-    remove_error: () => void;
     remove_banner: BannerDispatchActionProps['remove_banner']
     user: RootProps['user'];
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
@@ -38,6 +40,12 @@ interface Base {
 }
 
 const Base = (props: Base) => {
+    let [fontsLoaded] = useFonts({
+        Roboto_400Regular,
+        Rubik_500Medium
+    });
+
+
     const handleRender = () => {
         if (props.banner.loading) return <ActivityIndicator />
         if (props.user.fetchFail) return <Text>Oops! We couldn't retrieve your profile.</Text>
@@ -88,20 +96,24 @@ const Base = (props: Base) => {
 
     return (
         <View style={styles.container}>
-            <StatusBar style='dark' />
-            {
-                props.banner.notification.length > 0 &&
-                <Notification notification={props.banner.notification} />
-            }
-            {
-                props.banner.banner.length > 0 &&
-                <Banner
-                    remove_banner={props.remove_banner}
-                    banner={props.banner.banner}
-                />
-            }
-            {
-                handleRender()
+            {!fontsLoaded ? <ActivityIndicator size='small' color={colors.primary} /> :
+                <>
+                    <StatusBar style='dark' />
+                    {
+                        props.banner.notification.length > 0 &&
+                        <Notification notification={props.banner.notification} />
+                    }
+                    {
+                        props.banner.banner.length > 0 &&
+                        <Banner
+                            remove_banner={props.remove_banner}
+                            banner={props.banner.banner}
+                        />
+                    }
+                    {
+                        handleRender()
+                    }
+                </>
             }
         </View>
     );

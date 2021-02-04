@@ -5,8 +5,8 @@ import { RootProps } from '../../services';
 import { FriendsRootProps, FriendObjProps } from '../../services/friends/types';
 import { MeStackNavigationProp } from '../navigation/utils/types';
 import { colors, opacity_colors } from '../utils/styles';
-import { UnderlineHeader } from '../utils';
 import ProfileImage from '../profile/components/ProfileImage';
+import Empty from '../utils/components/Empty';
 
 interface FriendsProps {
     friends: FriendsRootProps;
@@ -42,10 +42,7 @@ const Friends = ({ friends, navigation }: FriendsProps) => {
                         )}
                         keyExtractor={(item, index) => item.uid ? item.uid : index.toString()}
                     /> :
-                    <UnderlineHeader
-                        textStyle={styles.underline_header_text}
-                        underlineStyle={styles.underline_header_underline}
-                        style={{ marginTop: 20 }}>Get Out There!</UnderlineHeader>
+                    <Empty style={{ flex: 1 }}>Go Get Out There!</Empty>
             }
         </View>
     )
@@ -59,13 +56,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    underline_header_text: {
-        color: colors.primary,
-        fontSize: 24
-    },
-    underline_header_underline: {
-        backgroundColor: colors.secondary
-    },
     friend_container: {
         padding: 10,
         paddingLeft: 110,
@@ -73,7 +63,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
-        backgroundColor: opacity_colors.secondary_light,
+        backgroundColor: colors.white,
         marginBottom: 20
     },
     content: {

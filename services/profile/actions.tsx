@@ -37,9 +37,8 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
         friend = profilePreviewData.friend
     } else {
         //search friends list
-        var friend = _.findIndex(getState().friends.users, (friend) => {
-            return friend.uid === profileUid
-        }) ? true : false
+        const friends = getState().friends.users
+        var friend = _.find(friends, (user) => user.uid === profileUid) ? true : false
     }
 
     //check to see if the profileObj is empty... if it is fetch it from server
@@ -69,7 +68,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 gender,
                 age,
                 hideOnMap,
-                gallery,
+                gallery: gallery ? gallery : [],
                 offline,
                 profileImg,
                 receivedInvite: receivedInvite ? receivedInvite : false,

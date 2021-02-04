@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef, useLayoutEffect, RefObject } from 'react';
+import { View, StyleSheet, Animated, Pressable } from 'react-native';
 import { colors } from '../../utils/styles';
 import Gallery from '../../gallery';
 import ProfileImage from './ProfileImage';
-import { CustomButton, HeaderText, BodyText } from '../../utils';
+import { CustomButton, HeaderText, BodyText, Icon } from '../../utils';
 import { TopProfileBackground } from '../../utils/svgs';
 import { GalleryItemProps } from '../../../services/user/types';
-import RespondButton from '../../utils/components/RespondButton';
+import RespondButton from '../../modal/respond/Slider';
 import { InvitationStatusOptions } from '../../../services/invitations/types';
-import { windowWidth } from '../../../utils/variables';
+import { windowWidth, windowHeight } from '../../../utils/variables';
 import { calcDateDiff } from '../../../utils/functions';
+import { ScrollView } from 'react-native-gesture-handler';
+import gallery from '../../gallery';
+import { getGalleryHeight } from '../../gallery/utils';
 
 interface UserProps {
     profileImg: any;
@@ -20,7 +23,7 @@ interface UserProps {
     friend?: boolean;
     sentInvite?: boolean;
     receivedInvite?: boolean;
-    distance: number;
+    distance?: number;
     updatedAt?: Date;
 }
 
@@ -28,132 +31,161 @@ interface ProfileProps {
     user: UserProps;
     directToMessage?: () => void;
     directToFriends?: () => void;
-    handleInvitationUpdate?: (status: InvitationStatusOptions) => Promise<void>;
     admin: boolean;
-    setShowModalInvite?: (show: boolean) => void;
+    showInviteModal?: () => void;
+    showRespondModal: () => void;
 }
 
-export default ({ user, directToMessage, directToFriends, handleInvitationUpdate, admin, setShowModalInvite }: ProfileProps) => {
-    const [inviteStatusLoading, setInviteStatusLoading] = useState<boolean>(false);
+export default ({ user, directToMessage, directToFriends, admin, showInviteModal, showRespondModal }: ProfileProps) => {
+    const [forceGalUpdate, setForceGalUpdate] = useState(0)
+    const firstUpdate = useRef<boolean>(true)
+    const scrollViewRef: RefObject<ScrollView> = useRef() as RefObject<ScrollView>
+
+    useLayoutEffect(() => {
+        if (firstUpdate.current) {
+            firstUpdate.current = false;
+            return
+        }
+
+        setForceGalUpdate(forceGalUpdate => forceGalUpdate + 1)
+    }, [user.gallery])
 
     const renderButton = () => {
-        if (admin) return <CustomButton onPress={directToFriends} text='Friends' type='primary' moreStyles={styles.header_button} />
+        if (admin) return <CustomButton onPress={directToFriends} text='Friends' type='primary' style={styles.header_button} />
 
-        if (user.friend) return <CustomButton onPress={directToMessage} text='Message' type='primary' moreStyles={styles.header_button} />
+        if (user.friend) return <CustomButton onPress={directToMessage} text='Message' type='primary' style={styles.header_button} />
 
-        if (user.sentInvite) return <CustomButton type='disabled' text='Pending' moreStyles={styles.header_button} />
+        if (user.sentInvite) return <CustomButton type='disabled' text='Pending' style={styles.header_button} />
 
-        if (user.receivedInvite && handleInvitationUpdate) return (
-            <View style={[styles.header_button, { flexDirection: 'row' }]}>
-                <RespondButton
-                    handleInvitationUpdate={handleInvitationUpdate}
-                    setLoading={setInviteStatusLoading}
-                    loading={inviteStatusLoading}
-                />
-            </View>
+        if (user.receivedInvite) return (
+            <CustomButton type='primary' text='Respond' style={styles.header_button} onPress={showRespondModal} />
         )
 
-        if (setShowModalInvite) return <CustomButton onPress={() => setShowModalInvite(true)} text='Invite' type='primary' moreStyles={styles.header_button} />
+        if (showInviteModal) return <CustomButton onPress={showInviteModal} text='Invite' type='secondary' style={styles.header_button} />
 
-        return <CustomButton type='disabled' text='unavailable' moreStyles={styles.header_background} />
+        return <CustomButton type='disabled' text='unavailable' style={styles.header_background} />
 
     }
 
+    const scrollToEnd = () => scrollViewRef.current?.scrollToEnd({ animated: true })
+    const scrollToTop = () => scrollViewRef.current?.scrollTo({
+        x: 0, y: 0, animated: true
+    })
+
     var dateDiff = calcDateDiff(user.updatedAt)
+    var height = getGalleryHeight(user.gallery)
+
 
     return (
         <>
             <TopProfileBackground style={styles.header_background} height={'14%'} width={windowWidth.toString()} />
-            <View style={styles.container}>
-                <View style={styles.distance}>
-                    <BodyText style={styles.text}>About {user.distance ? user.distance : 0} meters away</BodyText>
-                </View>
-                <View style={styles.seen}>
-                    <BodyText style={styles.text}>Last seen {dateDiff ? dateDiff : 'now'}</BodyText>
-                </View>
-                <View style={styles.header_section}>
-
-                    <ProfileImage image={user.profileImg} size='large' />
-
-                    <View style={styles.header_section_content}>
-                        <View style={styles.header_content_text}>
-                            <HeaderText style={styles.header_text} >{user.name}</HeaderText>
-                            <BodyText text={`${user.age} years old`} style={styles.sub_header_text} />
+            <ScrollView
+                ref={scrollViewRef}
+                contentContainerStyle={styles.container}
+                scrollEnabled={false}
+            >
+                <View style={{ height: windowHeight - 100, width: '100%', justifyContent: 'center' }}>
+                    <View style={{ height: height + 60 }}>
+                        <View style={styles.distance}>
+                            <BodyText style={styles.text}>About {user.distance ? user.distance : 0} meters away</BodyText>
                         </View>
-                        {renderButton()}
+                        <View style={styles.seen}>
+                            <BodyText style={styles.text}>Last seen {dateDiff ? dateDiff : 'now'}</BodyText>
+                        </View>
+                        <Gallery gallery={user.gallery} key={forceGalUpdate} height={height} />
+                        <Pressable style={styles.body} onPress={scrollToEnd}>
+
+                            <View style={styles.profile}>
+
+                                <View style={{ flexDirection: 'row' }}>
+
+                                    <ProfileImage image={user.profileImg} size='large' />
+
+                                    <View style={styles.profile_body}>
+                                        <HeaderText style={styles.profile_text} >{user.name}</HeaderText>
+                                        <BodyText text={`${user.age} years old`} style={styles.sub_profile_text} />
+                                    </View>
+
+                                </View>
+
+                                <View style={styles.header_button}>
+                                    {renderButton()}
+                                </View>
+                            </View>
+                        </Pressable>
+                    </View>
+
+                    <Pressable onPress={scrollToEnd} style={{ height: 100 }} />
+                </View>
+                <View style={{ backgroundColor: colors.tertiary, height: windowHeight - 100, width: '100%' }}>
+                    <Pressable onPress={scrollToTop} style={{ height: 100 }} />
+                    <View style={styles.body_bio}>
+                        <BodyText text={user.bioLong} style={styles.bio_text} />
                     </View>
                 </View>
-
-                <View style={styles.bio}>
-                    <BodyText text={user.bioLong} style={styles.bio_text} />
-                </View>
-                <Gallery gallery={user.gallery} />
-            </View>
+            </ScrollView>
         </>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        paddingRight: 20,
-        paddingLeft: 20,
         paddingTop: 10,
-        position: 'relative'
+        paddingLeft: 10,
+        paddingRight: 10,
+        position: 'relative',
     },
     distance: {
         position: 'absolute',
-        top: 20,
+        top: -10,
         right: 30
     },
     seen: {
         position: 'absolute',
-        top: 20,
+        top: -10,
         left: 30
     },
     text: {
         color: colors.secondary,
-        fontSize: 10
+        fontSize: 8
     },
     header_background: {
         top: -5,
         left: 0
     },
-    header_section: {
-        alignItems: 'center'
+    body: {
+        flex: 1,
+        flexDirection: 'column',
     },
-    header_section_content: {
-        alignItems: 'center'
+    profile: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        top: -40
     },
-    header_content_text: {
-        alignItems: 'center'
+    profile_body: {
+        alignItems: 'flex-start',
+        marginLeft: 10,
+        top: 35
     },
-    header_text: {
+    profile_text: {
         marginTop: 10,
         color: colors.primary,
         fontSize: 18
     },
     header_button: {
-        marginTop: 10,
-        flexDirection: 'row',
-        maxWidth: '70%'
+        alignSelf: 'center'
     },
-    sub_header_text: {
-        fontSize: 14,
-        color: colors.primary
+    sub_profile_text: {
+        fontSize: 12,
+        color: colors.primary,
+        marginLeft: 10,
     },
-    bio: {
-        paddingTop: 20,
-        paddingBottom: 20,
+    body_bio: {
         padding: 10
     },
     bio_text: {
         fontSize: 12,
         color: colors.primary,
         lineHeight: 15
-    },
-    edit_icon: {
-        alignSelf: 'flex-end',
-        padding: 10
     }
 })

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { colors } from '../utils/styles'
 import Maps from '../maps';
@@ -39,9 +39,12 @@ interface ListenersProps {
 
 const Home = (props: HomeProps) => {
     const [currentLocation, setCurrentLocation] = useState<CurrentLocationProps>({ ctryStateCity: undefined, location: undefined })
+    const mount = useRef<boolean>();
 
     useEffect(() => {
         //onMount update/set user location
+        mount.current = true;
+
         (async () => {
             try {
                 let { status } = await Location.requestPermissionsAsync();
@@ -56,7 +59,7 @@ const Home = (props: HomeProps) => {
                     const ctryStateCity: CtryStateCityProps | undefined = await getBucket(location);
 
                     if (ctryStateCity) {
-                        setCurrentLocation({ location, ctryStateCity })
+                        mount.current && setCurrentLocation({ location, ctryStateCity })
                     } else {
                         console.log('manually set it')
                     }
@@ -64,10 +67,15 @@ const Home = (props: HomeProps) => {
                 }
             } catch (e) {
                 console.log(e)
+                console.log('failed')
             }
 
 
         })();
+
+        return () => {
+            mount.current = false
+        }
     }, [])
 
     useEffect(() => {

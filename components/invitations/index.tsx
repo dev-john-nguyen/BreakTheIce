@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, FlatList, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
@@ -10,7 +10,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { renderDate } from '../chat/utils';
 import ProfileImage from '../profile/components/ProfileImage';
 import Empty from '../utils/components/Empty';
-import { BlurView } from 'expo-blur';
+import { Icon } from '../utils';
 
 interface Invitations {
     navigation: InvitationsStackNavigationProp;
@@ -19,6 +19,18 @@ interface Invitations {
 }
 
 const Invitations = ({ navigation, invitation, update_invitation_from_invitations }: Invitations) => {
+    const previewAdmin = useRef(new Animated.Value(0)).current
+
+
+    useEffect(() => {
+        Animated.timing(previewAdmin, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: false
+        }).start(() => {
+            previewAdmin.setValue(0)
+        })
+    }, [])
 
 
     const handleDirectToProfile = (inviterObj: InvitationObject) => {
@@ -35,19 +47,18 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     const renderRightActions = (progress: Animated.AnimatedInterpolation) => {
         const trans = progress.interpolate({
             inputRange: [0, .4, .5, 1],
-            outputRange: [0, -10, -120, -320],
+            outputRange: [0, -50, -150, -350],
         });
 
         return (
             <View style={styles.rightAction}>
-                <Animated.Text style={[
-                    styles.actionText,
+                <Animated.View style={
                     {
                         transform: [{ translateX: trans }]
                     }
-                ]}>
-                    Deny
-                    </Animated.Text>
+                }>
+                    <Icon type='arrow-left-circle' size={30} color={colors.white} pressColor={colors.white} />
+                </Animated.View>
             </View>
         )
     }
@@ -55,51 +66,69 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     const renderLeftActions = (progress: Animated.AnimatedInterpolation) => {
         const trans = progress.interpolate({
             inputRange: [0, .4, .5, 1],
-            outputRange: [0, 10, 120, 320],
+            outputRange: [0, 50, 150, 350],
         });
 
         return (
             <View style={styles.leftAction}>
-                <Animated.Text style={[
-                    styles.actionText,
+                <Animated.View style={
                     {
                         transform: [{ translateX: trans }]
                     }
-                ]}>
-                    Accept
-                    </Animated.Text>
+                }>
+                    <Icon type='arrow-right-circle' size={30} color={colors.white} pressColor={colors.white} />
+                </Animated.View>
             </View>
         )
     }
 
+    const renderAnimation = () => {
+        return (
+            <Animated.View style={{
+                width: previewAdmin.interpolate({
+                    inputRange: [0, .6, 1],
+                    outputRange: [.01, 60, .01],
+                }),
+                backgroundColor: colors.green,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <Icon type='arrow-right-circle' size={30} color={colors.white} pressColor={colors.white} />
+            </Animated.View>
+        )
+    }
+
     const renderInvitationList = () => {
-        if (!invitation.inbound || invitation.inbound.length < 1) return <Empty style={{ marginTop: 20 }}>No Invitations</Empty>
+        if (!invitation.inbound || invitation.inbound.length < 1) return <Empty style={{ flex: 1 }}>No Invitations</Empty>
 
         return <FlatList
             data={invitation.inbound}
             renderItem={({ item, index, separators }) => (
-                <Swipeable
-                    renderRightActions={renderRightActions}
-                    renderLeftActions={renderLeftActions}
-                    onSwipeableRightOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.denied)}
-                    onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
-                    containerStyle={styles.container}
-                >
-                    <View style={styles.content_container}>
-                        <View style={styles.profile_section}>
-                            <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
-                            <View style={styles.profile_section_text}>
-                                <Text style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
+                <View style={styles.container}>
+                    {index === 0 && renderAnimation()}
+                    <Swipeable
+                        renderRightActions={renderRightActions}
+                        renderLeftActions={renderLeftActions}
+                        onSwipeableRightOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.denied)}
+                        onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
+                        containerStyle={styles.swipe_container}
+                    >
+                        <Pressable style={styles.content_container}>
+                            <View style={styles.profile_section}>
+                                <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
+                                <View style={styles.profile_section_text}>
+                                    <Text style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.content_section}>
-                            <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
-                            <View style={styles.content_section_small}>
-                                <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
+                            <View style={styles.content_section}>
+                                <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
+                                <View style={styles.content_section_small}>
+                                    <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
+                                </View>
                             </View>
-                        </View>
-                    </View>
-                </Swipeable>
+                        </Pressable>
+                    </Swipeable>
+                </View>
             )}
             keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
         />
@@ -122,12 +151,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'flex-start',
     },
-    actionText: {
-        color: colors.white,
-        fontSize: 14,
-        backgroundColor: 'transparent',
-        padding: 10
-    },
     rightAction: {
         alignItems: 'flex-end',
         flex: 1,
@@ -135,17 +158,19 @@ const styles = StyleSheet.create({
         backgroundColor: colors.red,
     },
     container: {
-        borderBottomWidth: 1,
+        flexDirection: 'row', marginBottom: 20, borderBottomWidth: 1,
         borderTopWidth: 1,
         borderBottomColor: colors.primary,
         borderTopColor: colors.primary,
+    },
+    swipe_container: {
+        width: '100%',
         backgroundColor: colors.white,
-        position: 'relative',
-        marginBottom: 20
+        position: 'relative'
     },
     content_container: {
         flex: 1,
-        backgroundColor: colors.secondaryLight,
+        backgroundColor: colors.white,
         flexDirection: 'row',
         paddingLeft: 30,
         paddingRight: 20,

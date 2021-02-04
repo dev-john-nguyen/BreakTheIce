@@ -2,13 +2,11 @@ import React from 'react';
 import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator, Keyboard } from 'react-native';
 import { button_styles, underline_header_styles, drop_shadow_light, colors } from './styles';
 import { Feather } from '@expo/vector-icons';
-import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
-import { Roboto_400Regular } from '@expo-google-fonts/roboto';
 import { TextInput } from 'react-native-gesture-handler';
 import { windowWidth, windowHeight } from '../../utils/variables';
 
 export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: string, size: number, color: string, pressColor?: string, onPress?: () => void, style?: StyleProp<any> }) => (
-    <Pressable onPress={onPress} style={style} hitSlop={20}>
+    <Pressable onPress={onPress} style={style} hitSlop={10}>
         {({ pressed }) => <Feather name={type} size={size} color={pressed ? pressColor : color} />}
     </Pressable>
 )
@@ -18,17 +16,18 @@ interface CustomButtonProps {
     onPress?: () => void;
     type: "primary" | "secondary" | "white_outline" | "red_outline" | "disabled" | "red" | "white";
     moreStyles?: StyleProp<any>;
+    style?: StyleProp<any>
     indicatorColor?: string | false;
     size?: 'small' | 'regular';
     disabled?: boolean
 }
 
 //buttons
-export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, size, disabled }: CustomButtonProps) => {
+export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, size, disabled, style }: CustomButtonProps) => {
 
     const { pressed, unpressed } = button_styles(size, type)
 
-    const handlePressableStyle = (props: { pressed: boolean }) => [props.pressed ? pressed.button : unpressed.button, moreStyles, drop_shadow_light]
+    const handlePressableStyle = (props: { pressed: boolean }) => [props.pressed ? pressed.button : unpressed.button, moreStyles, style, drop_shadow_light]
 
     return <Pressable
         disabled={disabled ? disabled : indicatorColor ? true : false}
@@ -60,29 +59,11 @@ export const UnderlineHeader = ({ textStyle, style, children }: UnderLineHeaderP
 
 
 export const BodyText = ({ style, text, children }: { style?: StyleProp<any>, text?: string, children?: any }) => {
-    let [fontsLoaded] = useFonts({
-        Roboto_400Regular
-    });
-
-    if (!fontsLoaded) {
-        return <ActivityIndicator />;
-    }
-
-    // const genFontSize = windowWidth / 34
-
     return <Text style={[{ fontFamily: 'Roboto_400Regular' }, text_styles.body, style]}>{text ? text : children}</Text>;
 
 }
 
 export const HeaderText = ({ style, children }: { style?: StyleProp<any>, children: string }) => {
-    let [fontsLoaded] = useFonts({
-        Rubik_500Medium
-    });
-
-    if (!fontsLoaded) {
-        return <ActivityIndicator />;
-    }
-
     return <Text style={[{ fontFamily: 'Rubik_500Medium' }, text_styles.header, style]}>{children}</Text>;
 }
 
@@ -101,14 +82,6 @@ interface CustomInput {
 }
 
 export const CustomInput = ({ style, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize, autoCorrect, autoCompleteType }: CustomInput) => {
-    let [fontsLoaded] = useFonts({
-        Roboto_400Regular
-    });
-
-    if (!fontsLoaded) {
-        return <ActivityIndicator />;
-    }
-
     return <TextInput
         style={[style, text_styles.input, { fontFamily: 'Roboto_400Regular' }]}
         placeholder={placeholder}

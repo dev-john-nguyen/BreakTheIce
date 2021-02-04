@@ -77,10 +77,6 @@ const styles = StyleSheet.create({
     },
     picker: {
         flexBasis: '20%',
-        borderTopColor: colors.tertiary,
-        borderTopWidth: 1,
-        borderBottomColor: colors.tertiary,
-        borderBottomWidth: 1,
         marginRight: 5,
     },
     picker_item: {

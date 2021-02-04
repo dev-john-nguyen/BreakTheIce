@@ -74,7 +74,7 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
         <ActivityIndicator />
     </View>
 
-    if (chatPreviews.length < 1) return <Empty style={{ marginTop: 20 }}>No Messages</Empty>
+    if (chatPreviews.length < 1) return <Empty style={{ flex: 1 }}>No Messages</Empty>
 
     return (
         <FlatList
@@ -153,7 +153,7 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
     },
     content_container: {
         flex: 1,
-        backgroundColor: unread ? colors.secondaryMedium : colors.secondaryLight,
+        backgroundColor: unread ? colors.secondaryMedium : colors.white,
         flexDirection: 'row',
         paddingLeft: 30,
         paddingRight: 20,
