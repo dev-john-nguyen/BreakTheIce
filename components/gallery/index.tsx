@@ -5,7 +5,7 @@ import { colors, drop_shadow } from '../utils/styles';
 import Card from './components/Card';
 import Empty from '../utils/components/Empty';
 import { cloneDeepWith } from 'lodash'
-import { windowWidth } from '../../utils/variables';
+import { windowWidth, windowHeight } from '../../utils/variables';
 import { getGalleryHeight, ImageWidth } from './utils';
 
 interface GalleryComProps {

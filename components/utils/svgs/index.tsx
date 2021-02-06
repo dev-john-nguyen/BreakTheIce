@@ -12,10 +12,19 @@ const topSvg = `<svg width="414" height="80" viewBox="0 0 414 80" fill="none" xm
 </svg>
 `
 
+const messageCurvePrimary = (color: string) => `<svg viewBox="0 0 47 67" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M46 1V66.5H1C1 65.1193 2.13892 64.0071 3.51783 63.9366C38.7627 62.1339 42.254 22.3358 46 1Z" fill=${color} stroke=${color} />
+</svg>
+`
+
 export const BottomNavBackground = ({ style, height, width }: { style: StyleProp<any>, height: string, width: string }) => (
     <SvgXml xml={bottomSvg} height={height} width={width} style={style} preserveAspectRatio='none' />
 )
 
 export const TopProfileBackground = ({ style, height, width }: { style: StyleProp<any>, height: string, width: string }) => (
     <SvgXml xml={topSvg} height={height} width={width} style={style} preserveAspectRatio='none' />
+)
+
+export const MessageCurve = ({ style, color }: { style: StyleProp<any>, color: string }) => (
+    <SvgXml xml={messageCurvePrimary(color)} style={style} preserveAspectRatio='none' />
 )

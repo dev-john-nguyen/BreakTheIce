@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, StyleProp } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
-import { Icon, UnderlineHeader, HeaderText } from '../utils';
+import { Icon, HeaderText, UnderlineHeader } from '../utils';
 import { colors } from '../utils/styles';
 
 interface RouteProps {
@@ -31,6 +31,7 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
                 color: colors.white,
                 textTransform: 'lowercase',
                 fontSize: 20,
+                letterSpacing: 2
             };
             return (
                 <UnderlineHeader

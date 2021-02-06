@@ -4,7 +4,6 @@ import {
     View,
     StyleSheet,
     TextInput,
-    Alert,
     Picker,
 } from 'react-native';
 import * as FirebaseRecaptcha from 'expo-firebase-recaptcha';

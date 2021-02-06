@@ -70,7 +70,7 @@ export default ({ set_banner, profileImg, imgObj, setImgObj, handleCameraRollPer
     return (
         <>
             <ProfileImage image={imgObj ? imgObj : profileImg} size='large' />
-            <Icon size={10} type="edit" color={colors.primary} pressColor={colors.secondary} onPress={pickImage} />
+            <Icon size={15} type="edit" color={colors.primary} pressColor={colors.secondary} onPress={pickImage} />
         </>
     )
 }

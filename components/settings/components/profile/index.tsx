@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Picker, ScrollView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { View, StyleSheet, Picker, ScrollView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, ActivityIndicator } from 'react-native';
 import { colors } from '../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
-import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps } from '../../../../services/user/types';
+import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps, InterviewProps } from '../../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../../services/banner/tsTypes';
 import { MeStackNavigationProp } from '../../../navigation/utils/types';
-import { isEqual } from 'lodash';
-import EditProfileImg from './components/EditProfileImg';
+import { isEqual, isEmpty } from 'lodash';
+import EditProfileImg from './components/ProfileImage';
 import { ageArr } from '../../../../utils/variables';
 import { BodyText, CustomInput } from '../../../utils';
+import Questions from './components/Questions';
+import { likesInitIndex, carrerInitIndex, familyInitIndex, valuesInitIndex } from './components/utils';
 
 interface EditProfileProps {
     user: UserRootStateProps;
@@ -20,20 +22,25 @@ interface EditProfileProps {
 
 const EditProfile = ({ user, update_profile, set_banner, navigation, handleCameraRollPermission }: EditProfileProps) => {
     const [profileImg, setProfileImg] = useState<NewProfileImgProps>();
-    const [profileVals, setProfileVals] = useState<UpdateUserProfileProps>()
-
-
+    const [profileVals, setProfileVals] = useState<Omit<UpdateUserProfileProps, 'interview'>>()
+    const [interviewVals, setInterviewVals] = useState<InterviewProps>({
+        likes: [likesInitIndex, ''],
+        career: [carrerInitIndex, ''],
+        family: [familyInitIndex, ''],
+        values: [valuesInitIndex, '']
+    });
     const [loading, setLoading] = useState(false);
+    const mount = useRef<boolean>()
 
-    useEffect(() => {
-        var mount = true;
+    useLayoutEffect(() => {
+        mount.current = true;
         navigation.setOptions({
             headerRight: () => {
                 if (loading) {
-                    return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 30 }} />
+                    return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 15 }} />
                 } else {
                     return (
-                        <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 20 }}>
+                        <Pressable onPress={handleSave} style={{ marginRight: 15 }}>
                             {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
                         </Pressable >
                     )
@@ -42,24 +49,28 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
         })
 
         return () => {
-            mount = false
+            mount.current = false
             navigation.setOptions({ headerRight: undefined })
         }
-    }, [loading, profileVals, user, profileImg])
+    }, [loading, profileVals, profileImg, interviewVals, user])
 
     useEffect(() => {
-        const { name, bioShort, bioLong, age, gender, profileImg } = user;
+        const { name, bioShort, bioLong, age, gender, profileImg, interview } = user;
 
         setProfileVals({
             name,
             bioShort,
             bioLong,
             age,
-            gender: gender ? gender : 'man'
+            gender: gender ? gender : 'man',
         })
 
         if (profileImg) {
             setProfileImg(undefined)
+        }
+
+        if (!isEmpty(interview)) {
+            setInterviewVals(interview)
         }
 
     }, [user])
@@ -71,14 +82,14 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
         </View>
     )
 
-    const handleValidation = (mount: boolean) => {
+    const handleValidation = (formVals: UpdateUserProfileProps) => {
 
-        const { name, bioShort, bioLong, age, gender } = user;
+        const { name, bioShort, bioLong, age, gender, interview } = user;
 
-        var oldVals = { name, bioShort, bioLong, age, gender };
+        var oldVals = { name, bioShort, bioLong, age, gender, interview };
 
-        if (isEqual(oldVals, profileVals)) {
-            if (mount) {
+        if (isEqual(oldVals, formVals)) {
+            if (mount.current) {
                 set_banner('No updates found.', 'warning')
                 setLoading(false)
             }
@@ -89,7 +100,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
 
         for (key in profileVals) {
             if (!profileVals[key]) {
-                if (mount) {
+                if (mount.current) {
                     set_banner('Please ensure all fields are filled out.', 'error')
                     setLoading(false)
                 }
@@ -102,22 +113,25 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
     }
 
 
-    const handleSave = (mount: boolean) => {
+    const handleSave = () => {
         Keyboard.dismiss()
 
-        mount && setLoading(true)
+        mount.current && setLoading(true)
+
+        const formVals: UpdateUserProfileProps = { ...profileVals, interview: interviewVals }
+
         if (!profileImg) {
-            if (!handleValidation(mount)) return;
+            if (!handleValidation(formVals)) return;
         }
 
-        update_profile(profileVals, profileImg)
+        update_profile(formVals, profileImg)
             .then(() => {
-                mount && setLoading(false)
+                mount.current && setLoading(false)
             })
             .catch((err) => {
                 console.log(err)
-                mount && set_banner('Oops! Something went wrong updating your profile.', 'error')
-                mount && setLoading(false)
+                mount.current && set_banner('Oops! Something went wrong updating your profile.', 'error')
+                mount.current && setLoading(false)
             })
     }
 
@@ -211,6 +225,11 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                             </View>
                         </View>
 
+                        <Questions
+                            setInterviewVals={setInterviewVals}
+                            interviewVals={interviewVals}
+                        />
+
                     </ScrollView>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
@@ -234,11 +253,9 @@ const styles = StyleSheet.create({
         margin: 10
     },
     text_input: {
-        borderColor: colors.primary,
+        borderColor: colors.tertiary,
         borderWidth: 1,
         borderRadius: 5,
-        padding: 10,
-        fontSize: 10
     },
     text_input_label: {
         fontSize: 12,
@@ -247,7 +264,7 @@ const styles = StyleSheet.create({
         marginLeft: 2
     },
     text_input_info: {
-        fontSize: 8,
+        fontSize: 9,
         color: colors.primary,
         marginBottom: 5,
         marginLeft: 4,
@@ -256,13 +273,14 @@ const styles = StyleSheet.create({
     pickers_container: {
         flexDirection: 'row',
         margin: 10,
-        alignSelf: 'stretch'
+        alignSelf: 'stretch',
+        justifyContent: 'space-around'
     },
     picker: {
         width: 100,
-        borderColor: colors.primary,
-        borderWidth: 2,
-        borderRadius: 5,
+        borderColor: colors.tertiary,
+        borderWidth: 1,
+        borderRadius: 30,
         height: 100
     },
     picker_item: {

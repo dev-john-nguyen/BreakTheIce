@@ -45,7 +45,7 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
                 const saveVisible = imgObjs.length > 0 ? true : false
 
                 return (
-                    <View style={{ flexDirection: 'row', right: loading ? 30 : 20 }}>
+                    <View style={{ flexDirection: 'row', right: loading ? 30 : 15 }}>
                         {loading ?
                             <ActivityIndicator size='small' color={colors.primary} /> :
                             <>
@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
         position: 'relative'
     },
     flat_list: {
-        paddingRight: 25,
-        paddingLeft: 25,
+        marginRight: 40,
+        marginLeft: 40,
         paddingBottom: 10,
     },
     trash: {
@@ -294,8 +294,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white
     },
     image_content_drag: {
-        marginRight: 25,
-        marginLeft: 25,
+        marginRight: 40,
+        marginLeft: 40,
         marginTop: 5,
         shadowColor: "#000",
         shadowOffset: {

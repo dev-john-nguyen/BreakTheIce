@@ -30,7 +30,7 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
                     return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 20 }} />
                 } else {
                     return (
-                        <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 20 }}>
+                        <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 15 }}>
                             {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
                         </Pressable >
                     )

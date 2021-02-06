@@ -17,7 +17,7 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import HeaderRight from './components/HeaderRight';
 import { unfriend_user } from '../../services/friends/actions';
 import { set_banner } from '../../services/banner/actions';
-import ProfileContent from './components/Content';
+import ProfileContent from './components/content';
 import { TopProfileBackground } from '../utils/svgs';
 import { windowWidth } from '../../utils/variables';
 import { update_block_user } from '../../services/user/actions';

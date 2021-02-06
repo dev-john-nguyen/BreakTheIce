@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "LetsLink",
-    "slug": "LetsLink",
+    "name": "BreakTheIce",
+    "slug": "breaktheice",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -33,6 +33,7 @@
     },
     "experiments": {
       "turboModules": false
-    }
+    },
+    "description": "Not available on Andriod"
   }
 }

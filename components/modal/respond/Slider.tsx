@@ -96,7 +96,7 @@ export default ({ updateInvitationStatus }: InvitationButtonsProps) => {
                 containerStyle={styles.swipe_container}
             >
                 <View style={styles.content}>
-                    <BodyText style={styles.text}>Respond</BodyText>
+                    <BodyText style={styles.text}>Accept</BodyText>
                 </View>
             </Swipeable>
         </View>

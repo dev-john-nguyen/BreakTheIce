@@ -112,7 +112,8 @@ export const fetch_profile = async (uid: string) => {
                     offline: data.offline === undefined ? false : data.offline,
                     profileImg: data.profileImg ? data.profileImg : null,
                     blockedUsers: data.blockedUsers ? data.blockedUsers : [],
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
+                    interview: data.interview ? data.interview : {}
                 }
 
                 return { profile: profileObj }

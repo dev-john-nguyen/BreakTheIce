@@ -58,8 +58,8 @@ export const UnderlineHeader = ({ textStyle, style, children }: UnderLineHeaderP
 )
 
 
-export const BodyText = ({ style, text, children }: { style?: StyleProp<any>, text?: string, children?: any }) => {
-    return <Text style={[{ fontFamily: 'Roboto_400Regular' }, text_styles.body, style]}>{text ? text : children}</Text>;
+export const BodyText = ({ style, text, children, numberOfLines }: { style?: StyleProp<any>, text?: string, children?: any, numberOfLines?: number }) => {
+    return <Text style={[{ fontFamily: 'Roboto_400Regular' }, text_styles.body, style]} numberOfLines={numberOfLines}>{text ? text : children}</Text>;
 
 }
 
@@ -105,8 +105,10 @@ const text_styles = StyleSheet.create({
         letterSpacing: .5
     },
     input: {
-        padding: 10,
-        letterSpacing: .2
+        padding: 12,
+        paddingTop: 12,
+        letterSpacing: .2,
+        fontSize: 12
     }
 })
 

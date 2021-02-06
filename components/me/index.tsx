@@ -2,7 +2,7 @@ import React from 'react';
 import { MeStackNavigationProp } from '../navigation/utils/types';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import ProfileContent from '../profile/components/Content';
+import ProfileContent from '../profile/components/content';
 
 interface MeProps {
     navigation: MeStackNavigationProp;

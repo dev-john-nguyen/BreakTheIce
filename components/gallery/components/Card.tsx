@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { View, Animated, PanResponder, StyleSheet } from 'react-native';
-import { windowWidth } from '../../../utils/variables';
+import { windowWidth, windowHeight } from '../../../utils/variables';
 import { GalleryItemProps } from '../../../services/user/types';
 import { BodyText } from '../../utils';
 import { colors, drop_shadow, opacity_colors } from '../../utils/styles';

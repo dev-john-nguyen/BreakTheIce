@@ -3,6 +3,7 @@ import { StyleSheet, Dimensions, View } from "react-native"
 import Item from './components/Item';
 import { bannerStyles, colors } from '../../styles';
 import { BannerDispatchActionProps, BannerItemProps } from '../../../../services/banner/tsTypes';
+import { windowHeight } from '../../../../utils/variables';
 
 interface BannerProps {
     remove_banner: BannerDispatchActionProps['remove_banner']
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     banner_container: {
         position: 'absolute',
         flexDirection: 'column-reverse',
-        bottom: 40,
+        top: (windowHeight / 2),
         zIndex: 100,
         width: Math.round(Dimensions.get('window').width)
     },

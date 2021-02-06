@@ -19,20 +19,20 @@ export default ({ item, styles, remove_banner }: ItemProps) => {
             delay: item.message.length > 10 ? 5000 : 2000,
             toValue: 0,
             duration: 2000,
-            useNativeDriver: true
+            useNativeDriver: false
         }).start()
 
         Animated.sequence([
             Animated.timing(transYAdmin, {
                 toValue: 1,
                 duration: 1000,
-                useNativeDriver: true
+                useNativeDriver: false
             }),
             Animated.timing(transYAdmin, {
                 toValue: 2,
                 delay: item.message.length > 10 ? 5000 : 2000,
                 duration: 1000,
-                useNativeDriver: true
+                useNativeDriver: false
             })
         ]).start(() => {
             remove_banner(item.id)
@@ -46,16 +46,14 @@ export default ({ item, styles, remove_banner }: ItemProps) => {
                 styles.container,
                 { opacity: fadeAnim },
                 {
-                    transform: [{
-                        translateY: transYAdmin.interpolate({
-                            inputRange: [0, 1, 2],
-                            outputRange: [100, -20, 100]
-                        })
-                    }]
+                    width: transYAdmin.interpolate({
+                        inputRange: [0, 1, 2],
+                        outputRange: ['0%', '100%', '0%']
+                    })
                 }
             ]}
         >
-            <BodyText style={styles.text}>{item.message}</BodyText>
+            <BodyText style={styles.text} numberOfLines={1} >{item.message}</BodyText>
         </Animated.View>
     )
 }

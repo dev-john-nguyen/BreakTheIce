@@ -240,7 +240,7 @@ export const bannerStyles = (type: string) => {
         },
         text: {
             textAlign: 'center',
-            fontSize: 14,
+            fontSize: 12,
             letterSpacing: .5,
             textTransform: 'capitalize'
         }

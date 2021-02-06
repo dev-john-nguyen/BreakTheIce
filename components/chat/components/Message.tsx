@@ -15,6 +15,7 @@ import { ProfileImgProps } from '../../../services/user/types';
 import { timestamp } from '../../../utils/variables';
 import ProfileImage from '../../profile/components/ProfileImage';
 import { update_if_read, search_redux_chat, set_if_read, database_fetch_chat } from './utils';
+import { MessageCurve } from '../../utils/svgs';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
@@ -252,12 +253,14 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                     return (
                         <View key={item.docId} style={styles.message_right}>
                             <BodyText style={styles.message_right_text}>{item.message}</BodyText>
+                            <MessageCurve style={styles.message_curve_right} color={colors.lightGrey} />
                         </View>
                     )
                 } else {
                     return (
                         <View key={item.docId} style={styles.message_left}>
                             <BodyText style={styles.message_left_text}>{item.message}</BodyText>
+                            <MessageCurve style={styles.message_curve} color={colors.primary} />
                         </View>
                     )
                 }
@@ -314,10 +317,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         marginRight: 10,
-        padding: 5,
-        paddingLeft: 10,
-        paddingRight: 10,
-        borderColor: colors.primary
+        padding: 10,
+        paddingTop: 10,
+        borderColor: colors.primary,
+        alignSelf: 'stretch'
     },
     profile_content: {
         marginTop: 20,
@@ -335,34 +338,55 @@ const styles = StyleSheet.create({
         flex: 1
     },
     message_left: {
-        left: -10,
+        left: 20,
         marginTop: 10,
         marginBottom: 10,
-        width: '70%',
         padding: 20,
-        paddingLeft: 30,
-        borderWidth: 2,
-        borderColor: colors.primary,
-        borderRadius: 20
+        paddingLeft: 20,
+        backgroundColor: colors.primary,
+        position: 'relative',
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
+        alignSelf: 'flex-start',
+        maxWidth: '60%'
+    },
+    message_curve: {
+        position: 'absolute',
+        left: -20,
+        bottom: 0,
+        width: 30,
+        height: 30
     },
     message_left_text: {
-        color: colors.primary
+        color: colors.white,
+        fontSize: 12
     },
     message_right: {
         alignSelf: 'flex-end',
-        right: -10,
+        right: 20,
         marginTop: 10,
         marginBottom: 10,
-        width: '70%',
+        position: 'relative',
         padding: 20,
-        paddingRight: 30,
-        borderWidth: 1,
-        borderColor: colors.primary,
-        backgroundColor: colors.primary,
-        borderRadius: 20
+        paddingRight: 20,
+        backgroundColor: colors.lightGrey,
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+        borderTopRightRadius: 20,
+        maxWidth: '60%'
+    },
+    message_curve_right: {
+        position: 'absolute',
+        right: -20,
+        bottom: 0,
+        width: 30,
+        height: 30,
+        transform: [{ rotate: '90deg' }]
     },
     message_right_text: {
-        color: colors.white
+        color: colors.black,
+        fontSize: 12
     }
 })
 

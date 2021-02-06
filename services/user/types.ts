@@ -89,6 +89,14 @@ export interface UserRootStateProps {
     locationListener?: { remove: () => void };
     updatedAt: Date;
     blockedUsers: BlockUserProps[];
+    interview: InterviewProps
+}
+
+export interface InterviewProps {
+    likes: [string, string]
+    career: [string, string]
+    family: [string, string]
+    values: [string, string]
 }
 
 export interface UpdateUserProfileProps {
@@ -97,6 +105,7 @@ export interface UpdateUserProfileProps {
     bioLong: string;
     age: number;
     gender: string;
+    interview: InterviewProps;
 }
 
 export interface UpdateUserPrivacyProps {
