@@ -173,9 +173,8 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
         if (blob) {
             var path: string = `${uid}/gallery/${name}`;
             var newUpdatedAt: Date = new Date();
-            var uploadTask = fireStorage.ref().child(path).put(blob)
 
-            await uploadTask
+            await fireStorage.ref().child(path).put(blob)
                 .then(async (snapshot) => {
                     await snapshot.ref.getDownloadURL()
                         .then(downloadURL => {
@@ -186,13 +185,6 @@ export const save_gallery = (newGallery: NewGalleryItemProps[]) => async (dispat
                     console.log(err)
                     dispatch(set_banner('Error occured uploading image number' + (i + 1), 'error'))
                 })
-
-            // try {
-            //     await image_task_listener(uploadTask, dispatch, i, newGallery.length)
-            //         .then((genUrl: string) => gallery.push({ url: genUrl, description, updatedAt: newUpdatedAt, id, name }))
-            // } catch (e) {
-            //     dispatch(set_banner(e, 'error'))
-            // }
         } else {
             if (url && updatedAt) {
                 gallery.push({ url, description, updatedAt, id, name })

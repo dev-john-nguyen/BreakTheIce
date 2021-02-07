@@ -65,7 +65,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
 
     const handleCameraRollPermission = async (): Promise<boolean> => {
         try {
-            const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync();
+            const { status: CameraRollStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
             if (CameraRollStatus !== 'granted') {
                 set_banner('Camera roll access denied', 'warning')
@@ -85,7 +85,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
         <View style={styles.container}>
             <Animated.View style={styles.menu_container}>
                 <View style={styles.menu_options}>
-                    <TouchableHighlight
+                    {/* <TouchableHighlight
                         style={[styles.menu_items, target === TargetOptions.profile && styles.active]}
                         onPress={() => set_banner('fdsafadsf ', 'error')}
                         underlayColor={colors.tertiary}
@@ -93,7 +93,7 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                         <View style={styles.content}>
                             <BodyText style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Error</BodyText>
                         </View>
-                    </TouchableHighlight>
+                    </TouchableHighlight> */}
 
                     <TouchableHighlight
                         style={[styles.menu_items, target === TargetOptions.profile && styles.active]}

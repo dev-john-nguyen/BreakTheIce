@@ -34,9 +34,9 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
                 letterSpacing: 2
             };
             return (
-                <UnderlineHeader
-                    textStyle={textStyle}
-                >{route.params.title}</UnderlineHeader>
+                <HeaderText
+                    style={textStyle}
+                >{route.params.title}</HeaderText>
             )
         }
 

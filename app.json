@@ -19,7 +19,9 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app uses your location to identify users near you"
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to identify users near you",
+        "NSPhotoLibraryUsageDescription": "Give BreakTheIce permission to access photos",
+        "NSCameraUsageDescription": "Give BreakTheIce permission to access your camera"
       }
     },
     "android": {

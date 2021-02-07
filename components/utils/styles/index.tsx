@@ -1,4 +1,5 @@
 import { StyleSheet, StyleProp } from 'react-native'
+import { windowWidth } from '../../../utils/variables'
 
 
 //colors
@@ -242,7 +243,8 @@ export const bannerStyles = (type: string) => {
             textAlign: 'center',
             fontSize: 12,
             letterSpacing: .5,
-            textTransform: 'capitalize'
+            textTransform: 'capitalize',
+            width: windowWidth
         }
     }
 

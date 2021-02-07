@@ -11,7 +11,7 @@ import { UserDispatchActionsProps } from '../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { AutoId } from '../../../utils/functions';
-import _ from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 import { MeStackNavigationProp } from '../../navigation/utils/types';
 import { set_banner } from '../../../services/banner/actions';
 import { Feather } from '@expo/vector-icons';
@@ -42,7 +42,6 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
             headerRight: () => {
 
                 const imgObjsLen = imgObjs.filter(img => !img.removed).length
-                const saveVisible = imgObjs.length > 0 ? true : false
 
                 return (
                     <View style={{ flexDirection: 'row', right: loading ? 30 : 15 }}>
@@ -51,13 +50,13 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
                             <>
                                 {
                                     imgObjsLen < 5 &&
-                                    <Pressable onPress={pickImage} style={{ marginRight: saveVisible ? 10 : 0 }}>
+                                    <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
                                         {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
                                     </Pressable >
                                 }
-                                {saveVisible &&
-                                    <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSaveGallery} />
-                                }
+
+                                <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSave} />
+
                             </>
                         }
                     </View>
@@ -74,17 +73,24 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
 
     useEffect(() => {
         //need to reverse the order of the images to display correctly
-        gallery && setImgObjs(_.cloneDeep(gallery).reverse());
+        gallery && setImgObjs(cloneDeep(gallery).reverse());
 
     }, [gallery])
 
-    const handleSaveGallery = () => {
+    const handleSave = () => {
         Keyboard.dismiss();
         //allow description to be empty
         //check if any changes were made
-        const imgObjRev = _.cloneDeep(imgObjs).reverse();
+        if (imgObjs.length < 1) {
+            return set_banner('No photos found in the gallery to save.', 'warning');
+        }
 
-        if (_.isEqual(imgObjRev, gallery)) {
+        //lodash clone deep causing the app to crash in production for some reason...
+        const imgObjRev = [...imgObjs];
+
+        imgObjRev.reverse()
+
+        if (isEqual(imgObjRev, gallery)) {
             return set_banner('Looks like there were no changes found.', 'warning');
         }
 
@@ -117,11 +123,12 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
             quality: 1
         });
 
+
         if (!result.cancelled) {
 
             const manipResult = await ImageManipulator.manipulateAsync(
                 result.uri,
-                [{ resize: { width: 600 } }],
+                [{ resize: { width: 1000 } }],
                 { compress: 1, format: ImageManipulator.SaveFormat.PNG }
             );
 
