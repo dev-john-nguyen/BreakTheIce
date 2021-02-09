@@ -67,7 +67,7 @@ const Home = (props: HomeProps) => {
                 }
             } catch (e) {
                 console.log(e)
-                console.log('failed')
+                alert("unable to find your location. Please refresh.")
             }
 
 

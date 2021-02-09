@@ -11,6 +11,12 @@ import firebase from 'firebase';
 import { set_banner } from '../banner/actions';
 import { cacheImage } from '../../utils/functions';
 import { UPDATE_PROFILE_HISTORY } from '../profile/actionTypes';
+import * as Location from 'expo-location';
+import { getBucket } from '../../components/home/utils';
+import { isEqual } from 'lodash';
+import { fireDb_init_user_location } from '../user/utils';
+import { REFRESH_UPDATE_BUCKET } from '../user/actionTypes';
+
 
 //find near by users
 export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, newLocation: LocationObject) => (dispatch: AppDispatch, getState: () => RootProps) => {
@@ -38,7 +44,7 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
                 if (!doc.exists) continue;
 
                 // var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                const { username, location, bioShort, age, hideOnMap, profileImg, blockedUsers, updatedAt } = doc.data()
+                const { username, location, statusMsg, age, hideOnMap, profileImg, blockedUsers, updatedAt } = doc.data()
 
                 if (blockedUsers && blockedUsers.find((user: BlockUserProps) => user.uid === uid)) continue
 
@@ -46,7 +52,7 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
                     uid: doc.id,
                     username,
                     location,
-                    bioShort,
+                    statusMsg,
                     age,
                     distance: 0,
                     hideOnMap,
@@ -123,6 +129,48 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
     dispatch({ type: INIT_NEAR_USERS, payload: {} })
 
     return nearUsersListener
+}
+
+export const refresh_near_users = () => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    var location: LocationObject
+
+    try {
+        location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest });
+
+        const currentBucket: CtryStateCityProps | undefined = await getBucket(location)
+
+        const { user } = getState()
+
+        if (currentBucket) {
+            if (!isEqual(currentBucket, user.ctryStateCity)) {
+                //user's bucket needs to update
+                //and users location needs to update
+
+                await fireDb_init_user_location(user, currentBucket, location)
+
+                dispatch({
+                    type: REFRESH_UPDATE_BUCKET,
+                    payload: {
+                        location,
+                        ctryStateCity: currentBucket
+                    }
+                })
+
+                dispatch(set_banner("Great, looks like your in a different area. Safe travels.", "success"))
+
+            }
+        }
+
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner("Oops! Something went wrong trying to refresh. Please try again", "error"))
+        return;
+    }
+
+
+    const { nearUsers } = getState();
+
+    validate_near_users(location, nearUsers.nearBy, nearUsers.all, dispatch)
 }
 
 export const validate_near_users = async (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<NearByUsersProps>, dispatch: AppDispatch) => {

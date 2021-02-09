@@ -9,6 +9,7 @@ export interface UserActionProps {
         timelineLocDocId: string,
         gallery: GalleryItemProps[],
         locationListener: { remove: () => void }
+        statusMsg: string
     }
 }
 
@@ -42,7 +43,7 @@ export interface NewGalleryItemProps {
 export interface UserProfilePreviewProps {
     uid: string;
     username: string;
-    bioShort: string;
+    statusMsg: string;
     location: LocationObject;
     age: number;
     hideOnMap: boolean;
@@ -78,7 +79,7 @@ export interface UserRootStateProps {
     name: string;
     age: number;
     bioLong: string;
-    bioShort: string;
+    statusMsg: string;
     gender: string;
     profileImg: ProfileImgProps | null;
     gallery: GalleryItemProps[] | [];
@@ -101,7 +102,7 @@ export interface InterviewProps {
 
 export interface UpdateUserProfileProps {
     name: string;
-    bioShort: string;
+    statusMsg: string;
     bioLong: string;
     age: number;
     gender: string;
@@ -119,6 +120,7 @@ export interface UserDispatchActionsProps {
     update_privacy: (updatedPrivacyData: UpdateUserPrivacyProps) => Promise<any>;
     save_gallery: (newGallery: NewGalleryItemProps[]) => Promise<void | undefined>;
     update_block_user: (blockedUser: BlockUserProps) => Promise<void | undefined>;
+    update_status_message: (statusMsg: string) => Promise<void | undefined>;
     remove_account: (phoneNumber: string, ctryCode: string | number) => Promise<void | undefined>;
     go_online: () => void;
     sign_out: () => void;

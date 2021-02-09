@@ -48,9 +48,9 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
     const handleSave = (mount: boolean) => {
         mount && setLoading(true)
 
-        const { name, bioShort, bioLong, age, gender } = user;
+        const { name, statusMsg, bioLong, age, gender } = user;
 
-        var oldVals = { name, bioShort, bioLong, age, gender }
+        var oldVals = { name, statusMsg, bioLong, age, gender }
 
         if (isEqual(oldVals, privacyVals)) {
             if (mount) {

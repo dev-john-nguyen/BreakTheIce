@@ -8,7 +8,7 @@ const heightPercent = windowHeight < 700 ? .6 : .55
 export const imageRatio = 3 / 4
 
 export const ImageWidth = Math.round(((3 * (windowHeight * heightPercent)) / 4))
-const ImageHeight = (ImageWidth * (4 / 3))
+export const ImageHeight = (ImageWidth * (4 / 3))
 
 export function getGalleryHeight(gallery: GalleryItemProps[]) {
     return ImageHeight + ((gallery.length - 1) * topAdjust)

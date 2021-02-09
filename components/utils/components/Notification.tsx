@@ -38,7 +38,7 @@ export default ({ notification }: { notification: string }) => {
 const styles = StyleSheet.create({
     notification_container: {
         position: 'absolute',
-        top: 300,
+        top: 50,
         zIndex: 100,
         width: Math.round(Dimensions.get('window').width),
         backgroundColor: colors.secondary,

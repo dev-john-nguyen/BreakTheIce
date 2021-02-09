@@ -4,11 +4,11 @@ import { StyleSheet, View, Dimensions, ActivityIndicator } from 'react-native';
 import { ProfilePage } from '../../utils/variables';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { validate_near_users } from '../../services/near_users/actions';
-import { NearUsersRootProps, NearByUsersProps } from '../../services/near_users/types';
-import { UserRootStateProps } from '../../services/user/types';
+import { validate_near_users, refresh_near_users } from '../../services/near_users/actions';
+import { NearUsersRootProps, NearByUsersProps, NearUsersDispatchActionProps } from '../../services/near_users/types';
+import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
-import { CustomButton } from '../utils';
+import { CustomButton, Icon } from '../utils';
 import Preview from '../profile/components/Preview';
 import InvitationModal from '../modal/invitation';
 import ProfileImage from '../profile/components/ProfileImage';
@@ -17,6 +17,8 @@ import { colors } from '../utils/styles';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
 import { update_invitation } from '../../services/invitations/actions';
 import RespondModal from '../modal/respond';
+import UpdateStatus from '../me/components/UpdateStatus';
+import { update_status_message } from '../../services/user/actions';
 
 interface RegionProps {
     latitude: number;
@@ -41,6 +43,8 @@ interface MapsProps {
     allUsers: NearUsersRootProps['all'];
     user: UserRootStateProps;
     update_invitation: InvitationsDispatchActionProps['update_invitation']
+    refresh_near_users: NearUsersDispatchActionProps['refresh_near_users']
+    update_status_message: UserDispatchActionsProps['update_status_message']
 }
 
 const { width, height } = Dimensions.get('window');
@@ -79,10 +83,19 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             headerTitle: () => (
                 <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} />
             ),
-            headerLeft: () => this.props.user.hideOnMap &&
-                (
-                    <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 10 }} />
-                )
+            headerLeft: () => (
+                <View style={{ flexDirection: 'row' }}>
+                    <Icon type='refresh-ccw' style={{ marginLeft: 20 }} size={25} color={colors.primary} pressColor={colors.secondary} onPress={this.props.refresh_near_users} />
+
+                    {
+                        !this.props.user.hideOnMap &&
+                        (
+                            <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 20 }} />
+                        )
+                    }
+                </View>
+
+            )
         })
     }
 
@@ -119,29 +132,9 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         this.setState({ region })
     }
 
-    handleViewMe = () => {
-        const { uid, username, bioShort, location, age, hideOnMap, profileImg, updatedAt } = this.props.user;
+    handleViewMe = () => this.setState({ previewMe: true })
 
-        const mePreview: NearByUsersProps = {
-            uid,
-            profileImg,
-            username,
-            bioShort,
-            location,
-            age,
-            hideOnMap,
-            friend: false,
-            distance: 0,
-            sentInvite: false,
-            updatedAt,
-            receivedInvite: false
-        }
-
-        this.setState({
-            previewUser: mePreview,
-            previewMe: true
-        })
-    }
+    handleClosePrevieMe = () => this.setState({ previewMe: false })
 
     handleMarkerOnPress = (nearUser: NearByUsersProps) => {
         this.setState({ previewUser: nearUser, previewMe: false })
@@ -161,53 +154,53 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         }
     }
 
+    renderMapView = () => (
+        <MapView
+            style={styles.map}
+            region={this.state.region}
+            onRegionChangeComplete={this.handleOnRegionChangeComplete}
+            showsUserLocation={true}
+            followsUserLocation={true}
+            onPress={(e) => console.log(e.nativeEvent)}
+        >
+            {
+                <Marker
+                    key={this.props.user.uid}
+                    coordinate={{
+                        latitude: this.props.user.location.coords.latitude,
+                        longitude: this.props.user.location.coords.longitude,
+                    }}
+                >
+                    <FontAwesome name="dot-circle-o" size={10} color={colors.primary} />
+                </Marker>
+            }
+            {
+                this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: NearByUsersProps) => {
+
+                    if (nearUser.hideOnMap) return
+
+                    return (
+                        <Marker
+                            key={nearUser.uid}
+                            coordinate={{ latitude: nearUser.location.coords.latitude, longitude: nearUser.location.coords.longitude }}
+                            style={{ width: 'auto', height: 'auto' }}
+                            onPress={() => this.handleMarkerOnPress(nearUser)}
+                        >
+                            <ProfileImage friend={nearUser.friend} size='small' image={nearUser.profileImg} />
+                        </Marker>
+                    )
+                })
+            }
+        </MapView >
+    )
+
     render() {
-
-        const renderMapView = (
-            <MapView
-                style={styles.map}
-                region={this.state.region}
-                onRegionChangeComplete={this.handleOnRegionChangeComplete}
-                showsUserLocation={true}
-                onPress={(e) => console.log(e.nativeEvent)}
-            >
-                {
-                    <Marker
-                        key={this.props.user.uid}
-                        coordinate={{
-                            latitude: this.props.user.location.coords.latitude,
-                            longitude: this.props.user.location.coords.longitude,
-                        }}
-                    >
-                        <FontAwesome name="dot-circle-o" size={10} color={colors.primary} />
-                    </Marker>
-                }
-                {
-                    this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: NearByUsersProps) => {
-
-                        if (nearUser.hideOnMap) return
-
-                        return (
-                            <Marker
-                                key={nearUser.uid}
-                                coordinate={{ latitude: nearUser.location.coords.latitude, longitude: nearUser.location.coords.longitude }}
-                                style={{ width: 'auto', height: 'auto' }}
-                                onPress={() => this.handleMarkerOnPress(nearUser)}
-                            >
-                                <ProfileImage friend={nearUser.friend} size='small' image={nearUser.profileImg} />
-                            </Marker>
-                        )
-                    })
-                }
-            </MapView >
-        )
-
         const { previewUser, sendInvite, previewMe, showRespond } = this.state;
         const { nearUsersFetched, user, navigation, update_invitation } = this.props;
 
         return (
             <View style={styles.container}>
-                {nearUsersFetched && user.location ? renderMapView : <ActivityIndicator />}
+                {nearUsersFetched && user.location ? this.renderMapView() : <ActivityIndicator />}
 
                 <InvitationModal
                     visible={sendInvite}
@@ -221,11 +214,16 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                     targetUser={previewUser}
                 />
 
-                {previewUser &&
+                {previewMe ?
+                    <UpdateStatus
+                        user={user}
+                        handleClose={this.handleClosePrevieMe}
+                        update_status_message={this.props.update_status_message}
+                    />
+                    : previewUser &&
                     <View style={styles.preview_container}>
                         <Preview
                             nearUser={previewUser}
-                            me={previewMe}
                             navigation={navigation}
                             onAction={this.handleOnActionPress}
                             onSendInvite={() => this.setState({ sendInvite: true })}
@@ -254,15 +252,15 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
     },
-    my_location: {
-        position: 'absolute',
-        top: 52,
-        alignSelf: 'center',
-    },
     view_me: {
         position: 'absolute',
         bottom: 30,
         right: 10
+    },
+    refresh: {
+        position: 'absolute',
+        top: 30,
+        left: 10
     },
     preview_container: {
         position: 'absolute',
@@ -278,4 +276,4 @@ const mapStateToProps = (state: RootProps) => ({
     allUsers: state.nearUsers.all
 })
 
-export default connect(mapStateToProps, { validate_near_users, update_invitation })(Maps);
+export default connect(mapStateToProps, { validate_near_users, update_invitation, refresh_near_users, update_status_message })(Maps);

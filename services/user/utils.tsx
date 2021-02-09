@@ -45,12 +45,12 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, ct
         updatedAt: new Date()
     }
 
-    const { uid, username, bioShort, age, hideOnMap, blockedUsers } = userData
+    const { uid, username, statusMsg, age, hideOnMap, blockedUsers } = userData
 
     const profilePreview: UserProfilePreviewProps = {
         uid,
         username,
-        bioShort,
+        statusMsg,
         age,
         hideOnMap,
         blockedUsers,
@@ -65,11 +65,11 @@ export const fireDb_init_user_location = async (userData: UserRootStateProps, ct
 }
 
 export const fireDb_update_user_location = async (user: UserRootStateProps, newLocation: LocationObject) => {
-    const { ctryStateCity, uid, bioShort, age, hideOnMap, blockedUsers, profileImg } = user;
+    const { ctryStateCity, uid, statusMsg, age, hideOnMap, blockedUsers, profileImg } = user;
 
     const updatedProfilePreivew: Omit<UserProfilePreviewProps, 'username'> = {
         uid,
-        bioShort,
+        statusMsg,
         age,
         hideOnMap,
         blockedUsers,
@@ -104,7 +104,7 @@ export const fetch_profile = async (uid: string) => {
                     name: data.name ? data.name : '',
                     age: data.age ? data.age : 0,
                     bioLong: data.bioLong ? data.bioLong : '',
-                    bioShort: data.bioShort ? data.bioShort : '',
+                    statusMsg: data.statusMsg ? data.statusMsg : '',
                     gender: data.gender ? data.gender : null,
                     location: data.location ? data.location : null,
                     hideOnMap: data.hideOnMap ? data.hideOnMap : false,

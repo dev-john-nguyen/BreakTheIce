@@ -1,18 +1,18 @@
 import React from 'react'
-import { View, FlatList, ActivityIndicator, Text, StyleSheet } from 'react-native';
+import { View, FlatList, ActivityIndicator, Text, StyleSheet, RefreshControl } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { NearByUsersProps, NearUsersRootProps } from '../../services/near_users/types';
+import { NearByUsersProps, NearUsersRootProps, NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import { ProfilePage } from '../../utils/variables';
-import { colors } from '../utils/styles';
 import InvitationModal from '../modal/invitation';
 import Preview from '../profile/components/Preview';
 import { update_invitation } from '../../services/invitations/actions';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
-import { UnderlineHeader } from '../utils';
 import Empty from '../utils/components/Empty';
 import RespondModel from '../modal/respond';
+import { refresh_near_users } from '../../services/near_users/actions';
+import { colors } from '../utils/styles';
 
 
 interface NearByListProps {
@@ -20,11 +20,13 @@ interface NearByListProps {
     nearUsers: NearUsersRootProps['nearBy'];
     nearUsersFetched: NearUsersRootProps['fetched'];
     update_invitation: InvitationsDispatchActionProps['update_invitation']
+    refresh_near_users: NearUsersDispatchActionProps['refresh_near_users']
 }
 
 interface NearByListStateProps {
     inviteUser: NearByUsersProps | undefined;
     respondUser: NearByUsersProps | undefined;
+    refreshing: boolean;
 }
 
 
@@ -34,7 +36,8 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
 
         this.state = {
             inviteUser: undefined,
-            respondUser: undefined
+            respondUser: undefined,
+            refreshing: false
         }
     }
 
@@ -61,12 +64,24 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
 
     handleOnRespondClose = () => { this.setState({ respondUser: undefined }) }
 
+    handleOnRefresh = async () => {
+        this.setState({ refreshing: true })
+
+        try {
+            await this.props.refresh_near_users()
+        } catch (err) {
+            console.log(err)
+        }
+
+        this.setState({ refreshing: false })
+    }
+
     renderFlatList = () => {
         const { nearUsers, nearUsersFetched, update_invitation } = this.props
 
         if (!nearUsersFetched) return <ActivityIndicator />
 
-        if (nearUsers.length < 1) return <Empty style={{ marginTop: 20 }}>No Users Nearby</Empty>
+        // if (nearUsers.length < 1) return <Empty style={{ marginTop: 20 }}>No Users Nearby</Empty>
 
         return (
             <View style={{ flex: 1 }}>
@@ -96,6 +111,12 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                     )}
                     keyExtractor={(item) => item.uid}
                     contentContainerStyle={styles.flat_list}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={this.handleOnRefresh}
+                        />
+                    }
                 />
             </View>
         )
@@ -127,4 +148,4 @@ const mapStateToProps = (state: RootProps) => ({
     nearUsersFetched: state.nearUsers.fetched
 })
 
-export default connect(mapStateToProps, { update_invitation })(NearByList);
+export default connect(mapStateToProps, { update_invitation, refresh_near_users })(NearByList);

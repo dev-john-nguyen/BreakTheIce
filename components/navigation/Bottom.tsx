@@ -59,7 +59,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
                 //     });
                 // };
 
-                var type: string;
+                var type: any;
                 var size = 32;
                 var notificationNum = 0;
 

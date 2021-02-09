@@ -35,4 +35,5 @@ export interface NearUsersDispatchActionProps {
     set_and_listen_near_users: (ctryStateCity: CtryStateCityProps, location: LocationObject) => (() => void) | undefined;
     validate_near_users: (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<UserRootStateProps>) => Promise<void>;
     reset_near_users: () => void;
+    refresh_near_users: () => Promise<void | undefined>;
 }

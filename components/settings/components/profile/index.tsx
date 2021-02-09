@@ -55,11 +55,11 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
     }, [loading, profileVals, profileImg, interviewVals, user])
 
     useEffect(() => {
-        const { name, bioShort, bioLong, age, gender, profileImg, interview } = user;
+        const { name, statusMsg, bioLong, age, gender, profileImg, interview } = user;
 
         setProfileVals({
             name,
-            bioShort,
+            statusMsg,
             bioLong,
             age,
             gender: gender ? gender : 'man',
@@ -84,9 +84,9 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
 
     const handleValidation = (formVals: UpdateUserProfileProps) => {
 
-        const { name, bioShort, bioLong, age, gender, interview } = user;
+        const { name, statusMsg, bioLong, age, gender, interview } = user;
 
-        var oldVals = { name, bioShort, bioLong, age, gender, interview };
+        var oldVals = { name, statusMsg, bioLong, age, gender, interview };
 
         if (isEqual(oldVals, formVals)) {
             if (mount.current) {
@@ -171,8 +171,8 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                 placeholder='Short Bio'
                                 multiline
                                 maxLength={100}
-                                value={profileVals.bioShort}
-                                onChangeText={(text) => setProfileVals({ ...profileVals, bioShort: text })}
+                                value={profileVals.statusMsg}
+                                onChangeText={(text) => setProfileVals({ ...profileVals, statusMsg: text })}
                                 style={styles.text_input} />
                         </View>
 

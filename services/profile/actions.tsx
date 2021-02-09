@@ -50,7 +50,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
 
             if (!docData) throw 'No data exists';
 
-            const { location, name, bioShort, bioLong, ctryStateCity, gender, age, username, gallery, hideOnMap, offline, profileImg, blockedUsers, interview } = docData
+            const { location, name, statusMsg, bioLong, ctryStateCity, gender, age, username, gallery, hideOnMap, offline, profileImg, blockedUsers, interview } = docData
 
             if (blockedUsers) {
                 const { uid } = getState().user
@@ -62,7 +62,7 @@ export const set_current_profile = (profileUid: string) => async (dispatch: AppD
                 username,
                 location,
                 name,
-                bioShort,
+                statusMsg,
                 bioLong,
                 ctryStateCity,
                 gender,

@@ -1,4 +1,4 @@
-import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, SET_GALLERY, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS } from './actionTypes';
+import { SET_USER, REMOVE_USER, SET_LOCATION, UPDATE_LOCATION, SET_GALLERY, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS, UPDATE_STATUS_MESSAGE } from './actionTypes';
 import { set_loading, remove_loading, set_banner } from '../banner/actions';
 import { AppDispatch } from '../../App';
 import { CtryStateCityProps, UserRootStateProps, NewGalleryItemProps, GalleryItemProps, UpdateUserProfileProps, UpdateUserPrivacyProps, NewProfileImgProps, BlockUserProps, InterviewProps } from './types';
@@ -15,7 +15,7 @@ import { reset_chat } from '../chat/actions';
 import { reset_friends } from '../friends/actions';
 import { reset_invitations } from '../invitations/actions';
 import { reset_history } from '../profile/actions';
-import _ from 'lodash';
+import _, { isEmpty } from 'lodash';
 
 export const verifyAuth = (): any => (dispatch: AppDispatch) => {
     myFire.auth().onAuthStateChanged(async (user) => {
@@ -41,7 +41,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
 
                     } else if (fetchedUser.profile) {
 
-                        var { gallery, bioShort, bioLong, profileImg } = fetchedUser.profile
+                        var { gallery, statusMsg, bioLong, profileImg } = fetchedUser.profile
 
                         //cache gallery images
                         gallery = await cache_user_images(gallery)
@@ -55,7 +55,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                         }
 
                         //set banner if profile information has not be initiated
-                        if (!bioShort || !bioLong) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
+                        if (!statusMsg || !bioLong) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
 
                         dispatch({ type: SET_USER, payload: fetchedUser.profile });
                     } else {
@@ -334,6 +334,38 @@ export const update_block_user = (blockedUser: BlockUserProps) => async (dispatc
             console.log(err)
             dispatch(set_banner("Oops! Something went wrong adding the user to your block list.", 'error'))
         })
+
+}
+
+export const update_status_message = (statusMsg: string) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    if (isEmpty(statusMsg)) {
+        dispatch(set_banner('Found an empty status message. Please try again.', 'error'))
+        return;
+    }
+
+    if (statusMsg.length > 100) {
+        dispatch(set_banner('Status message must be 100 characters or less. Please try again.', 'error'))
+        return;
+    }
+
+    const { uid, ctryStateCity } = getState().user;
+
+    var batch = fireDb.batch()
+
+    const userRef = fireDb.collection(UsersDb).doc(uid)
+    const locationRef = fireDb.collection(LocationsDb).doc(ctryStateCity.ctryState).collection(ctryStateCity.city).doc(uid)
+
+    userRef.update({ statusMsg })
+    locationRef.update({ statusMsg })
+
+    try {
+        batch.commit()
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner("Oops! Something went wrong trying to update your status. Please try again", 'error'))
+    }
+
+    dispatch({ type: UPDATE_STATUS_MESSAGE, payload: { statusMsg } })
 
 }
 

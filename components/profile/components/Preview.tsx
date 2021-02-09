@@ -11,7 +11,6 @@ import { BlurView } from 'expo-blur';
 
 interface PreviewProps {
     nearUser: NearByUsersProps,
-    me?: boolean,
     onSendInvite: () => void;
     navigation: HomeToChatNavProp;
     onAction?: () => void;
@@ -23,7 +22,7 @@ interface PreviewProps {
     listView?: boolean
 }
 
-export default ({ nearUser, onSendInvite, onAction, navigation, me, containerStyle, onInvitationUpdate, x, handleX, onRespond, listView }: PreviewProps) => {
+export default ({ nearUser, onSendInvite, onAction, navigation, containerStyle, onInvitationUpdate, x, handleX, onRespond, listView }: PreviewProps) => {
 
     const handleMessageOnPress = () => {
 
@@ -38,7 +37,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
 
 
     const handleDirectToProfile = () => {
-        !me && navigation.navigate('Profile', {
+        navigation.navigate('Profile', {
             profileUid: nearUser.uid,
             title: nearUser.username
         })
@@ -50,8 +49,6 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
         if (nearUser.sentInvite) return <CustomButton type='disabled' text='Pending' />
 
         if (nearUser.receivedInvite) return <CustomButton type='primary' text='Respond' onPress={onRespond} />
-
-        if (me && !nearUser.sentInvite) return;
 
         return <CustomButton type='secondary' text='Invite' onPress={onSendInvite} />
     }
@@ -78,7 +75,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
                             </View>
                         </View>
                         <View style={styles.content_section}>
-                            <Text style={styles.content_section_text}>{nearUser.bioShort ? nearUser.bioShort : 'nothing ...'}</Text>
+                            <Text style={styles.content_section_text}>{nearUser.statusMsg ? nearUser.statusMsg : 'nothing ...'}</Text>
                             <View style={styles.content_section_buttons}>
                                 {renderButton()}
                             </View>
@@ -92,7 +89,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, me, containerSty
 
 const styles = StyleSheet.create({
     container: {
-        width: Math.round(Dimensions.get('window').width),
+        width: Math.round(Dimensions.get('window').width)
     },
     content: {
         width: '100%',

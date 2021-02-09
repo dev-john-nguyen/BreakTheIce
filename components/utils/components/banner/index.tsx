@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     banner_container: {
         position: 'absolute',
         flexDirection: 'column-reverse',
-        top: (windowHeight / 2),
+        top: (windowHeight / 10),
         zIndex: 100,
         width: Math.round(Dimensions.get('window').width)
     },

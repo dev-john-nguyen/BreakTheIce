@@ -1,4 +1,4 @@
-import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS } from './actionTypes';
+import { SET_USER, REMOVE_USER, REMOVE_LOCATION, SET_LOCATION, UPDATE_LOCATION, USER_FETCHED_FAILED, SET_GALLERY, GO_OFFILINE, GO_ONLINE, UPDATE_PROFILE, UPDATE_PRIVACY, INIT_USER, REMOVE_BLOCKED_USERS, ADD_BLOCKED_USERS, REFRESH_UPDATE_BUCKET, UPDATE_STATUS_MESSAGE } from './actionTypes';
 import { UserActionProps } from './types';
 import _ from 'lodash';
 
@@ -13,7 +13,7 @@ const INITIAL_STATE = {
     name: null,
     age: null,
     bioLong: null,
-    bioShort: null,
+    statusMsg: null,
     gender: null,
     private: false,
     fetchFail: false,
@@ -69,6 +69,12 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
                 ...state,
                 location: action.payload.location
             }
+        case REFRESH_UPDATE_BUCKET:
+            return {
+                ...state,
+                location: action.payload.location,
+                ctryStateCity: action.payload.ctryStateCity
+            }
         case SET_GALLERY:
             return {
                 ...state,
@@ -93,6 +99,11 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
             return {
                 ...state,
                 blockedUsers: [...state.blockedUsers, action.payload]
+            }
+        case UPDATE_STATUS_MESSAGE:
+            return {
+                ...state,
+                statusMsg: action.payload.statusMsg
             }
         case UPDATE_PROFILE:
         case UPDATE_PRIVACY:

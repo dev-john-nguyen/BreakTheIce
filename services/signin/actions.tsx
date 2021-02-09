@@ -49,7 +49,7 @@ export const init_user = (userFormValues: InitFormValues) => async (dispatch: Ap
                 uid,
                 age,
                 username,
-                bioShort: '',
+                statusMsg: '',
                 hideOnMap: false,
                 profileImg: null,
                 blockedUsers: [],
