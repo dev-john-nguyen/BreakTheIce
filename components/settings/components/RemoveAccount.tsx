@@ -66,8 +66,7 @@ const RemoveAccount = ({ remove_account }: RemoveAccountProps) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginRight: 20,
-        marginLeft: 20
+        margin: 20
     },
     phone_form: {
         flexDirection: 'row',

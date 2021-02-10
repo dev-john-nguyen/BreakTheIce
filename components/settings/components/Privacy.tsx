@@ -6,6 +6,7 @@ import { MeStackNavigationProp } from '../../navigation/utils/types';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../utils/styles';
 import { isEqual } from 'lodash';
+import { HeaderText } from '../../utils';
 
 interface PrivacyProps {
     user: UserRootStateProps;
@@ -102,8 +103,8 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginRight: 20,
-        marginLeft: 20
+        alignItems: 'center',
+        margin: 20
     },
     content_container: {
         flexDirection: 'row',

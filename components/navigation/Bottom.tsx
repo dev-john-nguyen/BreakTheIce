@@ -127,7 +127,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-evenly',
-        backgroundColor: colors.white
+        backgroundColor: colors.white,
+        alignSelf: 'stretch'
     },
     background: {
         position: 'absolute',

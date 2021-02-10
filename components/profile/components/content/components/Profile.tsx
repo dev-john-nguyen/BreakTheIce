@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { GalleryItemProps } from '../../../../../services/user/types';
 import { CustomButton, BodyText, HeaderText, Icon } from '../../../../utils';
 import ProfileImage from '../../ProfileImage';
-import { colors } from '../../../../utils/styles';
+import { colors, normalize } from '../../../../utils/styles';
 import Gallery from '../../../../gallery';
 import { calcDateDiff } from '../../../../../utils/functions';
 import { getGalleryHeight } from '../../../../gallery/utils';
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: colors.secondary,
-        fontSize: 8
+        fontSize: normalize(7)
     },
     body: {
         flex: 1,
@@ -147,14 +147,14 @@ const styles = StyleSheet.create({
     profile_text: {
         marginTop: 10,
         color: colors.primary,
-        fontSize: 18
+        fontSize: normalize(14)
     },
     header_button: {
         alignSelf: 'stretch',
         justifyContent: 'space-between'
     },
     sub_profile_text: {
-        fontSize: 12,
+        fontSize: normalize(10),
         color: colors.primary,
         marginLeft: 10,
     },

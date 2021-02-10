@@ -25,6 +25,15 @@ import { SigninDispatchActionProps } from '../services/signin/types';
 import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';
 import { colors } from './utils/styles';
+import * as BackgroundFetch from 'expo-background-fetch';
+import * as TaskManager from 'expo-task-manager';
+
+BackgroundFetch.setMinimumIntervalAsync(10);
+const taskName = 'test-background-fetch';
+TaskManager.defineTask(taskName, async () => {
+    console.log('background fetch running');
+    return BackgroundFetch.Result.NewData;
+});
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -39,11 +48,49 @@ interface Base {
     init_user: SigninDispatchActionProps['init_user'];
 }
 
+
 const Base = (props: Base) => {
-    let [fontsLoaded] = useFonts({
+    let [fontsLoaded,] = useFonts({
         Roboto_400Regular,
         Rubik_500Medium
     });
+
+
+    useEffect(() => {
+
+        (async () => {
+            await BackgroundFetch.registerTaskAsync(taskName);
+            await TaskManager.isAvailableAsync().then(res => console.log(res))
+            await TaskManager.getRegisteredTasksAsync(taskName).then(task => console.log(task))
+            console.log('task registered');
+        })()
+
+    }, [])
+
+
+    useEffect(() => {
+        //init and unsubscribe
+        var unsubscribeFriends: (() => void) | undefined,
+            unsubscribeInvitations: (() => void) | undefined,
+            unsubscribeChat: (() => void) | undefined;
+
+        const unsubscribeListeners = () => {
+            unsubscribeFriends && unsubscribeFriends()
+            unsubscribeInvitations && unsubscribeInvitations()
+            unsubscribeChat && unsubscribeChat()
+            props.user.locationListener && props.user.locationListener.remove();
+        }
+
+        if (props.user.uid && !props.user.init) {
+            unsubscribeFriends = props.set_and_listen_friends();
+            unsubscribeInvitations = props.set_and_listen_invitations();
+            unsubscribeChat = props.set_and_listen_messages();
+        } else {
+            unsubscribeListeners()
+        }
+
+        return () => unsubscribeListeners()
+    }, [props.user.uid, props.user.init])
 
 
     const handleRender = () => {
@@ -69,30 +116,6 @@ const Base = (props: Base) => {
         }
         else { return <SignIn /> }
     }
-
-    useEffect(() => {
-        //init and unsubscribe
-        var unsubscribeFriends: (() => void) | undefined,
-            unsubscribeInvitations: (() => void) | undefined,
-            unsubscribeChat: (() => void) | undefined;
-
-        const unsubscribeListeners = () => {
-            unsubscribeFriends && unsubscribeFriends()
-            unsubscribeInvitations && unsubscribeInvitations()
-            unsubscribeChat && unsubscribeChat()
-            props.user.locationListener && props.user.locationListener.remove();
-        }
-
-        if (props.user.uid && !props.user.init) {
-            unsubscribeFriends = props.set_and_listen_friends();
-            unsubscribeInvitations = props.set_and_listen_invitations();
-            unsubscribeChat = props.set_and_listen_messages();
-        } else {
-            unsubscribeListeners()
-        }
-
-        return () => unsubscribeListeners()
-    }, [props.user.uid, props.user.init])
 
     return (
         <View style={styles.container}>
@@ -124,6 +147,7 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         justifyContent: 'space-between',
         position: 'relative',
+        backgroundColor: colors.backgroundColor
     }
 });
 

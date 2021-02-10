@@ -99,9 +99,10 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     }
 
     const renderInvitationList = () => {
-        if (!invitation.inbound || invitation.inbound.length < 1) return <Empty style={{ flex: 1 }}>No Invitations</Empty>
-
         return <FlatList
+            ListEmptyComponent={() => (
+                <Empty style={{ marginTop: 50 }}>No Invitations</Empty>
+            )}
             data={invitation.inbound}
             renderItem={({ item, index, separators }) => (
                 <View style={styles.container}>

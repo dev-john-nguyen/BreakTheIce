@@ -8,7 +8,7 @@ import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER, UPDATE_RECEIVED_
 import { set_banner } from '../banner/actions';
 import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY, UPDATE_RECEIVED_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
 import { handleInvitations, handle_invitation_status } from './utils';
-import firebase from 'firebase';
+import { sendPushNotification } from '../notification/actions';
 
 //define the structure of the invitation
 
@@ -66,30 +66,41 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
         .where("sentTo.uid", "==", uid)
         .where('status', '==', InvitationStatusOptions.pending)
         .onSnapshot(async (querySnapshot) => {
-            const invitations: InvitationObject[] = await handleInvitations(querySnapshot)
+            const invitationsArr: InvitationObject[] = await handleInvitations(querySnapshot)
 
             dispatch({
                 type: UPDATE_RECEIVED_INVITE_NEAR_USERS,
-                payload: { invitations }
+                payload: { invitations: invitationsArr }
             })
 
             dispatch({
                 type: UPDATE_RECEIVED_INVITE_PROFILE_HISTORY,
-                payload: { invitations }
+                payload: { invitations: invitationsArr }
             })
 
             dispatch({
                 type: SET_INVITATIONS_INBOUND,
-                payload: invitations
+                payload: invitationsArr
             })
+
+            const { notification, invitations } = getState()
+
+            // sendPushNotification('dsafdsf', 'New Invitation', 'You have a new invitation');
+
+            // console.log(notification.expoPushToken)
+
+            // if (notification.expoPushToken) {
+            //     sendPushNotification(notification.expoPushToken, 'New Invitation', 'You have a new invitation');
+            // } else {
+            dispatch({ type: SET_INVITATIONS })
+            // }
+
         },
             err => {
                 console.log(err)
                 dispatch(set_banner("Oops! Couldn't get your invitations", 'error'))
             }
         )
-
-    dispatch({ type: SET_INVITATIONS, payload: { invitationListener } })
 
     return invitationListener
 }

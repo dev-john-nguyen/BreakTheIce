@@ -79,9 +79,11 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
     renderFlatList = () => {
         const { nearUsers, nearUsersFetched, update_invitation } = this.props
 
-        if (!nearUsersFetched) return <ActivityIndicator />
-
-        // if (nearUsers.length < 1) return <Empty style={{ marginTop: 20 }}>No Users Nearby</Empty>
+        if (!nearUsersFetched) return (
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+                <ActivityIndicator size='large' color={colors.primary} />
+            </View>
+        )
 
         return (
             <View style={{ flex: 1 }}>
@@ -96,6 +98,9 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                     handleClose={this.handleOnRespondClose}
                 />
                 <FlatList
+                    ListEmptyComponent={() => (
+                        <Empty style={{ marginTop: 50 }}>No Users Nearby</Empty>
+                    )}
                     data={this.props.nearUsers}
                     renderItem={({ item, index, separators }) => (
                         <Preview
@@ -115,6 +120,7 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
                         <RefreshControl
                             refreshing={this.state.refreshing}
                             onRefresh={this.handleOnRefresh}
+                            tintColor={colors.primary}
                         />
                     }
                 />

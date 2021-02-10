@@ -57,7 +57,7 @@ export default ({ nearUser, onSendInvite, onAction, navigation, containerStyle, 
     return (
         <Pressable onPress={onAction} style={styles.container}>
             {({ pressed }) => (
-                <View style={[pressed ? styles.content_pressed : styles.content, containerStyle, listView ? colors.white : opacity_colors.secondary_light]}>
+                <View style={[pressed ? styles.content_pressed : styles.content, { ...containerStyle, backgroundColor: listView && !pressed ? colors.white : undefined }, listView ? colors.white : opacity_colors.secondary_light]}>
                     <BlurView style={styles.blur} intensity={70}>
                         <View style={styles.topLeft}>
                             <Text style={styles.topLeft_text}>{nearUser.distance ? nearUser.distance : 0} meters away</Text>
@@ -93,18 +93,18 @@ const styles = StyleSheet.create({
     },
     content: {
         width: '100%',
-        borderTopColor: colors.primary,
-        borderBottomColor: colors.primary,
-        borderBottomWidth: 1,
-        borderTopWidth: 1
+        // borderTopColor: colors.primary,
+        // borderBottomColor: colors.primary,
+        // borderBottomWidth: 1,
+        // borderTopWidth: 1
     },
     content_pressed: {
         width: '100%',
-        borderTopColor: colors.primary,
-        borderBottomColor: colors.secondary,
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        backgroundColor: opacity_colors.secondary_medium
+        // borderTopColor: colors.primary,
+        // borderBottomColor: colors.secondary,
+        // borderBottomWidth: 1,
+        // borderTopWidth: 1,
+        backgroundColor: colors.secondary
     },
     blur: {
         flexDirection: 'row',

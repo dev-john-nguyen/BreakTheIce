@@ -6,7 +6,7 @@ import { InvitationsDb, FriendsDb, FriendsUsersDb } from "../../utils/variables"
 import { cacheImage } from "../../utils/functions";
 import { timestamp } from '../../utils/variables';
 
-export async function handleInvitations(querySnapshot: QuerySnapshot<DocumentData>) {
+export async function handleInvitations(querySnapshot: firebase.default.firestore.QuerySnapshot) {
 
     var invitations: Array<InvitationObject> = [];
 

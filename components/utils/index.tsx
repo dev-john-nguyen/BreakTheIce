@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator, Keyboard } from 'react-native';
-import { button_styles, underline_header_styles, drop_shadow_light, colors } from './styles';
+import { View, Pressable, StyleProp, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { button_styles, underline_header_styles, drop_shadow_light } from './styles';
 import { Feather } from '@expo/vector-icons';
 import { TextInput } from 'react-native-gesture-handler';
-import { windowWidth, windowHeight } from '../../utils/variables';
 
-export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: string, size: number, color: string, pressColor?: string, onPress?: () => void, style?: StyleProp<any> }) => (
+export const Icon = ({ type, size, color, pressColor, onPress, style }: { type: any, size: number, color: string, pressColor?: string, onPress?: () => void, style?: StyleProp<any> }) => (
     <Pressable onPress={onPress} style={style} hitSlop={10}>
         {({ pressed }) => <Feather name={type} size={size} color={pressed ? pressColor : color} />}
     </Pressable>

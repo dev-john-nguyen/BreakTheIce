@@ -1,5 +1,6 @@
-import { StyleSheet, StyleProp } from 'react-native'
-import { windowWidth } from '../../../utils/variables'
+import { Platform, PixelRatio } from 'react-native';
+import { StyleProp } from 'react-native'
+import { windowWidth, windowHeight } from '../../../utils/variables'
 
 
 //colors
@@ -24,6 +25,8 @@ export const colors = {
     lightOrange: '#f58634',
     yellow: '#ffcc29',
     green: '#28DF99',
+    backgroundColor: '#ECFFFF',
+    backgroundColor_rgb: '236  255  255',
 
     white: '#ffffff',
     white_rgb: '255,255,255',
@@ -263,3 +266,16 @@ export const bannerStyles = (type: string) => {
     }
     return styles
 }
+
+
+const scale = windowWidth / 320;
+
+export function normalize(size: number) {
+    const newSize = size * scale
+    if (Platform.OS === 'ios') {
+        return Math.round(PixelRatio.roundToNearestPixel(newSize))
+    } else {
+        return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2
+    }
+}
+

@@ -185,6 +185,7 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
 
         let distanceBetweenPoints = getDistance(userLocation, nearUserLocation)
 
+
         if (distanceBetweenPoints < acceptedRadius) {
             //if within radius check if user is already in the nearByUsers state
             // ? do nothing : push the user into the nearByUsers state
@@ -197,6 +198,8 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
                 nearByUsers.push(allUsers[i]);
             }
 
+
+
         } else {
             //the user is outside of the radius
             //loop through nearByUsers arr and see if the user exist
@@ -204,7 +207,8 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
 
             var nearByIndex = nearByUsers.findIndex(user => user.uid === allUsers[i].uid)
 
-            if (nearByIndex) {
+            if (nearByIndex >= 0) {
+                console.log(nearByIndex)
                 nearByUsers.splice(nearByIndex, 1);
             }
         }

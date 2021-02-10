@@ -24,25 +24,26 @@ const Friends = ({ friends, navigation }: FriendsProps) => {
     return (
         <View style={styles.container}>
             {
-                friends.users.length > 0 ?
-                    <FlatList
-                        data={friends.users}
-                        renderItem={({ item, index }) => (
-                            <TouchableHighlight
-                                key={item.uid ? item.uid : index.toString()}
-                                onPress={() => handleOnFriendPress(item)}
-                                underlayColor={opacity_colors.secondary_medium}
-                                style={styles.friend_container}
-                            >
-                                <View style={styles.content}>
-                                    <ProfileImage friend={true} size='regular' image={item.profileImg} onImagePress={() => handleOnFriendPress(item)} />
-                                    <Text style={styles.username}>{item.username}</Text>
-                                </View>
-                            </TouchableHighlight>
-                        )}
-                        keyExtractor={(item, index) => item.uid ? item.uid : index.toString()}
-                    /> :
-                    <Empty style={{ flex: 1 }}>Go Get Out There!</Empty>
+                <FlatList
+                    ListEmptyComponent={() => (
+                        <Empty style={{ marginTop: 50 }}>Go Get Out There!</Empty>
+                    )}
+                    data={friends.users}
+                    renderItem={({ item, index }) => (
+                        <TouchableHighlight
+                            key={item.uid ? item.uid : index.toString()}
+                            onPress={() => handleOnFriendPress(item)}
+                            underlayColor={opacity_colors.secondary_medium}
+                            style={styles.friend_container}
+                        >
+                            <View style={styles.content}>
+                                <ProfileImage friend={true} size='regular' image={item.profileImg} onImagePress={() => handleOnFriendPress(item)} />
+                                <Text style={styles.username}>{item.username}</Text>
+                            </View>
+                        </TouchableHighlight>
+                    )}
+                    keyExtractor={(item, index) => item.uid ? item.uid : index.toString()}
+                />
             }
         </View>
     )

@@ -192,8 +192,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly'
     },
     active: {
-        backgroundColor: colors.primary,
-        borderRadius: 5
+        backgroundColor: colors.primary
     },
     active_text: {
         fontSize: 12,

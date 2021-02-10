@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, StyleProp } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
-import { Icon, HeaderText, UnderlineHeader } from '../utils';
-import { colors } from '../utils/styles';
+import { Icon, HeaderText } from '../utils';
+import { colors, normalize } from '../utils/styles';
 
 interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
@@ -30,9 +30,10 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
             var textStyle: StyleProp<any> = {
                 color: colors.white,
                 textTransform: 'lowercase',
-                fontSize: 20,
+                fontSize: normalize(16),
                 letterSpacing: 2
             };
+
             return (
                 <HeaderText
                     style={textStyle}
@@ -50,7 +51,7 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
     headerBackTitleVisible: false,
     headerTransparent: true,
     cardStyle: {
-        backgroundColor: colors.white,
+        backgroundColor: colors.backgroundColor,
         paddingTop: 90
     }
 }

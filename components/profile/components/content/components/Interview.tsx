@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Icon, HeaderText, BodyText } from '../../../../utils';
-import { colors } from '../../../../utils/styles';
+import { colors, normalize } from '../../../../utils/styles';
 import Empty from '../../../../utils/components/Empty';
 import { InterviewProps } from '../../../../../services/user/types';
 import { isEmpty } from 'lodash';
@@ -59,12 +59,12 @@ const styles = StyleSheet.create({
         color: colors.primary
     },
     question_text: {
-        fontSize: 14,
+        fontSize: normalize(10),
         color: colors.primary,
         marginBottom: 5
     },
     answer_text: {
-        fontSize: 12,
+        fontSize: normalize(8),
         color: colors.secondary,
         marginLeft: 5,
         lineHeight: 15

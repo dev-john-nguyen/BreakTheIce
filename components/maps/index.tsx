@@ -88,7 +88,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                     <Icon type='refresh-ccw' style={{ marginLeft: 20 }} size={25} color={colors.primary} pressColor={colors.secondary} onPress={this.props.refresh_near_users} />
 
                     {
-                        !this.props.user.hideOnMap &&
+                        this.props.user.hideOnMap &&
                         (
                             <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 20 }} />
                         )

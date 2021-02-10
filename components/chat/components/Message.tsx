@@ -253,14 +253,14 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                     return (
                         <View key={item.docId} style={styles.message_right}>
                             <BodyText style={styles.message_right_text}>{item.message}</BodyText>
-                            <MessageCurve style={styles.message_curve_right} color={colors.lightGrey} />
+                            <MessageCurve style={styles.message_curve_right} color='grey' />
                         </View>
                     )
                 } else {
                     return (
                         <View key={item.docId} style={styles.message_left}>
                             <BodyText style={styles.message_left_text}>{item.message}</BodyText>
-                            <MessageCurve style={styles.message_curve} color={colors.primary} />
+                            <MessageCurve style={styles.message_curve} color='primary' />
                         </View>
                     )
                 }
@@ -381,8 +381,7 @@ const styles = StyleSheet.create({
         right: -20,
         bottom: 0,
         width: 30,
-        height: 30,
-        transform: [{ rotate: '90deg' }]
+        height: 30
     },
     message_right_text: {
         color: colors.black,

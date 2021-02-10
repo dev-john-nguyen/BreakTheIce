@@ -74,10 +74,11 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
         <ActivityIndicator />
     </View>
 
-    if (chatPreviews.length < 1) return <Empty style={{ flex: 1 }}>No Messages</Empty>
-
     return (
         <FlatList
+            ListEmptyComponent={() => (
+                <Empty style={{ marginTop: 50 }}>No Messages</Empty>
+            )}
             data={chatPreviews}
             renderItem={({ item, index }) => {
 

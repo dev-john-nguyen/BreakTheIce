@@ -21,7 +21,11 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to identify users near you",
         "NSPhotoLibraryUsageDescription": "Give BreakTheIce permission to access photos",
-        "NSCameraUsageDescription": "Give BreakTheIce permission to access your camera"
+        "NSCameraUsageDescription": "Give BreakTheIce permission to access your camera",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
       }
     },
     "android": {

@@ -6,6 +6,7 @@ import invitationsReducer from './invitations/reducer';
 import friendsReducer from './friends/reducer';
 import chatReducer from './chat/reducer';
 import profileReducer from './profile/reducer';
+import notificationReducer from './notification/reducer';
 
 import { NearUsersRootProps } from './near_users/types';
 import { BannerRootStateProps } from './banner/tsTypes';
@@ -14,6 +15,7 @@ import { InvitationsRootProps } from './invitations/types';
 import { FriendsRootProps } from './friends/types';
 import { ChatRootProps } from './chat/types';
 import { ProfileRootProps } from './profile/types';
+import { NotificationRootProps } from './notification/types';
 
 export default combineReducers({
     user: userReducer,
@@ -22,7 +24,8 @@ export default combineReducers({
     invitations: invitationsReducer,
     friends: friendsReducer,
     chat: chatReducer,
-    profile: profileReducer
+    profile: profileReducer,
+    notification: notificationReducer
 });
 
 export interface RootProps {
@@ -33,4 +36,5 @@ export interface RootProps {
     friends: FriendsRootProps;
     chat: ChatRootProps;
     profile: ProfileRootProps;
+    notification: NotificationRootProps
 }

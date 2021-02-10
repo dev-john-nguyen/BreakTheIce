@@ -163,12 +163,13 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                         </View>
 
                         <View style={styles.text_input_container}>
-                            <BodyText style={styles.text_input_label}>Short Bio:</BodyText>
+                            <BodyText style={styles.text_input_label}>Status:</BodyText>
                             <BodyText style={styles.text_input_info}>
-                                <Feather name="info" size={10} color={colors.primary} /> Other will initially see this. Make a good first impression. Max character length is 100.
+                                <Feather name="info" size={10} color={colors.primary} />
+                                The status in which the other users will initially see. 100 character limit.
                             </BodyText>
                             <CustomInput
-                                placeholder='Short Bio'
+                                placeholder='status'
                                 multiline
                                 maxLength={100}
                                 value={profileVals.statusMsg}
@@ -177,9 +178,9 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                         </View>
 
                         <View style={styles.text_input_container}>
-                            <BodyText style={styles.text_input_label}>Long Bio:</BodyText>
+                            <BodyText style={styles.text_input_label}>Brief summary about yourself</BodyText>
                             <BodyText style={styles.text_input_info}>
-                                <Feather name="info" size={10} color={colors.primary} /> Will be displayed on your profile. Max character length is 200.
+                                <Feather name="info" size={10} color={colors.primary} />  200 character limit.
                             </BodyText>
                             <CustomInput
                                 placeholder='Long Bio'
