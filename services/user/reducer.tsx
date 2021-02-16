@@ -42,8 +42,8 @@ export default (state: any = INITIAL_STATE, action: UserActionProps) => {
             }
         case SET_USER:
             return {
-                ...action.payload,
-                init: false
+                ...state,
+                ...action.payload
             };
         case REMOVE_USER:
             if (state.locationListener) {

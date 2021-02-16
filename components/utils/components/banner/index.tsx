@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Dimensions, View } from "react-native"
 import Item from './components/Item';
-import { bannerStyles, colors } from '../../styles';
+import { bannerStyles } from '../../styles';
 import { BannerDispatchActionProps, BannerItemProps } from '../../../../services/banner/tsTypes';
 import { windowHeight } from '../../../../utils/variables';
 

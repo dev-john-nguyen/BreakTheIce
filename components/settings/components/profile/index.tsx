@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { View, StyleSheet, Picker, ScrollView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, ActivityIndicator } from 'react-native';
-import { colors } from '../../../utils/styles';
+import { colors, dropShadowListContainer, normalize } from '../../../utils/styles';
 import { Feather } from '@expo/vector-icons';
 import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps, InterviewProps } from '../../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../../services/banner/tsTypes';
@@ -157,7 +157,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                 placeholder='Name'
                                 value={profileVals.name}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, name: text })}
-                                style={styles.text_input}
+                                style={[styles.text_input, dropShadowListContainer]}
                                 maxLength={200}
                             />
                         </View>
@@ -165,8 +165,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                         <View style={styles.text_input_container}>
                             <BodyText style={styles.text_input_label}>Status:</BodyText>
                             <BodyText style={styles.text_input_info}>
-                                <Feather name="info" size={10} color={colors.primary} />
-                                The status in which the other users will initially see. 100 character limit.
+                                <Feather name="info" size={10} color={colors.primary} /> The status in which the other users will initially see. 100 character limit.
                             </BodyText>
                             <CustomInput
                                 placeholder='status'
@@ -174,13 +173,13 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                 maxLength={100}
                                 value={profileVals.statusMsg}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, statusMsg: text })}
-                                style={styles.text_input} />
+                                style={[styles.text_input, dropShadowListContainer]} />
                         </View>
 
                         <View style={styles.text_input_container}>
                             <BodyText style={styles.text_input_label}>Brief summary about yourself</BodyText>
                             <BodyText style={styles.text_input_info}>
-                                <Feather name="info" size={10} color={colors.primary} />  200 character limit.
+                                <Feather name="info" size={10} color={colors.primary} /> 200 character limit.
                             </BodyText>
                             <CustomInput
                                 placeholder='Long Bio'
@@ -188,7 +187,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                 maxLength={200}
                                 value={profileVals.bioLong}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, bioLong: text })}
-                                style={styles.text_input} />
+                                style={[styles.text_input, dropShadowListContainer]} />
                         </View>
 
                         <View style={styles.pickers_container}>
@@ -200,7 +199,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                     enabled={false}
                                     selectedValue={profileVals.age}
                                     onValueChange={(num) => setProfileVals({ ...profileVals, age: parseInt(num) ? parseInt(num) : 0 })}
-                                    style={styles.picker}
+                                    style={[styles.picker, dropShadowListContainer]}
                                     itemStyle={styles.picker_item}
                                 >
                                     {ageArr.map((age, index) => <Picker.Item key={index} label={index.toString()} value={index} />)}
@@ -216,7 +215,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                     onValueChange={(itemValue) => {
                                         setProfileVals({ ...profileVals, gender: itemValue.toString() })
                                     }}
-                                    style={styles.picker}
+                                    style={[styles.picker, dropShadowListContainer]}
                                     itemStyle={styles.picker_item}
                                 >
                                     <Picker.Item label='Man' value='man' />
@@ -247,27 +246,26 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     scrollView: {
-        paddingBottom: 40,
+        paddingBottom: 100,
         alignItems: 'stretch'
     },
     text_input_container: {
-        margin: 10
+        margin: 10,
     },
     text_input: {
-        borderColor: colors.tertiary,
-        borderWidth: 1,
-        borderRadius: 5,
+        backgroundColor: colors.white,
+        borderRadius: 10,
     },
     text_input_label: {
-        fontSize: 12,
-        color: colors.primary,
+        fontSize: normalize(10),
+        color: colors.black,
         marginBottom: 5,
         marginLeft: 2
     },
     text_input_info: {
-        fontSize: 9,
-        color: colors.primary,
-        marginBottom: 5,
+        fontSize: normalize(8),
+        color: colors.black,
+        marginBottom: 10,
         marginLeft: 4,
         alignItems: 'center'
     },
@@ -275,17 +273,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         margin: 10,
         alignSelf: 'stretch',
-        justifyContent: 'space-around'
+        justifyContent: 'space-around',
     },
     picker: {
         width: 100,
-        borderColor: colors.tertiary,
-        borderWidth: 1,
+        backgroundColor: colors.white,
         borderRadius: 30,
         height: 100
     },
     picker_item: {
-        fontSize: 10,
+        fontSize: normalize(10),
         height: 100
     }
 })

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, StyleProp, Dimensions } from 'react-native';
 import { NearByUsersProps } from '../../../services/near_users/types';
-import { colors, opacity_colors } from '../../utils/styles';
+import { colors, opacity_colors, dropShadowListContainer, normalize } from '../../utils/styles';
 import { HomeToChatNavProp } from '../../navigation/utils/types';
-import { CustomButton, Icon } from '../../utils';
-import ProfileImage from './ProfileImage';
+import { CustomButton, Icon, BodyText } from '../../utils';
+import { ListProfileImage } from './ProfileImage';
 import RespondButton from '../../modal/respond/Slider';
 import { InvitationStatusOptions, InvitationsDispatchActionProps } from '../../../services/invitations/types';
 import { BlurView } from 'expo-blur';
@@ -53,29 +53,31 @@ export default ({ nearUser, onSendInvite, onAction, navigation, containerStyle, 
         return <CustomButton type='secondary' text='Invite' onPress={onSendInvite} />
     }
 
-
     return (
-        <Pressable onPress={onAction} style={styles.container}>
+        <Pressable onPress={onAction} style={[styles.container, dropShadowListContainer]}>
             {({ pressed }) => (
-                <View style={[pressed ? styles.content_pressed : styles.content, { ...containerStyle, backgroundColor: listView && !pressed ? colors.white : undefined }, listView ? colors.white : opacity_colors.secondary_light]}>
+                <View style={[styles.content, containerStyle, { backgroundColor: listView && !pressed ? colors.white : !pressed ? opacity_colors.secondary_light : colors.tertiary }]}>
                     <BlurView style={styles.blur} intensity={70}>
-                        <View style={styles.topLeft}>
-                            <Text style={styles.topLeft_text}>{nearUser.distance ? nearUser.distance : 0} meters away</Text>
-                        </View>
                         {
-                            !!x && <View style={styles.topRight}>
+                            !!x && <Pressable style={styles.topRight} onPress={handleX}>
                                 <Icon type='x' onPress={handleX} color={colors.primary} pressColor={colors.secondary} size={16} />
-                            </View>
+                            </Pressable>
                         }
                         <View style={styles.profile_section}>
-                            <ProfileImage image={nearUser.profileImg} size='regular' onImagePress={handleDirectToProfile} friend={nearUser.friend} />
+                            <ListProfileImage
+                                image={nearUser.profileImg}
+                                onImagePress={handleDirectToProfile}
+                                friend={nearUser.friend} />
                             <View style={styles.profile_section_text}>
-                                <Text style={styles.username} numberOfLines={1}>{nearUser.username ? nearUser.username.toLowerCase() : 'RandomUser'}</Text>
-                                <Text style={styles.age}>{nearUser.age ? nearUser.age : 0} years old</Text>
+                                <BodyText style={styles.username} numberOfLines={1}>{nearUser.username ? nearUser.username.toLowerCase() : 'RandomUser'}</BodyText>
+                                <BodyText style={styles.age}>{nearUser.age ? nearUser.age : 0} years old</BodyText>
                             </View>
                         </View>
                         <View style={styles.content_section}>
-                            <Text style={styles.content_section_text}>{nearUser.statusMsg ? nearUser.statusMsg : 'nothing ...'}</Text>
+                            <View style={styles.topLeft}>
+                                <BodyText style={styles.topLeft_text}>{nearUser.distance ? nearUser.distance : 0} meters away</BodyText>
+                            </View>
+                            <BodyText style={styles.content_section_text}>{nearUser.statusMsg ? nearUser.statusMsg : 'nothing ...'}</BodyText>
                             <View style={styles.content_section_buttons}>
                                 {renderButton()}
                             </View>
@@ -93,82 +95,68 @@ const styles = StyleSheet.create({
     },
     content: {
         width: '100%',
-        // borderTopColor: colors.primary,
-        // borderBottomColor: colors.primary,
-        // borderBottomWidth: 1,
-        // borderTopWidth: 1
-    },
-    content_pressed: {
-        width: '100%',
-        // borderTopColor: colors.primary,
-        // borderBottomColor: colors.secondary,
-        // borderBottomWidth: 1,
-        // borderTopWidth: 1,
-        backgroundColor: colors.secondary
     },
     blur: {
         flexDirection: 'row',
-        paddingLeft: 30,
-        paddingRight: 10,
-        paddingTop: 20,
+        paddingLeft: 20,
         flex: 1
     },
     topLeft: {
         position: 'absolute',
-        top: 10,
-        left: 10,
+        top: 5,
+        left: 5,
     },
     topRight: {
         position: 'absolute',
         top: 10,
         right: 10,
+        zIndex: 10
     },
     profile_section: {
         flex: .5,
         marginRight: 10,
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: 130,
-        paddingBottom: 10
+        height: 150,
     },
     topLeft_text: {
-        fontSize: 8,
+        fontSize: normalize(6),
         color: colors.primary
     },
     profile_section_text: {
-        bottom: 5
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        justifyContent: 'center',
+        padding: 10
     },
     username: {
-        marginTop: 15,
-        fontSize: 14,
+        fontSize: normalize(11),
         color: colors.primary,
         textAlign: 'center',
         overflow: 'visible'
     },
     age: {
-        fontSize: 12,
+        fontSize: normalize(7),
         color: colors.primary,
         textAlign: 'center'
     },
     content_section: {
         flex: 1,
-        justifyContent: 'space-evenly',
-        paddingTop: 20,
-        paddingBottom: 20,
         paddingLeft: 20,
-        paddingRight: 10,
-        alignSelf: 'center'
+        paddingRight: 20,
+        paddingTop: 30,
+        alignSelf: 'stretch',
+        justifyContent: 'space-between'
     },
     content_section_text: {
-        fontSize: 12,
+        fontSize: normalize(10),
         color: colors.primary,
         display: 'flex',
         justifyContent: 'center',
         textAlign: 'center'
     },
     content_section_buttons: {
-        marginTop: 20,
+        marginBottom: 20,
         flexDirection: 'row',
         justifyContent: 'center'
     }

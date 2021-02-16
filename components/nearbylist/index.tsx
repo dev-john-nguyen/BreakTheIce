@@ -142,10 +142,10 @@ const styles = StyleSheet.create({
         flex: 1
     },
     flat_list: {
-        paddingBottom: 20
+        paddingBottom: 100
     },
     preview_container: {
-        marginBottom: 20
+        marginTop: 20
     }
 })
 

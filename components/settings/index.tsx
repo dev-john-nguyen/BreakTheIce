@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect, useRef } from 'react';
 import { View, StyleSheet, TouchableHighlight, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, Easing, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out, remove_account } from '../../services/user/actions';
-import { colors } from '../utils/styles';
+import { colors, dropShadowListContainer, normalize } from '../utils/styles';
 import { MeStackNavigationProp } from '../navigation/utils/types';
 import EditProfile from './components/profile';
 import Privacy from './components/Privacy';
@@ -82,76 +82,75 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
     const handleSignOut = () => sign_out()
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dropShadowListContainer]}>
             <Animated.View style={styles.menu_container}>
                 <View style={styles.menu_options}>
                     {/* <TouchableHighlight
                         style={[styles.menu_items, target === TargetOptions.profile && styles.active]}
                         onPress={() => set_banner('fdsafadsf ', 'error')}
-                        underlayColor={colors.tertiary}
+                        
                     >
                         <View style={styles.content}>
                             <BodyText style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Error</BodyText>
                         </View>
                     </TouchableHighlight> */}
 
-                    <TouchableHighlight
-                        style={[styles.menu_items, target === TargetOptions.profile && styles.active]}
+                    <Pressable
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.profile || pressed) && styles.active]}
                         onPress={() => setTarget(TargetOptions.profile)}
-                        underlayColor={colors.tertiary}
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Profile</BodyText>
+                            <BodyText style={styles.text}>Profile</BodyText>
                         </View>
-                    </TouchableHighlight>
+                    </Pressable>
 
-                    <TouchableHighlight
-                        style={[styles.menu_items, target === TargetOptions.gallery && styles.active]}
+                    <Pressable
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.gallery || pressed) && styles.active]}
                         onPress={() => setTarget(TargetOptions.gallery)}
-                        underlayColor={colors.tertiary}
+
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text, target === TargetOptions.gallery && styles.active_text]}>Gallery</BodyText>
+                            <BodyText style={[styles.text]}>Gallery</BodyText>
                         </View>
-                    </TouchableHighlight>
+                    </Pressable>
 
-                    <TouchableHighlight
-                        style={[styles.menu_items, target === TargetOptions.privacy && styles.active]}
+                    <Pressable
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.privacy || pressed) && styles.active]}
                         onPress={() => setTarget(TargetOptions.privacy)}
-                        underlayColor={colors.tertiary}
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text, target === TargetOptions.privacy && styles.active_text]}>Privacy</BodyText>
+                            <BodyText style={[styles.text]}>Privacy</BodyText>
                         </View>
-                    </TouchableHighlight>
+                    </Pressable>
 
-                    <TouchableHighlight
-                        style={[styles.menu_items, target === TargetOptions.privatePolicy && styles.active]}
+                    <Pressable
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.privatePolicy || pressed) && styles.active]}
                         onPress={() => setTarget(TargetOptions.privatePolicy)}
-                        underlayColor={colors.tertiary}
+
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text, target === TargetOptions.privatePolicy && styles.active_text]} numberOfLines={1}>Private Policy</BodyText>
+                            <BodyText style={[styles.text]} numberOfLines={1}>Private Policy</BodyText>
                         </View>
-                    </TouchableHighlight>
+                    </Pressable>
 
 
-                    <TouchableHighlight
-                        style={[styles.menu_items, target === TargetOptions.removeAccount && styles.active]}
+                    <Pressable
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.removeAccount || pressed) && styles.active]}
                         onPress={() => setTarget(TargetOptions.removeAccount)}
-                        underlayColor={colors.tertiary}
+
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text, target === TargetOptions.removeAccount && styles.active_text]}>Account</BodyText>
+                            <BodyText style={[styles.text]}>Account</BodyText>
                         </View>
-                    </TouchableHighlight>
+                    </Pressable>
 
 
                 </View>
 
                 <Pressable onPress={handleSignOut} style={styles.menu_items}>
-                    <BodyText style={styles.text}>Sign Out</BodyText>
+                    <Icon type='log-out' size={20} color={colors.primary} pressColor={colors.secondary} onPress={handleSignOut} />
                 </Pressable>
+
             </Animated.View>
             <KeyboardAvoidingView keyboardVerticalOffset={110} behavior={'padding'} style={{ flex: 1, marginTop: 60 }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -165,25 +164,23 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
-        borderTopColor: colors.primary,
-        borderTopWidth: 1
+        flexDirection: 'row'
     },
     header: {
         alignSelf: 'center',
         color: colors.primary,
-        fontSize: 16
+        fontSize: normalize(14)
     },
     menu_container: {
         position: 'absolute',
         flexDirection: 'row',
-        backgroundColor: colors.secondaryLight,
+        backgroundColor: colors.white,
         height: 40,
         width: '100%',
         zIndex: 100,
         justifyContent: 'space-between',
-        borderBottomColor: colors.primary,
-        borderBottomWidth: 1,
+        // borderBottomColor: colors.tertiary,
+        // borderBottomWidth: 1,
         overflow: 'hidden'
     },
     menu_options: {
@@ -192,7 +189,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly'
     },
     active: {
-        backgroundColor: colors.primary
+        borderBottomColor: colors.primary,
+        borderBottomWidth: 2
     },
     active_text: {
         fontSize: 12,
@@ -209,8 +207,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     text: {
-        fontSize: 12,
-        color: colors.primary,
+        fontSize: normalize(10),
+        color: colors.black,
         flexWrap: 'nowrap'
     }
 })

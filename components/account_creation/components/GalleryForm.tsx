@@ -1,116 +1,42 @@
-import React, { useState, useEffect, ReactNode, useLayoutEffect, useRef } from 'react';
-import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, ActivityIndicator, Keyboard } from 'react-native';
+import React, { useState, ReactNode, useRef, useEffect } from 'react';
+import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, Animated } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, dropShadow, dropShadowDeep } from '../../utils/styles';
-import { galleryImgSizeLimit } from '../../../utils/variables';
-import { NewGalleryItemProps, UserRootStateProps } from '../../../services/user/types';
-import { connect } from 'react-redux';
-import { RootProps } from '../../../services';
-import { save_gallery } from '../../../services/user/actions';
-import { UserDispatchActionsProps } from '../../../services/user/types';
+import { UserDispatchActionsProps, NewGalleryItemProps } from '../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
-import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
-import { AutoId } from '../../../utils/functions';
-import { cloneDeep, isEqual } from 'lodash'
-import { MeStackNavigationProp } from '../../navigation/utils/types';
-import { set_banner } from '../../../services/banner/actions';
-import { Feather } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { hashCode } from '../../../utils/functions';
-import { Icon, CustomInput } from '../../utils';
+import { galleryImgSizeLimit } from '../../../utils/variables';
+import { hashCode, AutoId } from '../../../utils/functions';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
+import { Icon, CustomInput, HeaderText, CustomButton, BodyText } from '../../utils';
+import { colors, normalize, dropShadow, dropShadowDeep } from '../../utils/styles';
+import { introStyles } from './utils';
 
 //Summary
 //image limit will be set to 10000000 byte = 10mb
 //need to lower the size
-interface EditGalleryProps {
+interface UploadGalleryProps {
     save_gallery: UserDispatchActionsProps['save_gallery'];
-    gallery: UserRootStateProps['gallery'];
-    navigation: MeStackNavigationProp;
     set_banner: BannerDispatchActionProps['set_banner'];
-    handleCameraRollPermission: () => Promise<boolean>
+    handleCameraRollPermission: () => Promise<boolean>;
+    onNext: () => void;
+    imgObjs: NewGalleryItemProps[]
+    setImgObjs: (imgObjs: NewGalleryItemProps[]) => void;
 }
 
-const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCameraRollPermission }: EditGalleryProps) => {
-    const [imgObjs, setImgObjs] = useState<NewGalleryItemProps[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    var mount = useRef<boolean>()
-
-    useLayoutEffect(() => {
-        mount.current = true;
-
-        navigation.setOptions({
-            headerRight: () => {
-
-                const imgObjsLen = imgObjs.filter(img => !img.removed).length
-
-                return (
-                    <View style={{ flexDirection: 'row', right: loading ? 30 : 15 }}>
-                        {loading ?
-                            <ActivityIndicator size='small' color={colors.primary} /> :
-                            <>
-                                {
-                                    imgObjsLen < 5 &&
-                                    <Pressable onPress={pickImage} style={{ marginRight: 10 }}>
-                                        {({ pressed }) => <Feather name='image' size={30} color={pressed ? colors.secondary : colors.primary} />}
-                                    </Pressable >
-                                }
-
-                                <Icon type='save' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleSave} />
-
-                            </>
-                        }
-                    </View>
-                )
-
-            }
-        })
-
-        return () => {
-            mount.current = false;
-            navigation.setOptions({ headerRight: undefined })
-        }
-    }, [loading, imgObjs])
+export default ({ save_gallery, set_banner, handleCameraRollPermission, onNext, imgObjs, setImgObjs }: UploadGalleryProps) => {
+    const [intro, setIntro] = useState(true)
+    const fadeAmin = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        //need to reverse the order of the images to display correctly
-        gallery && setImgObjs(cloneDeep(gallery).reverse());
-
-    }, [gallery])
-
-    const handleSave = () => {
-        Keyboard.dismiss();
-        //allow description to be empty
-        //check if any changes were made
-        if (imgObjs.length < 1) {
-            return set_banner('No photos found in the gallery to save.', 'warning');
-        }
-
-        //lodash clone deep causing the app to crash in production for some reason...
-        const imgObjRev = [...imgObjs];
-
-        imgObjRev.reverse()
-
-        if (isEqual(imgObjRev, gallery)) {
-            return set_banner('Looks like there were no changes found.', 'warning');
-        }
-
-        imgObjRev.forEach((item, index) => {
-            if ((!item.url && !item.blob) || !item.id) {
-                return set_banner(`Oops! Looks like image #${index + 1} did not load correctly. Please try to remove and upload again.`, 'error')
-            }
+        Animated.timing(fadeAmin, {
+            delay: 3000,
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: false
+        }).start(() => {
+            setIntro(false)
         })
-
-        setLoading(true)
-
-        save_gallery(imgObjRev)
-            .then(() => {
-                mount.current && setLoading(false)
-            })
-            .catch((err) => {
-                console.log(err)
-                mount.current && setLoading(false)
-            })
-    }
+    }, [])
 
     const pickImage = async () => {
 
@@ -171,11 +97,8 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
 
         if (index !== undefined) {
             const { removed, url } = imgObjs[index]
-            if (url) {
-                imgObjs[index].removed = removed ? false : true
-            } else {
-                imgObjs.splice(index, 1)
-            }
+            imgObjs.splice(index, 1)
+
         } else {
             return set_banner('Issues removing the image', 'error')
         }
@@ -218,11 +141,58 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
         </Pressable>
     );
 
+    const previewGalleryImage = (
+        <View style={[styles.image_content, dropShadow]}>
+            <Image
+                source={require('../sunset.jpg')}
+                style={styles.image}
+            />
+            <BodyText
+                style={[styles.image_description_input, {
+                    padding: 12,
+                    paddingTop: 12,
+                }]}
+            >I love morning sunsets with friends</BodyText>
+        </View>
+    )
+
+
+    if (intro) return (
+        <Animated.View style={[
+            {
+                opacity: fadeAmin.interpolate({
+                    inputRange: [0, .5, 1],
+                    outputRange: [1, .2, 0]
+                }),
+                flex: 1
+            }
+        ]}>
+            <View style={styles.container}>
+                <HeaderText style={introStyles.intro_header}>Lastly, Lets Add Some Photos To Your Gallery!</HeaderText>
+                <BodyText style={introStyles.intro_body}>Upload up to 5 images to the gallery.</BodyText>
+            </View>
+        </Animated.View>
+    )
+
 
     return (
         <View style={styles.container}>
+            {imgObjs.length < 5 ? <CustomButton
+                type='primary'
+                text="Upload A New Photo"
+                onPress={pickImage}
+                style={styles.button}
+            />
+                :
+                <CustomButton
+                    type='disabled'
+                    text='5 Photo Limit Reached'
+                    style={styles.button}
+                />
+            }
             <KeyboardAvoidingView keyboardVerticalOffset={120} behavior={'height'} style={{ flex: 1 }}>
                 <DraggableFlatList
+                    ListEmptyComponent={previewGalleryImage}
                     contentContainerStyle={styles.flat_list}
                     keyboardDismissMode='interactive'
                     data={imgObjs}
@@ -239,8 +209,18 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        position: 'relative',
-        paddingBottom: 80
+        position: 'relative'
+    },
+    header: {
+        fontSize: normalize(25),
+        color: colors.primary,
+        marginBottom: 10
+    },
+    sub_header: {
+        fontSize: normalize(15),
+        color: colors.secondary,
+        marginBottom: 20,
+        marginLeft: 20
     },
     flat_list: {
         marginRight: 40,
@@ -296,7 +276,6 @@ const styles = StyleSheet.create({
         marginRight: 40,
         marginLeft: 40,
         marginTop: 5,
-        alignItems: 'center',
         borderWidth: 1,
         borderColor: `rgba(${colors.primary_rgb},.5)`,
         borderRadius: 5,
@@ -313,11 +292,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         alignSelf: 'flex-start',
         color: colors.black
+    },
+    button: {
+        marginBottom: 20,
+        marginRight: 40,
+        marginLeft: 40,
     }
 })
-
-const mapStateToProps = (state: RootProps) => ({
-    gallery: state.user.gallery
-})
-
-export default connect(mapStateToProps, { save_gallery, set_banner })(EditGallery);

@@ -1,16 +1,16 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { View, FlatList, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { InvitationsStackNavigationProp } from '../navigation/utils/types';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/types';
 import { update_invitation_from_invitations } from '../../services/invitations/actions';
-import { colors, opacity_colors } from '../utils/styles';
+import { colors, dropShadowListContainer, normalize } from '../utils/styles';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { renderDate } from '../chat/utils';
-import ProfileImage from '../profile/components/ProfileImage';
+import { ListProfileImage } from '../profile/components/ProfileImage';
 import Empty from '../utils/components/Empty';
-import { Icon } from '../utils';
+import { Icon, BodyText } from '../utils';
 
 interface Invitations {
     navigation: InvitationsStackNavigationProp;
@@ -19,18 +19,22 @@ interface Invitations {
 }
 
 const Invitations = ({ navigation, invitation, update_invitation_from_invitations }: Invitations) => {
+    const [showPreview, setShowPreview] = useState(false);
     const previewAdmin = useRef(new Animated.Value(0)).current
 
 
     useEffect(() => {
-        Animated.timing(previewAdmin, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: false
-        }).start(() => {
-            previewAdmin.setValue(0)
-        })
-    }, [])
+        if (showPreview) {
+            Animated.timing(previewAdmin, {
+                toValue: 1,
+                duration: 2000,
+                useNativeDriver: false
+            }).start(() => {
+                previewAdmin.setValue(0)
+            })
+            setShowPreview(false)
+        }
+    }, [showPreview])
 
 
     const handleDirectToProfile = (inviterObj: InvitationObject) => {
@@ -39,6 +43,8 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
             title: inviterObj.sentBy.username
         })
     }
+
+    const handleShowPreview = () => setShowPreview(true)
 
     const handleOnStatusUpdatePress = (inviterObj: InvitationObject, updatedStatus: InvitationObject['status']) => {
         update_invitation_from_invitations(inviterObj, updatedStatus);
@@ -57,7 +63,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                         transform: [{ translateX: trans }]
                     }
                 }>
-                    <Icon type='arrow-left-circle' size={30} color={colors.white} pressColor={colors.white} />
+                    <Icon type='arrow-left-circle' size={40} color={colors.white} pressColor={colors.white} />
                 </Animated.View>
             </View>
         )
@@ -76,7 +82,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                         transform: [{ translateX: trans }]
                     }
                 }>
-                    <Icon type='arrow-right-circle' size={30} color={colors.white} pressColor={colors.white} />
+                    <Icon type='arrow-right-circle' size={40} color={colors.white} pressColor={colors.white} />
                 </Animated.View>
             </View>
         )
@@ -104,8 +110,9 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                 <Empty style={{ marginTop: 50 }}>No Invitations</Empty>
             )}
             data={invitation.inbound}
+            contentContainerStyle={styles.flat_list}
             renderItem={({ item, index, separators }) => (
-                <View style={styles.container}>
+                <View style={[styles.container, dropShadowListContainer]}>
                     {index === 0 && renderAnimation()}
                     <Swipeable
                         renderRightActions={renderRightActions}
@@ -114,18 +121,23 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                         onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
                         containerStyle={styles.swipe_container}
                     >
-                        <Pressable style={styles.content_container}>
+                        <Pressable style={styles.content_container} onPress={handleShowPreview}>
                             <View style={styles.profile_section}>
-                                <ProfileImage size='regular' image={item.sentBy.profileImg} onImagePress={() => handleDirectToProfile(item)} />
+                                <ListProfileImage
+                                    image={item.sentBy.profileImg}
+                                    onImagePress={() => handleDirectToProfile(item)}
+                                    friend={false}
+                                />
                                 <View style={styles.profile_section_text}>
-                                    <Text style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</Text>
+                                    <BodyText style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</BodyText>
+                                    <BodyText style={styles.age}>{item.sentBy.age ? item.sentBy.age : 0} years old</BodyText>
                                 </View>
                             </View>
                             <View style={styles.content_section}>
-                                <Text style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</Text>
-                                <View style={styles.content_section_small}>
-                                    <Text style={styles.content_section_small_text}>{item.createdAt && renderDate(item.createdAt)}</Text>
+                                <View style={styles.topLeft}>
+                                    <BodyText style={styles.topLeft_text}>{item.createdAt && renderDate(item.createdAt)}</BodyText>
                                 </View>
+                                <BodyText style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</BodyText>
                             </View>
                         </Pressable>
                     </Swipeable>
@@ -146,6 +158,9 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
 }
 
 const styles = StyleSheet.create({
+    flat_list: {
+        paddingBottom: 80
+    },
     leftAction: {
         flex: 1,
         backgroundColor: colors.green,
@@ -159,10 +174,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.red,
     },
     container: {
-        flexDirection: 'row', marginBottom: 20, borderBottomWidth: 1,
-        borderTopWidth: 1,
-        borderBottomColor: colors.primary,
-        borderTopColor: colors.primary,
+        flexDirection: 'row',
+        marginTop: 20
     },
     swipe_container: {
         width: '100%',
@@ -174,29 +187,28 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
         flexDirection: 'row',
         paddingLeft: 30,
-        paddingRight: 20,
-        paddingTop: 10,
-        paddingBottom: 10
+        height: 150,
     },
     profile_section: {
-        flexBasis: '30%',
-        marginRight: 5,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
+        flex: .5,
+        marginRight: 10,
+        flexDirection: 'column'
     },
     profile_section_text: {
-        bottom: 5
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        justifyContent: 'center',
+        padding: 10
     },
     username: {
-        marginTop: 15,
-        fontSize: 14,
+        fontSize: normalize(11),
         color: colors.primary,
         textAlign: 'center',
         overflow: 'visible'
     },
     age: {
-        fontSize: 12,
+        fontSize: normalize(7),
         color: colors.primary,
         textAlign: 'center'
     },
@@ -205,7 +217,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         paddingLeft: 20,
         paddingRight: 10,
-        alignSelf: 'center'
+        alignSelf: 'stretch'
     },
     content_section_text: {
         fontSize: 12,
@@ -214,15 +226,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center'
     },
-    content_section_small: {
-        alignSelf: 'flex-end',
-        flexDirection: 'row'
+    topLeft: {
+        position: 'absolute',
+        top: 5,
+        left: 5,
     },
-    content_section_small_text: {
-        fontSize: 8,
-        color: colors.primary,
-        margin: 5
-    }
+    topLeft_text: {
+        fontSize: normalize(6),
+        color: colors.primary
+    },
 })
 
 const mapStateToProps = (state: RootProps) => ({

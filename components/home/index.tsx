@@ -10,12 +10,9 @@ import { UserRootStateProps, UserDispatchActionsProps, CtryStateCityProps, } fro
 import { NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { HomeToChatNavProp } from '../navigation/utils/types';
 import * as Location from 'expo-location';
-import { CustomButton } from '../utils';
+import { CustomButton, BodyText } from '../utils';
 import { getBucket } from './utils';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import { set_expo_push_token, remove_expo_push_token } from '../../services/notification/actions';
-import { NotificationDispatchActionProps } from '../../services/notification/types';
 
 interface HomeProps {
     navigation: HomeToChatNavProp;
@@ -25,8 +22,6 @@ interface HomeProps {
     go_online: UserDispatchActionsProps['go_online'];
     invitationFetched: boolean;
     friendsFetched: boolean;
-    set_expo_push_token: NotificationDispatchActionProps['set_expo_push_token'];
-    remove_expo_push_token: NotificationDispatchActionProps['remove_expo_push_token'];
 }
 
 interface CurrentLocationProps {
@@ -59,59 +54,21 @@ const Home = (props: HomeProps) => {
 
 
     useEffect(() => {
-        //init push notifications
-        registerForPushNotificationsAsync()
-            .then(token => {
-                if (token) {
-                    props.set_expo_push_token(token)
-                }
-            });
-
         // This listener is fired whenever a notification is received while the app is foregrounded
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            console.log(notification)
+            console.log('foreground')
         });
 
         // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
+            console.log('background');
         });
 
         return () => {
             Notifications.removeNotificationSubscription(notificationListener);
             Notifications.removeNotificationSubscription(responseListener);
-            props.remove_expo_push_token()
         };
     }, [])
-
-    const registerForPushNotificationsAsync = async () => {
-        let token;
-        if (Constants.isDevice) {
-            const { status: existingStatus } = await Notifications.getPermissionsAsync();
-            let finalStatus = existingStatus;
-            if (existingStatus !== 'granted') {
-                const { status } = await Notifications.requestPermissionsAsync();
-                finalStatus = status;
-            }
-            if (finalStatus !== 'granted') {
-                alert('Failed to get push token for push notification!');
-                return;
-            }
-            token = (await Notifications.getExpoPushTokenAsync()).data;
-            return token
-        } else {
-            console.log('Must use physical device for Push Notifications');
-        }
-
-        // if (Platform.OS === 'android') {
-        //     Notifications.setNotificationChannelAsync('default', {
-        //         name: 'default',
-        //         importance: Notifications.AndroidImportance.MAX,
-        //         vibrationPattern: [0, 250, 250, 250],
-        //         lightColor: '#FF231F7C',
-        //     });
-        // }
-    };
 
     useEffect(() => {
         //onMount update/set user location
@@ -121,8 +78,9 @@ const Home = (props: HomeProps) => {
             try {
                 let { status } = await Location.requestPermissionsAsync();
                 if (status !== 'granted') {
-                    return console.log('Permission to access location was denied')
-                    // setErrorMsg('Permission to access location was denied');
+                    console.log('Permission to access location was denied')
+                    setErrMsg('Permission denied. Will need location permission to users neear you.')
+                    return;
                 }
 
                 let location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest });
@@ -186,14 +144,17 @@ const Home = (props: HomeProps) => {
                 <Maps navigation={props.navigation} />
                 :
                 !!errMsg ?
-                    <CustomButton
-                        type='primary'
-                        text='refresh'
-                        onPress={() => {
-                            setErrMsg('');
-                            setRefresh(true);
-                        }}
-                    />
+                    <>
+                        <BodyText>{errMsg}</BodyText>
+                        <CustomButton
+                            type='primary'
+                            text='refresh'
+                            onPress={() => {
+                                setErrMsg('');
+                                setRefresh(true);
+                            }}
+                        />
+                    </>
                     : <ActivityIndicator size='large' color={colors.primary} />}
         </View>
     )
@@ -215,5 +176,5 @@ const mapStateToProps = (state: RootProps) => ({
 })
 
 export default connect(mapStateToProps, {
-    set_and_listen_user_location, set_and_listen_near_users, go_online, set_expo_push_token, remove_expo_push_token
+    set_and_listen_user_location, set_and_listen_near_users, go_online
 })(Home);

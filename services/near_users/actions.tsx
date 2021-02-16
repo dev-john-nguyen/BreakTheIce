@@ -14,7 +14,7 @@ import { UPDATE_PROFILE_HISTORY } from '../profile/actionTypes';
 import * as Location from 'expo-location';
 import { getBucket } from '../../components/home/utils';
 import { isEqual } from 'lodash';
-import { fireDb_init_user_location } from '../user/utils';
+import { fireDb_init_user_location, fireDb_update_user_location } from '../user/utils';
 import { REFRESH_UPDATE_BUCKET } from '../user/actionTypes';
 
 
@@ -159,6 +159,23 @@ export const refresh_near_users = () => async (dispatch: AppDispatch, getState: 
                 dispatch(set_banner("Great, looks like your in a different area. Safe travels.", "success"))
 
             }
+        }
+
+        //update location
+        //get coordinates and compare
+        const prevLocCords = {
+            latitude: user.location.coords.latitude,
+            longitude: user.location.coords.longitude,
+        }
+
+        const curLocCords = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        }
+
+        if (getDistance(prevLocCords, curLocCords) > 1) {
+            console.log('updating')
+            await fireDb_update_user_location(user, location)
         }
 
     } catch (err) {

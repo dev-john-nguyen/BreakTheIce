@@ -369,7 +369,19 @@ export const update_status_message = (statusMsg: string) => async (dispatch: App
 
 }
 
-export const sign_out = () => async (dispatch: AppDispatch) => {
+export const sign_out = () => async (dispatch: AppDispatch, getState: () => RootProps) => {
+
+    const { uid } = getState().user
+
+    //remove notification token
+    try {
+        await fireDb.collection(UsersDb).doc(uid).collection('Token').doc(uid).delete()
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner('Oops! Something happened trying to sign out', 'error'))
+        return;
+    }
+
     myFire.auth().signOut().then(() => {
         dispatch(set_banner('signed out', 'success'))
     })

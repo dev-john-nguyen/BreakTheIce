@@ -1,3 +1,5 @@
+import { InterviewProps } from "../../../../../services/user/types"
+
 export const likesQuestions = [
     "What’s your favorite way to spend a day off?",
     "What type of music are you into?",
@@ -69,3 +71,7 @@ export const likesInitIndex = likesQuestions[Math.round(likesQuestions.length / 
 export const valuesInitIndex = valuesQuestions[Math.round(likesQuestions.length / 2)]
 export const familyInitIndex = familyQuestions[Math.round(likesQuestions.length / 2)]
 export const carrerInitIndex = carrerQuestions[Math.round(likesQuestions.length / 2)]
+
+export type InterviewKeys = keyof InterviewProps
+
+export const interviewKeys: InterviewKeys[] = ['likes', 'career', 'family', 'values']

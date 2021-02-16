@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import { BodyText } from '../../utils';
-import { colors, drop_shadow_light } from '../../utils/styles';
+import React, { useRef, useEffect, useState } from 'react';
+import { View, StyleSheet, Animated, Pressable } from 'react-native';
+import { BodyText, Icon } from '../../utils';
+import { colors, dropShadowLight, normalize } from '../../utils/styles';
 import { InvitationStatusOptions } from '../../../services/invitations/types';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
@@ -11,7 +11,6 @@ interface InvitationButtonsProps {
 
 export default ({ updateInvitationStatus }: InvitationButtonsProps) => {
     const backgroundAdmin: Animated.Value = useRef(new Animated.Value(0)).current;
-    const previewAdmin = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
         Animated.loop(
@@ -21,14 +20,6 @@ export default ({ updateInvitationStatus }: InvitationButtonsProps) => {
                 useNativeDriver: false
             }),
         ).start()
-
-        Animated.timing(previewAdmin, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: false
-        }).start(() => {
-            previewAdmin.setValue(0)
-        })
     }, [])
 
     const handleDenied = () => updateInvitationStatus(InvitationStatusOptions.denied)
@@ -68,26 +59,8 @@ export default ({ updateInvitationStatus }: InvitationButtonsProps) => {
     )
 
 
-    const renderAnimation = () => {
-        return (
-            <Animated.View style={{
-                width: previewAdmin.interpolate({
-                    inputRange: [0, .6, .7, 1],
-                    outputRange: [0, 13, 17, 0],
-                }),
-                backgroundColor: colors.green,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderTopLeftRadius: 5,
-                borderBottomLeftRadius: 5,
-                left: 2
-            }} />
-        )
-    }
-
     return (
-        <View style={[drop_shadow_light, styles.container]}>
-            {renderAnimation()}
+        <Pressable style={[dropShadowLight, styles.container]}>
             <Swipeable
                 renderRightActions={renderRightActions}
                 renderLeftActions={renderLeftActions}
@@ -96,34 +69,48 @@ export default ({ updateInvitationStatus }: InvitationButtonsProps) => {
                 containerStyle={styles.swipe_container}
             >
                 <View style={styles.content}>
-                    <BodyText style={styles.text}>Accept</BodyText>
+                    <Animated.View style={{
+                        width: '20%', height: 40, backgroundColor: backgroundAdmin.interpolate({
+                            inputRange: [0, 1, 2],
+                            outputRange: [
+                                colors.darkGreen,
+                                colors.green,
+                                colors.darkGreen
+                            ],
+                        }), alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <Icon
+                            type='chevrons-right'
+                            size={20}
+                            color={colors.white}
+                            pressColor={colors.lightWhite}
+                        />
+                    </Animated.View>
+
+                    <BodyText style={{ alignSelf: 'center', marginRight: 30, color: colors.black, fontSize: normalize(9) }}>Slide To Accept</BodyText>
                 </View>
             </Swipeable>
-        </View>
+        </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        position: 'relative',
         flexDirection: 'row',
         width: '60%',
-        borderRadius: 5,
         alignSelf: 'center'
     },
     swipe_container: {
         position: 'relative',
-        flex: 1
+        flex: 1,
+        borderRadius: 10
     },
     content: {
-        padding: 10,
-        borderWidth: 1,
-        alignItems: 'center',
-        borderColor: colors.primary,
         backgroundColor: colors.white,
-        borderRadius: 5,
         position: 'relative',
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'space-between'
     },
     text: {
         fontSize: 12,
@@ -133,8 +120,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.green,
         justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 5
+        alignItems: 'center'
     },
     actionText: {
         color: colors.white,
@@ -146,7 +132,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: colors.red,
-        borderRadius: 5
+        backgroundColor: colors.red
     },
 })

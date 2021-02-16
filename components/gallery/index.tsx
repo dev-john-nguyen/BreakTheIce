@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { GalleryItemProps } from '../../services/user/types';
-import { colors, drop_shadow } from '../utils/styles';
+import { colors, dropShadow, normalize } from '../utils/styles';
 import Card from './components/Card';
 import Empty from '../utils/components/Empty';
 import { cloneDeepWith } from 'lodash'
@@ -46,7 +46,7 @@ export default ({ gallery, height }: GalleryComProps) => {
             flexBasis: height,
             width: ImageWidth
         },
-            drop_shadow,
+            dropShadow,
         styles.empty
         ]}>
             <Empty>No Images</Empty>
@@ -88,10 +88,6 @@ const styles = StyleSheet.create({
         position: 'relative',
         alignItems: 'center',
         marginTop: 10
-    },
-    underline_header_text: {
-        color: colors.primary,
-        fontSize: 24
     },
     underline_header_underline: {
         backgroundColor: colors.secondary

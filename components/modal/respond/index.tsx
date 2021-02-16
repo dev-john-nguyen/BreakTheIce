@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Modal, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
-import { colors } from '../../utils/styles';
+import { colors, normalize } from '../../utils/styles';
 import { connect } from 'react-redux';
 import { InvitationStatusOptions, InvitationsDispatchActionProps, InvitationObject } from '../../../services/invitations/types';
 import { update_invitation } from '../../../services/invitations/actions';
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.primary,
         borderColor: colors.secondary,
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 10,
         alignItems: "stretch",
         justifyContent: 'center',
         padding: 40,
@@ -137,16 +137,16 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     message_container: {
-        backgroundColor: colors.secondary,
-        width: "70%",
+        backgroundColor: colors.white,
+        minHeight: 100,
         padding: 20,
         marginBottom: 20,
-        borderRadius: 5,
+        borderRadius: 10,
         alignSelf: 'center'
     },
     message: {
-        fontSize: 12,
-        color: colors.white
+        fontSize: normalize(10),
+        color: colors.black
     },
     close_button: {
         position: 'absolute',

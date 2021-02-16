@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { View, StyleSheet, StyleProp, Pressable } from 'react-native';
 import { ProfileImgProps, NewProfileImgProps } from '../../../services/user/types';
 import { FontAwesome } from '@expo/vector-icons';
-import { colors } from '../../utils/styles';
+import { colors, dropShadowListContainer, dropShadowLight } from '../../utils/styles';
 import { Image } from 'react-native';
 import { Icon } from '../../utils';
 import { windowWidth } from '../../../utils/variables';
 
 interface ProfileImageProp {
     image: ProfileImgProps | NewProfileImgProps | null;
-    friend?: Boolean;
-    size: 'small' | 'regular' | 'large';
+    friend: Boolean;
+    size: 'small' | 'regular';
     onImagePress?: () => void;
 }
 
-export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
+export const CircleProfileImage = ({ image, friend, size, onImagePress }: ProfileImageProp) => {
     const [errImg, setErrImg] = useState<boolean>(false);
 
     var styles: any, iconSize: number;
@@ -24,33 +24,23 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
             styles = smallStyles;
             iconSize = 5;
             break;
-        case 'large':
-            styles = largeStyles;
-            iconSize = 20
-            break
         default:
             styles = regularStyles;
-            iconSize = 10
+            iconSize = 15
     }
 
 
     const renderImage = () => {
-
-        if (errImg) return (
-            <FontAwesome
-                name="user-circle-o"
-                color={colors.primary}
-                style={styles.icon}
-            />
-        )
-
-        if (image && image.uri) {
+        if (image && image.uri && !errImg) {
             const uri = image.cachedUrl ? image.cachedUrl : image.uri
+
             return (
                 <View style={styles.image_container}>
                     <Image
                         source={{ uri, cache: 'force-cache' }}
-                        style={baseStyles.image}
+                        style={[baseStyles.image, {
+                            borderRadius: 50
+                        }]}
                         onError={(err) => {
                             console.log(err)
                             setErrImg(true)
@@ -60,6 +50,7 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
             )
         }
 
+
         return <FontAwesome
             name="user-circle-o"
             color={colors.primary}
@@ -67,13 +58,87 @@ export default ({ image, friend, size, onImagePress }: ProfileImageProp) => {
         />
     }
 
+
     return (
-        <Pressable style={styles.container} onPress={onImagePress}>
+        <Pressable style={[styles.container, dropShadowLight]} onPress={onImagePress}>
             {renderImage()}
             {friend && <Icon type='link' size={iconSize} color={colors.primary} pressColor={colors.secondary} style={styles.friend} />}
         </Pressable>
     )
 }
+
+
+interface ListProfileImageProp {
+    image: ProfileImgProps | NewProfileImgProps | null;
+    friend: boolean;
+    onImagePress: () => void
+}
+
+export const ListProfileImage = ({ image, friend, onImagePress }: ListProfileImageProp) => {
+    const [errImg, setErrImg] = useState<boolean>(false);
+
+    const renderImage = () => {
+        if (image && image.uri && !errImg) {
+            const uri = image.cachedUrl ? image.cachedUrl : image.uri
+            return (
+                <Image
+                    source={{ uri, cache: 'force-cache' }}
+                    style={listStyles.image}
+                    onError={(err) => {
+                        console.log(err)
+                        setErrImg(true)
+                    }}
+                />
+            )
+        }
+
+        return <FontAwesome
+            name="user-circle-o"
+            color={colors.primary}
+            style={listStyles.icon}
+        />
+    }
+
+    return (
+        <Pressable style={[listStyles.container, dropShadowListContainer, !image && listStyles.border]} onPress={onImagePress}>
+            {renderImage()}
+            {friend && <Icon type='link' size={15} color={colors.primary} pressColor={colors.secondary} style={listStyles.friend} />}
+        </Pressable>
+    )
+}
+
+const listStyles = StyleSheet.create({
+    container: {
+        position: 'relative',
+        flex: 1,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    border: {
+        borderColor: colors.primary,
+        borderWidth: 1
+    },
+    friend: {
+        position: 'absolute',
+        transform: [
+            {
+                rotate: "90deg"
+            }
+        ],
+        left: 5,
+        top: 5
+    },
+    icon: {
+        fontSize: 50,
+        top: -25
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 5
+    }
+})
 
 const baseStyles: StyleProp<any> = StyleSheet.create({
     friend: {
@@ -87,37 +152,6 @@ const baseStyles: StyleProp<any> = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
-        borderRadius: 100
-    },
-    image_container: {
-        borderRadius: 100,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    }
-})
-
-const largeStyles = StyleSheet.create({
-    container: {
-        position: 'relative'
-    },
-    friend: {
-        ...baseStyles.friend
-    },
-    icon: {
-        width: windowWidth / 5,
-        height: windowWidth / 5,
-        fontSize: windowWidth / 5
-    },
-    image_container: {
-        width: windowWidth / 5,
-        height: windowWidth / 5,
-        ...baseStyles.image_container
     }
 })
 
@@ -137,26 +171,31 @@ const smallStyles = StyleSheet.create({
     image_container: {
         width: 30,
         height: 30,
-        ...baseStyles.image_container
+        borderRadius: 50,
     }
 })
 
 const regularStyles = StyleSheet.create({
     container: {
-        position: 'relative'
+        position: 'relative',
+        height: windowWidth / 5,
+        width: windowWidth / 5,
     },
     friend: {
-        ...baseStyles.friend,
-        right: -5,
+        position: 'absolute',
+        transform: [
+            {
+                rotate: "90deg"
+            }
+        ]
     },
     icon: {
-        width: 40,
-        height: 40,
-        fontSize: 40
+        fontSize: windowWidth / 5.5
     },
     image_container: {
-        width: 45,
-        height: 45,
-        ...baseStyles.image_container
+        flex: 1,
+        // width: windowWidth / 5,
+        // height: windowWidth / 5,
+        borderRadius: 50
     }
 })

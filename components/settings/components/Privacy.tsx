@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     },
     content_text: {
         fontSize: 12,
-        color: colors.primary,
+        color: colors.black,
         marginRight: 10
     }
 

@@ -19,23 +19,13 @@ import { set_and_listen_friends } from '../services/friends/actions';
 import { set_and_listen_messages } from '../services/chat/actions';
 import Banner from './utils/components/banner';
 import Notification from './utils/components/Notification';
-import UserInitForm from './signin/components/UserInitForm';
-import { init_user } from '../services/signin/actions';
-import { SigninDispatchActionProps } from '../services/signin/types';
 import { useFonts, Rubik_500Medium } from '@expo-google-fonts/rubik';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';
 import { colors } from './utils/styles';
-import * as BackgroundFetch from 'expo-background-fetch';
-import * as TaskManager from 'expo-task-manager';
-
-BackgroundFetch.setMinimumIntervalAsync(10);
-const taskName = 'test-background-fetch';
-TaskManager.defineTask(taskName, async () => {
-    console.log('background fetch running');
-    return BackgroundFetch.Result.NewData;
-});
+import AccountCreation from './account_creation';
 
 const BottomTabs = createBottomTabNavigator();
+
 
 interface Base {
     banner: BannerRootStateProps;
@@ -45,7 +35,6 @@ interface Base {
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
     set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
     remove_notification: () => void;
-    init_user: SigninDispatchActionProps['init_user'];
 }
 
 
@@ -54,18 +43,6 @@ const Base = (props: Base) => {
         Roboto_400Regular,
         Rubik_500Medium
     });
-
-
-    useEffect(() => {
-
-        (async () => {
-            await BackgroundFetch.registerTaskAsync(taskName);
-            await TaskManager.isAvailableAsync().then(res => console.log(res))
-            await TaskManager.getRegisteredTasksAsync(taskName).then(task => console.log(task))
-            console.log('task registered');
-        })()
-
-    }, [])
 
 
     useEffect(() => {
@@ -100,7 +77,7 @@ const Base = (props: Base) => {
         if (props.user.uid) {
 
             if (props.user.init) {
-                return <UserInitForm init_user={props.init_user} />
+                return <AccountCreation />
             }
 
             return (
@@ -160,6 +137,5 @@ export default connect(mapStateToProps, {
     remove_banner, set_and_listen_invitations,
     set_and_listen_friends,
     set_and_listen_messages,
-    remove_notification,
-    init_user
+    remove_notification
 })(Base)

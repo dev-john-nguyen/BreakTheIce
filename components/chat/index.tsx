@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleProp, StyleSheet, Animated, Pressable } from 'react-native';
-import { colors, opacity_colors } from '../utils/styles';
+import { colors, opacity_colors, dropShadowListContainer, normalize } from '../utils/styles';
 import { connect } from 'react-redux';
 import { ChatStackNavigationProp } from '../navigation/utils/types'
 import { RootProps } from '../../services';
 import { ChatPreviewProps, ChatDispatchActionsProps } from '../../services/chat/types'
-import ProfileImage from '../profile/components/ProfileImage';
+import { ListProfileImage } from '../profile/components/ProfileImage';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
-import { Icon } from '../utils';
+import { Icon, BodyText } from '../utils';
 import { delete_chat } from '../../services/chat/actions';
 import { renderOtherUser } from './utils';
 import Empty from '../utils/components/Empty';
@@ -45,7 +45,15 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
         //figure out if unread should be updated ....
         const setRead = preview.unread && user.uid !== preview.recentUid ? true : false
 
-        navigation.push('Message', { msgDocId: preview.docId, setRead, targetUser });
+        navigation.navigate('Message', { msgDocId: preview.docId, setRead, targetUser });
+    }
+
+    const directToProfile = (user: { uid: string, username: string } | undefined) => {
+        if (!user) return;
+        navigation.navigate('Profile', {
+            profileUid: user.uid,
+            title: user.username
+        })
     }
 
     const renderRightActions = (progress: Animated.AnimatedInterpolation) => {
@@ -80,6 +88,7 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
                 <Empty style={{ marginTop: 50 }}>No Messages</Empty>
             )}
             data={chatPreviews}
+            contentContainerStyle={styles.flat_list}
             renderItem={({ item, index }) => {
 
                 var unread = item.unread && item.recentUid !== user.uid;
@@ -95,27 +104,33 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
                 const list_style = chat_styles(unread)
 
                 return (
-                    <Swipeable
-                        key={item.docId ? item.docId : index.toString()}
-                        renderRightActions={renderRightActions}
-                        containerStyle={list_style.container}
-                        onSwipeableRightOpen={() => delete_chat(item.docId)}
-                    >
-                        <Pressable style={({ pressed }) => [list_style.content_container, pressed && { backgroundColor: opacity_colors.secondary_medium }]} onPress={() => directToMessage(item)}>
-                            <View style={list_style.profile_section}>
-                                <ProfileImage friend={true} size='regular' image={otherUserImg} />
-                                <View style={list_style.profile_section_text}>
-                                    <Text style={list_style.username} numberOfLines={1}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</Text>
+                    <View style={dropShadowListContainer}>
+                        <Swipeable
+                            key={item.docId ? item.docId : index.toString()}
+                            renderRightActions={renderRightActions}
+                            containerStyle={list_style.container}
+                            onSwipeableRightOpen={() => delete_chat(item.docId)}
+                        >
+                            <Pressable style={({ pressed }) => [list_style.content_container, pressed && { backgroundColor: opacity_colors.secondary_medium }]} onPress={() => directToMessage(item)}>
+                                <View style={list_style.profile_section}>
+                                    <ListProfileImage
+                                        friend={true}
+                                        image={otherUserImg}
+                                        onImagePress={() => directToProfile(otherUser)}
+                                    />
+                                    <View style={list_style.profile_section_text}>
+                                        <BodyText style={list_style.username} numberOfLines={1}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</BodyText>
+                                    </View>
                                 </View>
-                            </View>
-                            <View style={list_style.content_section}>
-                                <Text style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</Text>
-                                <View style={list_style.content_section_small}>
-                                    <Text style={list_style.content_section_small_text}>{calcDateDiff(item.dateSent)}</Text>
+                                <View style={list_style.content_section}>
+                                    <BodyText style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</BodyText>
+                                    <View style={list_style.content_section_small}>
+                                        <BodyText style={list_style.content_section_small_text}>{calcDateDiff(item.dateSent)}</BodyText>
+                                    </View>
                                 </View>
-                            </View>
-                        </Pressable>
-                    </Swipeable>
+                            </Pressable>
+                        </Swipeable>
+                    </View>
                 )
             }}
             keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
@@ -140,46 +155,45 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         backgroundColor: colors.red,
+    },
+    flat_list: {
+        paddingBottom: 80
     }
 })
 
 const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
     container: {
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        borderBottomColor: colors.primary,
-        borderTopColor: colors.primary,
         position: 'relative',
-        marginBottom: 20
+        marginTop: 20,
     },
     content_container: {
         flex: 1,
         backgroundColor: unread ? colors.secondaryMedium : colors.white,
         flexDirection: 'row',
         paddingLeft: 30,
-        paddingRight: 20,
-        paddingTop: 10,
-        paddingBottom: 10
+        height: 150
     },
     profile_section: {
-        flexBasis: '30%',
-        marginRight: 5,
+        flex: .5,
+        marginRight: 10,
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
+        height: 150,
     },
     profile_section_text: {
-        bottom: 5
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        justifyContent: 'center',
+        padding: 10
     },
     username: {
-        marginTop: 15,
-        fontSize: 16,
+        fontSize: normalize(11),
         color: colors.primary,
         textAlign: 'center',
         overflow: 'visible'
     },
     age: {
-        fontSize: 12,
+        fontSize: normalize(7),
         color: colors.primary,
         textAlign: 'center'
     },

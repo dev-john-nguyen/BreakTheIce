@@ -22,6 +22,6 @@ const styles = StyleSheet.create({
     },
     body: {
         fontSize: 12,
-        color: colors.primary
+        color: colors.black
     }
 })

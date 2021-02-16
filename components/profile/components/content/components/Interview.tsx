@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Icon, HeaderText, BodyText } from '../../../../utils';
-import { colors, normalize } from '../../../../utils/styles';
+import { colors, normalize, dropShadowListContainer } from '../../../../utils/styles';
 import Empty from '../../../../utils/components/Empty';
 import { InterviewProps } from '../../../../../services/user/types';
 import { isEmpty } from 'lodash';
@@ -19,23 +19,28 @@ const interviewKeys: InterviewKeys[] = ['likes', 'career', 'family', 'values']
 export default ({ showProfile, interview }: InterviewComProps) => {
     return (
         <View style={styles.container}>
-            <Empty style={styles.header}>Q&A</Empty>
+            <View style={{ flex: .80 }}>
+                <View style={[styles.content, dropShadowListContainer]}>
+                    <Empty style={styles.header}>Q&A</Empty>
 
-            <View style={styles.content_container}>
-                {
-                    isEmpty(interview) ?
-                        <HeaderText style={styles.empty}>Interview hasn't taken place yet.</HeaderText> :
-                        interviewKeys.map((type, index) => {
-                            return (
-                                <View style={styles.interview_container} key={index}>
-                                    <HeaderText style={styles.question_text} >{interview[type][0]}</HeaderText>
-                                    <BodyText style={styles.answer_text} >{interview[type][1]}</BodyText>
-                                </View>
-                            )
-                        })
-                }
+                    <View style={styles.content_container}>
+                        {
+                            isEmpty(interview) ?
+                                <HeaderText style={styles.empty}>Interview hasn't taken place yet.</HeaderText> :
+                                interviewKeys.map((type, index) => {
+                                    return (
+                                        <View style={styles.interview_container} key={index}>
+                                            <HeaderText style={styles.question_text} >{interview[type][0]}</HeaderText>
+                                            <BodyText style={styles.answer_text} >{interview[type][1]}</BodyText>
+                                        </View>
+                                    )
+                                })
+                        }
+                    </View>
+
+                    <Icon type='chevrons-left' color={colors.primary} size={30} pressColor={colors.secondary} onPress={showProfile} style={{ position: 'absolute', left: 10, top: 10 }} />
+                </View>
             </View>
-            <Icon type='chevrons-left' color={colors.primary} size={30} pressColor={colors.secondary} onPress={showProfile} style={{ position: 'absolute', left: 0, bottom: 15 }} />
         </View>
     )
 }
@@ -43,13 +48,20 @@ export default ({ showProfile, interview }: InterviewComProps) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center'
     },
     header: {
         flex: .1
     },
+    content: {
+        flex: 1,
+        margin: 20,
+        backgroundColor: colors.white,
+        padding: 10,
+        borderRadius: 10
+    },
     content_container: {
         flex: 1,
-        marginBottom: 50,
         justifyContent: 'space-evenly'
     },
     interview_container: {

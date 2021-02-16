@@ -29,13 +29,6 @@ export default ({ item, styles, remove_banner }: ItemProps) => {
             })
         ]).start()
 
-        // Animated.timing(fadeAnim, {
-        //     delay: item.message.length > 10 ? 5000 : 2000,
-        //     toValue: 0,
-        //     duration: 2000,
-        //     useNativeDriver: false
-        // }).start()
-
         Animated.sequence([
             Animated.timing(transYAdmin, {
                 toValue: 1,

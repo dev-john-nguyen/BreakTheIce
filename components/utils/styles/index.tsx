@@ -25,8 +25,7 @@ export const colors = {
     lightOrange: '#f58634',
     yellow: '#ffcc29',
     green: '#28DF99',
-    backgroundColor: '#ECFFFF',
-    backgroundColor_rgb: '236  255  255',
+    backgroundColor: '#f4f9f9',
 
     white: '#ffffff',
     white_rgb: '255,255,255',
@@ -46,7 +45,32 @@ export const opacity_colors = {
     secondary_medium: `rgba(${colors.secondary_rgb}, .5)`
 }
 
-export const drop_shadow: StyleProp<any> = {
+//style functions
+const scale = windowWidth / 320;
+
+export function normalize(size: number) {
+    const newSize = size * scale
+    if (Platform.OS === 'ios') {
+        return Math.round(PixelRatio.roundToNearestPixel(newSize))
+    } else {
+        return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2
+    }
+}
+
+
+//drop shadows
+export const dropShadowDeep: StyleProp<any> = {
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+    elevation: 10,
+}
+
+export const dropShadow: StyleProp<any> = {
     shadowColor: "#000",
     shadowOffset: {
         width: 0,
@@ -57,7 +81,7 @@ export const drop_shadow: StyleProp<any> = {
     elevation: 5,
 }
 
-export const drop_shadow_light: StyleProp<any> = {
+export const dropShadowLight: StyleProp<any> = {
     shadowColor: "#000",
     shadowOffset: {
         width: 0,
@@ -69,34 +93,53 @@ export const drop_shadow_light: StyleProp<any> = {
     elevation: 2,
 }
 
+export const dropShadowListContainer: StyleProp<any> = {
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: .5,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 1.00,
+
+    elevation: .5,
+}
 
 //buttons
 const buttonBase: StyleProp<any> = {
     borderRadius: 5,
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingTop: 10,
-    paddingBottom: 10,
+    // paddingLeft: 30,
+    // paddingRight: 30,
+    // paddingTop: 10,
+    // paddingBottom: 10,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: 'center'
 }
 
 const smallButtonBase: StyleProp<any> = {
     borderRadius: 5,
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 5,
-    paddingBottom: 5,
+    // paddingLeft: 15,
+    // paddingRight: 15,
+    // paddingTop: 5,
+    // paddingBottom: 5,
     borderWidth: 1,
     alignItems: 'center',
 }
 
 const textBase = {
-    fontSize: 12
+    fontSize: normalize(10),
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 10,
+    marginBottom: 10,
 }
 
 const smallTextBase = {
-    fontSize: 8
+    fontSize: normalize(8),
+    marginLeft: 15,
+    marginRight: 15,
+    marginTop: 5,
+    marginBottom: 5,
 }
 
 interface ButtonStylesProps {
@@ -107,7 +150,8 @@ interface ButtonStylesProps {
     unpressed: {
         button: StyleProp<any>
         text: StyleProp<any>
-    }
+    },
+    indicator: StyleProp<any>
 }
 
 export const button_styles = (size: 'small' | 'regular' | undefined, type: string): ButtonStylesProps => {
@@ -199,7 +243,8 @@ export const button_styles = (size: 'small' | 'regular' | undefined, type: strin
 
     return {
         pressed,
-        unpressed
+        unpressed,
+        indicator: textBase
     }
 }
 
@@ -223,12 +268,11 @@ export const underline_header_styles: StyleProp<any> = {
     underline: {
         position: 'absolute',
         opacity: .9,
-        height: 10,
         borderRadius: 5,
         bottom: 3,
         alignSelf: 'center',
         width: '120%',
-        backgroundColor: colors.tertiary
+        // backgroundColor: colors.tertiary
     }
 }
 
@@ -244,7 +288,7 @@ export const bannerStyles = (type: string) => {
         },
         text: {
             textAlign: 'center',
-            fontSize: 12,
+            fontSize: normalize(12),
             letterSpacing: .5,
             textTransform: 'capitalize',
             width: windowWidth
@@ -266,16 +310,3 @@ export const bannerStyles = (type: string) => {
     }
     return styles
 }
-
-
-const scale = windowWidth / 320;
-
-export function normalize(size: number) {
-    const newSize = size * scale
-    if (Platform.OS === 'ios') {
-        return Math.round(PixelRatio.roundToNearestPixel(newSize))
-    } else {
-        return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2
-    }
-}
-

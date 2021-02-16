@@ -15,6 +15,7 @@ import { ChatPreviewProps } from '../../../services/chat/types';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { ProfileImgProps } from '../../../services/user/types';
 import { windowHeight } from '../../../utils/variables';
+import { colors } from '../../utils/styles';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -161,14 +162,14 @@ export const MeStackScreen = (props: any) => {
     const { title } = props.route.params;
 
     return <MeStack.Navigator screenOptions={screenOptions}>
-        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={{ cardStyle: { marginTop: 0 } }} />
-        <MeStack.Screen name="Friends" component={Friends} />
+        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={{ cardStyle: { paddingTop: 0, backgroundColor: colors.backgroundColor } }} />
+        <MeStack.Screen name="Friends" component={Friends} options={{ cardStyle: { paddingTop: windowHeight / 9, backgroundColor: colors.backgroundColor } }} />
         <MeStack.Screen
             name="Profile"
             component={Profile}
             options={profileOptions}
             initialParams={{ profileUid: '' }} />
-        <MeStack.Screen name="Settings" component={Settings} options={{ cardStyle: { paddingTop: windowHeight / 9 } }} />
+        <MeStack.Screen name="Settings" component={Settings} options={{ cardStyle: { paddingTop: windowHeight / 9, backgroundColor: colors.backgroundColor } }} />
     </MeStack.Navigator>
 }
 

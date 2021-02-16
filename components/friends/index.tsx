@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, FlatList, TouchableHighlight, Text, StyleSheet } from 'react-native';
+import { View, FlatList, TouchableHighlight, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { FriendsRootProps, FriendObjProps } from '../../services/friends/types';
 import { MeStackNavigationProp } from '../navigation/utils/types';
-import { colors, opacity_colors } from '../utils/styles';
-import ProfileImage from '../profile/components/ProfileImage';
+import { colors, opacity_colors, normalize, dropShadowListContainer } from '../utils/styles';
+import { CircleProfileImage } from '../profile/components/ProfileImage';
 import Empty from '../utils/components/Empty';
+import { BodyText } from '../utils';
 
 interface FriendsProps {
     friends: FriendsRootProps;
@@ -29,16 +30,17 @@ const Friends = ({ friends, navigation }: FriendsProps) => {
                         <Empty style={{ marginTop: 50 }}>Go Get Out There!</Empty>
                     )}
                     data={friends.users}
+                    contentContainerStyle={styles.flat_list}
                     renderItem={({ item, index }) => (
                         <TouchableHighlight
                             key={item.uid ? item.uid : index.toString()}
                             onPress={() => handleOnFriendPress(item)}
                             underlayColor={opacity_colors.secondary_medium}
-                            style={styles.friend_container}
+                            style={[styles.friend_container, dropShadowListContainer]}
                         >
                             <View style={styles.content}>
-                                <ProfileImage friend={true} size='regular' image={item.profileImg} onImagePress={() => handleOnFriendPress(item)} />
-                                <Text style={styles.username}>{item.username}</Text>
+                                <CircleProfileImage friend={true} size='small' image={item.profileImg} onImagePress={() => handleOnFriendPress(item)} />
+                                <BodyText style={styles.username}>{item.username}</BodyText>
                             </View>
                         </TouchableHighlight>
                     )}
@@ -57,15 +59,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
+    flat_list: {
+        paddingBottom: 100
+    },
     friend_container: {
         padding: 10,
         paddingLeft: 110,
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        borderBottomColor: colors.primary,
-        borderTopColor: colors.primary,
         backgroundColor: colors.white,
-        marginBottom: 20
+        marginBottom: 10,
+        shadowColor: "#000"
     },
     content: {
         position: 'relative',
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
     },
     username: {
         marginLeft: 20,
-        fontSize: 16,
+        fontSize: normalize(11),
         color: colors.primary,
         textAlign: 'center'
     }

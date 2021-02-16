@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, StyleProp } from 'react-native';
 import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
-import { Icon, HeaderText } from '../utils';
+import { Icon, HeaderText, UnderlineHeader } from '../utils';
 import { colors, normalize } from '../utils/styles';
+import { windowHeight } from '../../utils/variables';
 
 interface RouteProps {
     props: HomeScreenRouteProp | InvitationsScreenRouteProp | ChatScreenRouteProp | MeScreenRouteProp
@@ -30,14 +31,17 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
             var textStyle: StyleProp<any> = {
                 color: colors.white,
                 textTransform: 'lowercase',
-                fontSize: normalize(16),
+                fontSize: normalize(20),
                 letterSpacing: 2
             };
 
             return (
-                <HeaderText
-                    style={textStyle}
-                >{route.params.title}</HeaderText>
+                <UnderlineHeader
+                    textStyle={textStyle}
+                    height={12}
+                    colorFrom={colors.tertiary}
+                    colorTo={colors.primary}
+                >{route.params.title}</UnderlineHeader>
             )
         }
 
@@ -45,24 +49,26 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
     },
     headerForceInset: { top: 'never', bottom: 'never' },
     headerRight: () => renderHeaderRight(route, navigation),
-    headerStyle: { backgroundColor: colors.lightOrange },
     headerTintColor: colors.primary,
-    headerTitleStyle: { backgroundColor: colors.lightOrange },
     headerBackTitleVisible: false,
     headerTransparent: true,
     cardStyle: {
         backgroundColor: colors.backgroundColor,
-        paddingTop: 90
+        paddingTop: (windowHeight / 12)
     }
 }
 )
+
+function cardPaddingTop() {
+    windowHeight
+}
 
 const styles = StyleSheet.create({
     container: {
         position: 'relative',
     },
     header_text: {
-        fontSize: 16,
+        fontSize: normalize(14),
         color: colors.primary
     },
     underline_header_underline: {

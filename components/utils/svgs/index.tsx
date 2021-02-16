@@ -8,8 +8,14 @@ const bottomSvg = `<svg viewBox="0 0 414 79" fill="none" xmlns="http://www.w3.or
 </svg>
 `
 
-const topSvg = `<svg viewBox="0 0 414 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0 1.5752L0.255829 68.8149L25.6759 75.2105C39.2734 78.6317 53.4384 79.1551 67.2513 76.7468L98.7587 71.2535C109.68 69.3493 120.842 69.2745 131.788 71.032L171.285 77.3739C181.565 79.0245 192.039 79.0596 202.33 77.478L250.676 70.0473C260.342 68.5615 270.174 68.5019 279.858 69.8702L330.551 77.0331C340.984 78.5072 351.583 78.3234 361.958 76.4885L414.253 67.2397L413.997 4.64348e-05L0 1.5752Z" fill="#26BAEE" stroke="#73D2F3" stroke-width='2' />
+const topSvg = `<svg width="414" height="299" viewBox="0 0 414 299" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M415.5 0H0V225C8.5 249.667 61.8 299 207 299C352.2 299 406.5 249.667 415.5 225V0Z" fill="url(#paint0_radial)"/>
+<defs>
+<radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(208 86.5) rotate(90) scale(212.5 695.481)">
+<stop offset="0.130208" stop-color="#26BAEE"/>
+<stop offset="1" stop-color="#26BAEE" stop-opacity="0"/>
+</radialGradient>
+</defs>
 </svg>`
 
 const messageCurvePrimary = `<svg viewBox="0 0 49 67" fill="none" xmlns="http://www.w3.org/2000/svg">

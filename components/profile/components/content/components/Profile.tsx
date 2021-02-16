@@ -2,11 +2,13 @@ import React, { useLayoutEffect, useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { GalleryItemProps } from '../../../../../services/user/types';
 import { CustomButton, BodyText, HeaderText, Icon } from '../../../../utils';
-import ProfileImage from '../../ProfileImage';
+import { CircleProfileImage } from '../../ProfileImage';
 import { colors, normalize } from '../../../../utils/styles';
 import Gallery from '../../../../gallery';
 import { calcDateDiff } from '../../../../../utils/functions';
 import { getGalleryHeight } from '../../../../gallery/utils';
+import { TopProfileBackground } from '../../../../utils/svgs';
+import { windowWidth, windowHeight } from '../../../../../utils/variables';
 
 interface UserProps {
     profileImg: any;
@@ -19,6 +21,7 @@ interface UserProps {
     receivedInvite?: boolean;
     distance?: number;
     updatedAt?: Date;
+    username: string;
 }
 
 export interface ProfileComProps {
@@ -67,41 +70,43 @@ export default ({ user, showInviteModal, showRespondModal, admin, directToMessag
     var height = getGalleryHeight(user.gallery)
 
     return (
-        <View style={{ height: height + 60 }}>
-            <View style={styles.distance}>
-                <BodyText style={styles.text}>About {user.distance ? user.distance : 0} meters away</BodyText>
-            </View>
-            <View style={styles.seen}>
-                <BodyText style={styles.text}>Last seen {dateDiff ? dateDiff : 'now'}</BodyText>
-            </View>
-            <Gallery gallery={user.gallery} key={forceGalUpdate} height={height} />
-            <View style={styles.body} >
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ height: height + 60 }}>
+                <View style={styles.distance}>
+                    <BodyText style={styles.text}>About {user.distance ? user.distance : 0} meters away</BodyText>
+                </View>
+                <View style={styles.seen}>
+                    <BodyText style={styles.text}>Last seen {dateDiff ? dateDiff : 'now'}</BodyText>
+                </View>
+                <Gallery gallery={user.gallery} key={forceGalUpdate} height={height} />
+                <View style={styles.body} >
 
-                <View style={styles.profile}>
+                    <View style={styles.profile}>
 
-                    <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row' }}>
 
-                        <ProfileImage image={user.profileImg} size='large' />
 
-                        <View style={styles.profile_body}>
-                            <HeaderText style={styles.profile_text} >{user.name}</HeaderText>
-                            <BodyText text={`${user.age} years old`} style={styles.sub_profile_text} />
+                            <CircleProfileImage image={user.profileImg} size='regular' friend={user.friend ? true : false} />
+
+                            <View style={styles.profile_body}>
+                                <HeaderText style={styles.profile_text} >{user.name}</HeaderText>
+                                <BodyText text={`${user.age} years old`} style={styles.sub_profile_text} />
+                            </View>
+
+                        </View>
+
+
+                        <View style={styles.header_button}>
+                            {renderButton()}
                         </View>
 
                     </View>
-
-
-                    <View style={styles.header_button}>
-                        {renderButton()}
-                    </View>
-
                 </View>
+                <Icon type='chevrons-right' color={colors.primary} size={30} pressColor={colors.secondary} onPress={showInterview} style={{
+                    position:
+                        'absolute', bottom: 10, right: 20
+                }} />
             </View>
-
-            <Icon type='chevrons-right' color={colors.primary} size={30} pressColor={colors.secondary} onPress={showInterview} style={{
-                position:
-                    'absolute', bottom: 10, right: 0
-            }} />
         </View>
     )
 }
@@ -116,6 +121,12 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%'
     },
+    header_background: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 0
+    },
     distance: {
         position: 'absolute',
         top: -10,
@@ -127,7 +138,7 @@ const styles = StyleSheet.create({
         left: 30
     },
     text: {
-        color: colors.secondary,
+        color: colors.white,
         fontSize: normalize(7)
     },
     body: {

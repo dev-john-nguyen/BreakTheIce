@@ -13,9 +13,10 @@ import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import { CustomButton, BodyText, HeaderText } from '../../utils';
 import { ProfileImgProps } from '../../../services/user/types';
 import { timestamp } from '../../../utils/variables';
-import ProfileImage from '../../profile/components/ProfileImage';
+import { CircleProfileImage } from '../../profile/components/ProfileImage';
 import { update_if_read, search_redux_chat, set_if_read, database_fetch_chat } from './utils';
 import { MessageCurve } from '../../utils/svgs';
+import { sendPushNotification } from '../../../services/notification/actions';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
@@ -97,7 +98,11 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         navigation.setOptions({
             headerTitle: () => (
                 <View style={{ alignItems: 'center' }}>
-                    <ProfileImage size='regular' image={route.params.targetUser.profileImg} />
+                    <CircleProfileImage
+                        size='small'
+                        image={route.params.targetUser.profileImg}
+                        friend={true}
+                    />
                     <HeaderText style={{ color: colors.primary, fontSize: 12 }}>{route.params.targetUser.username}</HeaderText>
                 </View>
             )
@@ -223,6 +228,10 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
         batch.commit()
             .then(() => {
+                const { targetUser } = route.params;
+
+                sendPushNotification(targetUser.uid, user.username, 'newMessage')
+
                 //if chatId is not undefined then a new Chat was created
                 newChatId && setTargetChatDocId(newChatId);
                 setMessageTxt('');

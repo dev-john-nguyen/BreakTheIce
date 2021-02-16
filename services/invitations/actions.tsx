@@ -21,6 +21,9 @@ export const send_invitation = (invitationObj: Omit<InvitationObject, 'docId'>) 
         return
     }
 
+    //send notification to other user
+    sendPushNotification(invitationObj.sentTo.uid, invitationObj.sentBy.username, 'sentInvite');
+
     //will need to update the near user of which the invitation was sent
     dispatch({
         type: SENT_INVITE_NEAR_USER,
@@ -83,18 +86,7 @@ export const set_and_listen_invitations = () => (dispatch: AppDispatch, getState
                 payload: invitationsArr
             })
 
-            const { notification, invitations } = getState()
-
-            // sendPushNotification('dsafdsf', 'New Invitation', 'You have a new invitation');
-
-            // console.log(notification.expoPushToken)
-
-            // if (notification.expoPushToken) {
-            //     sendPushNotification(notification.expoPushToken, 'New Invitation', 'You have a new invitation');
-            // } else {
-            dispatch({ type: SET_INVITATIONS })
-            // }
-
+            dispatch({ type: SET_INVITATIONS, payload: {} })
         },
             err => {
                 console.log(err)

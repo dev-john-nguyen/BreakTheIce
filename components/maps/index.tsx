@@ -11,7 +11,7 @@ import { HomeToChatNavProp } from '../navigation/utils/types';
 import { CustomButton, Icon } from '../utils';
 import Preview from '../profile/components/Preview';
 import InvitationModal from '../modal/invitation';
-import ProfileImage from '../profile/components/ProfileImage';
+import { CircleProfileImage } from '../profile/components/ProfileImage';
 import { FontAwesome } from '@expo/vector-icons';
 import { colors } from '../utils/styles';
 import { InvitationsDispatchActionProps } from '../../services/invitations/types';
@@ -19,6 +19,9 @@ import { update_invitation } from '../../services/invitations/actions';
 import RespondModal from '../modal/respond';
 import UpdateStatus from '../me/components/UpdateStatus';
 import { update_status_message } from '../../services/user/actions';
+import { set_banner } from '../../services/banner/actions';
+import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
+import Refresh from './components/Refresh';
 
 interface RegionProps {
     latitude: number;
@@ -44,7 +47,8 @@ interface MapsProps {
     user: UserRootStateProps;
     update_invitation: InvitationsDispatchActionProps['update_invitation']
     refresh_near_users: NearUsersDispatchActionProps['refresh_near_users']
-    update_status_message: UserDispatchActionsProps['update_status_message']
+    update_status_message: UserDispatchActionsProps['update_status_message'];
+    set_banner: BannerDispatchActionProps['set_banner']
 }
 
 const { width, height } = Dimensions.get('window');
@@ -85,13 +89,21 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             ),
             headerLeft: () => (
                 <View style={{ flexDirection: 'row' }}>
-                    <Icon type='refresh-ccw' style={{ marginLeft: 20 }} size={25} color={colors.primary} pressColor={colors.secondary} onPress={this.props.refresh_near_users} />
-
+                    <Refresh refresh_near_users={this.props.refresh_near_users} />
                     {
-                        this.props.user.hideOnMap &&
-                        (
-                            <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 20 }} />
-                        )
+                        this.props.user.hideOnMap ?
+                            (
+                                <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 20 }} />
+                            ) :
+                            (
+                                <View style={{ marginLeft: 20 }}>
+                                    <CircleProfileImage
+                                        size='small'
+                                        image={this.props.user.profileImg} onImagePress={this.handleViewMe}
+                                        friend={false}
+                                    />
+                                </View>
+                            )
                     }
                 </View>
 
@@ -160,8 +172,9 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             region={this.state.region}
             onRegionChangeComplete={this.handleOnRegionChangeComplete}
             showsUserLocation={true}
-            followsUserLocation={true}
+            // followsUserLocation={true}
             onPress={(e) => console.log(e.nativeEvent)}
+
         >
             {
                 <Marker
@@ -186,7 +199,11 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                             style={{ width: 'auto', height: 'auto' }}
                             onPress={() => this.handleMarkerOnPress(nearUser)}
                         >
-                            <ProfileImage friend={nearUser.friend} size='small' image={nearUser.profileImg} />
+                            <CircleProfileImage
+                                friend={nearUser.friend}
+                                size='small'
+                                image={nearUser.profileImg}
+                            />
                         </Marker>
                     )
                 })
@@ -219,6 +236,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                         user={user}
                         handleClose={this.handleClosePrevieMe}
                         update_status_message={this.props.update_status_message}
+                        set_banner={this.props.set_banner}
                     />
                     : previewUser &&
                     <View style={styles.preview_container}>
@@ -235,7 +253,8 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                         />
                     </View>
                 }
-                <CustomButton text='View Me' type='primary' onPress={this.handleViewMe} moreStyles={styles.view_me} />
+                {/* <CustomButton text='View Me' type='primary' onPress={this.handleViewMe} moreStyles={styles.view_me} /> */}
+
             </View>
         )
     }
@@ -254,7 +273,7 @@ const styles = StyleSheet.create({
     },
     view_me: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 100,
         right: 10
     },
     refresh: {
@@ -276,4 +295,4 @@ const mapStateToProps = (state: RootProps) => ({
     allUsers: state.nearUsers.all
 })
 
-export default connect(mapStateToProps, { validate_near_users, update_invitation, refresh_near_users, update_status_message })(Maps);
+export default connect(mapStateToProps, { validate_near_users, update_invitation, refresh_near_users, update_status_message, set_banner })(Maps);

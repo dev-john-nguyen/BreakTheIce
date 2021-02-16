@@ -1,198 +1,156 @@
-import * as React from 'react';
-import {
-    Text,
-    View,
-    StyleSheet,
-    TextInput,
-    Picker,
-} from 'react-native';
-import * as FirebaseRecaptcha from 'expo-firebase-recaptcha';
-import firebase from 'firebase';
-import { firebaseConfig } from '../../services/firebase';
-import { CustomButton, BodyText, HeaderText } from '../utils';
-import { colors } from '../utils/styles';
-
-export default function PhoneAuthScreen() {
-    const recaptchaVerifier = React.useRef(null);
-    const verificationCodeTextInput = React.useRef<any>(null);
-    const [phoneNumber, setPhoneNumber] = React.useState('');
-    const [verificationId, setVerificationId] = React.useState('');
-    const [ctryCode, setCtryCode] = React.useState<string>('+1')
-    const [verifyError, setVerifyError] = React.useState<{ message: string }>();
-    const [verifyInProgress, setVerifyInProgress] = React.useState(false);
-    const [verificationCode, setVerificationCode] = React.useState('');
-    const [confirmError, setConfirmError] = React.useState<{ message: string }>();
-    const [confirmInProgress, setConfirmInProgress] = React.useState(false);
-    const isConfigValid = !!firebaseConfig.apiKey;
+import React, { useState, useRef, useEffect } from 'react';
+import { View, StyleSheet, ImageBackground, Animated } from 'react-native';
+import { Item1, Item2, Item3, Item4 } from './svg';
+import { colors, normalize, dropShadow } from '../utils/styles';
+import { UnderlineHeader, CustomButton, Icon, HeaderText } from '../utils';
+import LoginForm from './components/LoginForm';
 
 
-    if (verificationId) {
-        return (
-            <View style={styles.container}>
-                <View style={styles.content}>
-                    <BodyText
-                        style={styles.title}
-                    >Enter Verification Code</BodyText>
-                    <TextInput
-                        ref={verificationCodeTextInput}
-                        style={styles.textInput}
-                        editable={!!verificationId}
-                        keyboardType='numeric'
-                        placeholder="123456"
-                        onChangeText={(verificationCode: string) => setVerificationCode(verificationCode)}
-                    />
-                    <CustomButton
-                        text="Confirm"
-                        type={!verificationCode ? 'disabled' : 'primary'}
-                        disabled={!verificationCode}
-                        indicatorColor={confirmInProgress && colors.white}
-                        moreStyles={styles.button}
-                        onPress={async () => {
-                            try {
-                                setConfirmError(undefined);
-                                setConfirmInProgress(true);
-                                const credential = firebase.auth.PhoneAuthProvider.credential(
-                                    verificationId,
-                                    verificationCode
-                                );
-                                await firebase.auth().signInWithCredential(credential);
-                                // setConfirmInProgress(false);
-                                // setVerificationId('');
-                                // setVerificationCode('');
-                                // verificationCodeTextInput.current?.clear();
-                                // Alert.alert('Phone authentication successful!');
-                            } catch (err) {
-                                setConfirmError(err);
-                                setConfirmInProgress(false);
-                            }
-                        }}
-                    />
-                    <CustomButton
-                        text="Try again."
-                        type='secondary'
-                        onPress={() => setVerificationId('')}
-                        moreStyles={styles.button}
-                    />
-                    {confirmError && <Text style={styles.error}>{`Error: ${confirmError.message}`}</Text>}
-                </View>
-            </View>
-        )
+export default () => {
+    const [login, setLogin] = useState(false);
+    const fadeAdmin = useRef(new Animated.Value(0)).current
+
+    useEffect(() => {
+
+    }, [])
+
+    const handleLogin = () => {
+        Animated.timing(fadeAdmin, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: false
+        }).start(() => {
+            setLogin(false)
+        })
     }
+
+    const handleShow = () => {
+        setLogin(true)
+        Animated.timing(fadeAdmin, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: false
+        }).start()
+    }
+
+    const renderLogin = () => (
+        <Animated.View style={[styles.modal, {
+            opacity: fadeAdmin
+        }]}>
+            <View style={[styles.modal_content, dropShadow]}>
+                <UnderlineHeader
+                    textStyle={styles.modal_header}
+                    height={12}
+                    colorFrom={colors.primary}
+                    colorTo={colors.tertiary}
+                >Sign In</UnderlineHeader>
+                <LoginForm />
+                <Icon type='x' size={20} color={colors.black} style={{ position: 'absolute', right: 10, top: 10 }} onPress={handleLogin} />
+            </View>
+        </Animated.View>
+    )
 
     return (
         <View style={styles.container}>
-            <View style={styles.content}>
-                <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
-                    ref={recaptchaVerifier}
-                    firebaseConfig={firebaseConfig}
-                    attemptInvisibleVerification={true}
-                />
-                <HeaderText
-                    style={styles.title}
-                >Enter Phone Number</HeaderText>
-                <View style={styles.phone_form}>
-                    <Picker
-                        enabled={false}
-                        selectedValue={ctryCode}
-                        onValueChange={(text) => setCtryCode(text)}
-                        style={styles.picker}
-                        itemStyle={styles.picker_item}
-                    >
-                        <Picker.Item label='+1' value='+1' />
-                    </Picker>
-                    <TextInput
-                        style={styles.textInput}
-                        autoFocus={isConfigValid}
-                        autoCompleteType="tel"
-                        keyboardType="phone-pad"
-                        textContentType="telephoneNumber"
-                        placeholder="+1 999 999 9999"
-                        editable={!verificationId}
-                        onChangeText={(phoneNumber: string) => setPhoneNumber(phoneNumber)}
-                    />
+            {login && renderLogin()}
+            <ImageBackground
+                source={require('./header-image.jpg')}
+                style={{
+                    flex: .8,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+            >
+
+                <UnderlineHeader
+                    textStyle={styles.header}
+                    height={12}
+                    colorFrom={colors.primary}
+                    colorTo={colors.tertiary}
+                >Break The Ice</UnderlineHeader>
+            </ImageBackground>
+
+            <View style={{ flex: 1 }}>
+                <View style={styles.section}>
+                    <View style={{ flex: 1 }}>
+                        <Item1 />
+                    </View>
+                    <View style={{ flex: 1 }} />
                 </View>
-                <CustomButton
-                    text={`${verificationId ? 'Resend' : 'Send'} Verification Code`}
-                    indicatorColor={verifyInProgress && colors.white}
-                    disabled={!phoneNumber}
-                    type={!phoneNumber ? 'disabled' : 'primary'}
-                    onPress={async () => {
-                        const phoneProvider = new firebase.auth.PhoneAuthProvider();
-                        try {
-                            setVerifyError(undefined);
-                            setVerifyInProgress(true);
-                            setVerificationId('');
-                            const formattedPhoneNum = ctryCode + phoneNumber.replace(/[^0-9]/g, '');
-                            const verificationId = await phoneProvider.verifyPhoneNumber(
-                                formattedPhoneNum,
-                                // @ts-ignore
-                                recaptchaVerifier.current
-                            );
-                            setVerifyInProgress(false);
-                            setVerificationId(verificationId);
-                            verificationCodeTextInput.current?.focus();
-                        } catch (err) {
-                            console.log(err)
-                            setVerifyError(err);
-                            setVerifyInProgress(false);
-                        }
-                    }}
-                />
-                {verifyError && <Text style={styles.error}>{verifyError.message}</Text>}
+                <View style={styles.section}>
+                    <View style={styles.button_container}>
+                        <View>
+                            <CustomButton type='primary' text='Login' onPress={handleShow} />
+                        </View>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Item2 />
+                    </View>
+                </View>
+                <View style={styles.section}>
+                    <View style={{ flex: 1 }}>
+                        <Item3 />
+                    </View>
+                    <View style={styles.button_container}>
+                        <View>
+                            <CustomButton type='secondary' text='Sign Up' onPress={handleShow} />
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.section}>
+                    <View style={{ flex: 1 }} />
+                    <View style={{ flex: 1 }}>
+                        <Item4 />
+                    </View>
+                </View>
             </View>
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 0,
-        justifyContent: 'center'
+        justifyContent: 'space-evenly',
+        zIndex: 0
     },
-    content: {
-        alignItems: 'center'
+    header: {
+        alignSelf: 'center',
+        fontSize: normalize(25),
+        color: colors.white
     },
-    title: {
-        marginBottom: 10,
-        fontSize: 20,
-        color: colors.primary
-    },
-    phone_form: {
+    section: {
         flexDirection: 'row',
+        flex: 1,
+        margin: 10
+    },
+    button_container: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
-    picker: {
-        flexBasis: '20%',
+    modal: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        paddingTop: 100,
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 10
     },
-    picker_item: {
-        fontSize: 12,
-        height: 100,
+    modal_content: {
+        backgroundColor: colors.white,
+        height: '50%',
+        width: '80%',
+        minHeight: 400,
+        minWidth: 300,
+        borderRadius: 20,
+        padding: 30,
+        zIndex: 100
     },
-    subtitle: {
-        marginBottom: 10,
-        opacity: 0.35,
-        fontWeight: 'bold',
-    },
-    text: {
-        marginTop: 10,
-        marginBottom: 4,
-    },
-    textInput: {
-        fontSize: 17,
-        borderBottomColor: colors.primary,
-        padding: 10,
-        borderBottomWidth: 1,
-        marginBottom: 10,
-        minWidth: 160
-    },
-    error: {
-        marginTop: 10,
-        fontWeight: 'bold',
-        color: 'red',
-    },
-    button: {
-        marginTop: 10
+    modal_header: {
+        alignSelf: 'center',
+        fontSize: normalize(20),
+        color: colors.primary
     }
-});
+})

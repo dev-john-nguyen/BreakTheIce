@@ -1,18 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Picker, StyleSheet } from 'react-native';
-import { likesQuestions, carrerQuestions, familyQuestions, valuesQuestions } from './utils'
-import { CustomInput, CustomButton, BodyText, HeaderText } from '../../../../utils';
-import { colors } from '../../../../utils/styles';
+import { likesQuestions, carrerQuestions, familyQuestions, valuesQuestions, interviewKeys } from './utils'
+import { CustomInput, BodyText, HeaderText } from '../../../../utils';
+import { colors, normalize, dropShadowListContainer } from '../../../../utils/styles';
 import { InterviewProps } from '../../../../../services/user/types';
 
 interface QuestionProps {
     setInterviewVals: (interview: InterviewProps) => void;
     interviewVals: InterviewProps;
 }
-
-type InterviewKeys = keyof InterviewProps
-
-const interviewKeys: InterviewKeys[] = ['likes', 'career', 'family', 'values']
 
 export default (props: QuestionProps) => {
     return (
@@ -50,7 +46,7 @@ export default (props: QuestionProps) => {
                                     ...props.interviewVals,
                                     [type]: [Q, props.interviewVals[type][1]]
                                 })}
-                                style={styles.picker_container}
+                                style={[styles.picker_container, dropShadowListContainer]}
                                 itemStyle={styles.picker_item}
                             >
                                 {questionsArr.map((question, index) => (
@@ -89,37 +85,37 @@ const styles = StyleSheet.create({
     header: {
         alignSelf: 'center',
         alignItems: 'center',
-        marginBottom: 20
+        marginBottom: 50
     },
     header_text: {
-        fontSize: 14,
-        marginBottom: 5
+        fontSize: normalize(15),
+        marginBottom: 10,
+        color: colors.black
     },
     header_sub_text: {
-        fontSize: 12
+        fontSize: normalize(10),
+        color: colors.black
     },
     question_container: {
-        marginBottom: 20
+        marginBottom: 50
     },
     question_text: {
-        fontSize: 12,
+        fontSize: normalize(10),
         textAlign: 'center',
         marginBottom: 20,
     },
     input: {
-        borderWidth: 1,
-        borderColor: colors.tertiary,
-        borderRadius: 5
+        backgroundColor: colors.white,
+        borderRadius: 10
     },
     picker_container: {
         width: '100%',
-        borderRadius: 100,
+        borderRadius: 10,
         alignSelf: 'center',
         marginBottom: 20,
-        borderWidth: 1,
-        borderColor: colors.tertiary
+        backgroundColor: colors.white
     },
     picker_item: {
-        fontSize: 12
+        fontSize: normalize(10)
     }
 })

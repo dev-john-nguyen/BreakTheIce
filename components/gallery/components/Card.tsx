@@ -1,10 +1,10 @@
 
 import React, { useRef } from 'react';
 import { View, Animated, PanResponder, StyleSheet } from 'react-native';
-import { windowWidth, windowHeight } from '../../../utils/variables';
+import { windowWidth } from '../../../utils/variables';
 import { GalleryItemProps } from '../../../services/user/types';
 import { BodyText } from '../../utils';
-import { colors, drop_shadow, opacity_colors } from '../../utils/styles';
+import { colors, dropShadow, opacity_colors, normalize } from '../../utils/styles';
 import { PinchGestureHandler, PinchGestureHandlerStateChangeEvent, State } from 'react-native-gesture-handler';
 import { BlurView } from 'expo-blur';
 import { ImageWidth } from '../utils';
@@ -126,7 +126,7 @@ export default ({ item, index, uri, topRef, handleUpdateAnimatedRef, galleryLen,
             {...panResponder.panHandlers}
             style={[
                 styles.container,
-                drop_shadow,
+                dropShadow,
                 {
                     transform: [{ translateX: pan.x }, { translateY: pan.y }],
                     zIndex: zIndexRef,
@@ -154,7 +154,7 @@ export default ({ item, index, uri, topRef, handleUpdateAnimatedRef, galleryLen,
                         ]}
                     />
                     {!!item.description &&
-                        <Animated.View style={[styles.text_container, drop_shadow, { opacity: opacityRef }]}>
+                        <Animated.View style={[styles.text_container, dropShadow, { opacity: opacityRef }]}>
                             <BlurView style={styles.text_blur} intensity={70}>
                                 <View style={styles.text_content} >
                                     <BodyText style={styles.text}>{item.description}</BodyText>
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: colors.white,
-        fontSize: 14
+        fontSize: normalize(12)
     }
 })
 

@@ -1,4 +1,4 @@
-import { UserProfilePreviewProps } from "../user/types";
+import { UserProfilePreviewProps, UpdateUserProfileProps, NewProfileImgProps, NewGalleryItemProps, InterviewProps } from "../user/types";
 
 export interface SignUpValuesProps {
     email: string;
@@ -15,9 +15,11 @@ export interface InitFormValues {
 }
 
 export interface InitUserProps extends Omit<UserProfilePreviewProps, 'location' | 'updatedAt'> {
-    gallery: []
+    gallery: [],
+    name: string
 }
 
 export interface SigninDispatchActionProps {
     init_user: (userFormValues: InitFormValues) => Promise<void | undefined | boolean>;
+    init_account: (interview: InterviewProps, profileImg: NewProfileImgProps | undefined, gallery: NewGalleryItemProps[]) => Promise<void | undefined>
 }

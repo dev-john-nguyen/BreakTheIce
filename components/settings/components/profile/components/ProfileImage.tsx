@@ -7,9 +7,9 @@ import { hashCode } from '../../../../../utils/functions';
 import { galleryImgSizeLimit } from '../../../../../utils/variables';
 import { Icon } from '../../../../utils';
 import { colors } from '../../../../utils/styles';
-import ProfileImage from '../../../../profile/components/ProfileImage';
+import { CircleProfileImage } from '../../../../profile/components/ProfileImage';
 
-interface EditProfileImage {
+export interface EditProfileImage {
     set_banner: BannerDispatchActionProps['set_banner'];
     profileImg: ProfileImgProps | null;
     imgObj?: NewProfileImgProps;
@@ -69,7 +69,7 @@ export default ({ set_banner, profileImg, imgObj, setImgObj, handleCameraRollPer
 
     return (
         <>
-            <ProfileImage image={imgObj ? imgObj : profileImg} size='large' />
+            <CircleProfileImage image={imgObj ? imgObj : profileImg} size='regular' friend={false} />
             <Icon size={15} type="edit" color={colors.primary} pressColor={colors.secondary} onPress={pickImage} />
         </>
     )

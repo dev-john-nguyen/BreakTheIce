@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { TopProfileBackground } from '../../../utils/svgs';
-import { windowWidth } from '../../../../utils/variables';
+import { windowWidth, windowHeight } from '../../../../utils/variables';
 import Profile, { ProfileComProps } from './components/Profile';
 import Interview, { InterviewComProps } from './components/Interview';
+import { colors } from '../../../utils/styles';
+import { HeaderText } from '../../../utils';
 
 interface ContentProps extends Omit<ProfileComProps, 'showInterview' | 'user'> {
     user: ProfileComProps['user'] & { interview: InterviewComProps['interview'] }
@@ -51,8 +53,8 @@ export default ({ user, directToMessage, directToFriends, admin, showInviteModal
     }
 
     return (
-        <>
-            <TopProfileBackground style={styles.header_background} height={'14%'} width={windowWidth.toString()} />
+        <View style={{ flex: 1, position: 'relative' }}>
+            <TopProfileBackground style={styles.header_background} height={'40%'} width={windowWidth.toString()} />
             <Animated.View style={{
                 flex: 1, flexDirection: 'row',
                 right: profileAdmin.interpolate({
@@ -78,22 +80,24 @@ export default ({ user, directToMessage, directToFriends, admin, showInviteModal
                     />
                 </View>
             </Animated.View>
-        </>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 0,
-        paddingLeft: 10,
-        paddingRight: 10,
+        // paddingTop: 0,
+        // paddingLeft: 10,
+        // paddingRight: 10,
         justifyContent: 'center',
         position: 'relative',
         height: '100%',
         width: '100%'
     },
     header_background: {
-        top: -5,
-        left: 0
-    }
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 0
+    },
 })

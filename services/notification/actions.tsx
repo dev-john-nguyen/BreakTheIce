@@ -1,33 +1,41 @@
-import { SET_EXPO_PUSH_TOKEN, REMOVE_EXPO_PUSH_TOKEN } from './actionTypes';
+import { myFire } from '../firebase';
 
-export const set_expo_push_token = (expoPushToken: string) => ({
-    type: SET_EXPO_PUSH_TOKEN,
-    payload: expoPushToken
-})
+const notificationTypes = {
+    sentInvite: 'sentInvite',
+    newFriend: 'newFriend',
+    nearBy: 'nearBy',
+    newMessage: 'newMessage'
+}
 
-export const remove_expo_push_token = () => ({
-    type: REMOVE_EXPO_PUSH_TOKEN
-})
+type TypeProps = keyof typeof notificationTypes
 
 
-export const sendPushNotification = async (expoPushToken: string, title: string, body: string) => {
-    console.log(expoPushToken)
-    const message = {
-        to: 'ExponentPushToken[mOgp07Oh7dEn7EZaK05ExJ]',
-        sound: 'default',
-        title,
-        body,
-        ios: { _displayInForeground: true },
-        data: { someData: null },
-    };
+export const sendPushNotification = async (sentToId: string, sentByUsername: string, type: TypeProps) => {
 
-    await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Accept-encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(message),
-    });
+
+    const user = myFire.auth().currentUser
+
+    if (!user) return false
+
+    const idToken = await user.getIdToken()
+
+    try {
+        await fetch('http://10.0.0.18:5050/notification', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + idToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sentToId: sentToId,
+                sentByUsername: sentByUsername,
+                type
+            })
+        })
+
+    } catch (err) {
+        console.log(err)
+    }
+
 }
