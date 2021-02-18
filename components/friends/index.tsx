@@ -3,7 +3,7 @@ import { View, FlatList, TouchableHighlight, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { FriendsRootProps, FriendObjProps } from '../../services/friends/types';
-import { MeStackNavigationProp } from '../navigation/utils/types';
+import { MeStackNavigationProp } from '../navigation';
 import { colors, opacity_colors, normalize, dropShadowListContainer } from '../utils/styles';
 import { CircleProfileImage } from '../profile/components/ProfileImage';
 import Empty from '../utils/components/Empty';

@@ -50,7 +50,7 @@ export const set_and_listen_near_users = (ctryStateCity: CtryStateCityProps, new
 
                 var userData: NearByUsersProps = {
                     uid: doc.id,
-                    username,
+                    username: username.toLowerCase(),
                     location,
                     statusMsg,
                     age,

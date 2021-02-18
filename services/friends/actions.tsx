@@ -33,7 +33,7 @@ export const set_and_listen_friends = () => (dispatch: AppDispatch, getState: ()
                         uid: doc.id,
                         dateCreated: friend.dateCreated,
                         active: friend.active,
-                        username: friend.username,
+                        username: friend.username.toLowerCase(),
                         profileImg: null
                     }
 

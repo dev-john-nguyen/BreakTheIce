@@ -2,6 +2,7 @@
   "expo": {
     "name": "BreakTheIce",
     "slug": "breaktheice",
+    "privacy": "unlisted",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,11 +18,12 @@
       "assets/images/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Break The Ice uses your location to identify users near you.",
         "NSPhotoLibraryUsageDescription": "Break The Ice access photo library for users usage only to select photos for their profile."
-      }
+      },
+      "bundleIdentifier": "com.nguyening20.breaktheice"
     },
     "android": {
       "adaptiveIcon": {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Dimensions, View } from "react-native"
+import { StyleSheet, Dimensions, View, StyleProp } from "react-native"
 import Item from './components/Item';
-import { bannerStyles } from '../../styles';
 import { BannerDispatchActionProps, BannerItemProps } from '../../../../services/banner/tsTypes';
-import { windowHeight } from '../../../../utils/variables';
+import { windowHeight, windowWidth } from '../../../../utils/variables';
+import { normalize, colors } from '../../styles';
 
 interface BannerProps {
     remove_banner: BannerDispatchActionProps['remove_banner']
@@ -26,6 +26,42 @@ export default ({ remove_banner, banner }: BannerProps) => {
     )
 }
 
+const bannerStyles = (type: string) => {
+    interface StylesProps {
+        container: StyleProp<any>
+        text: StyleProp<any>
+    }
+
+    var styles: StylesProps = {
+        container: {
+            padding: 15,
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        text: {
+            fontSize: normalize(11),
+            letterSpacing: .5,
+            textTransform: 'capitalize',
+            marginLeft: 10,
+            width: (windowWidth / 1.2)
+        }
+    }
+
+    switch (type) {
+        case 'warning':
+            styles.container.backgroundColor = colors.yellow
+            styles.text.color = colors.white
+            break;
+        case 'error':
+            styles.container.backgroundColor = colors.red
+            styles.text.color = colors.white
+            break;
+        default:
+            styles.container.backgroundColor = colors.green
+            styles.text.color = colors.white
+    }
+    return styles
+}
 
 
 const styles = StyleSheet.create({

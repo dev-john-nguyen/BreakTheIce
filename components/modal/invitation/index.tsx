@@ -93,6 +93,9 @@ const InviteModal = ({ visible, handleClose, send_invitation, targetUser, user }
                     <View style={styles.center_view}>
                         <View style={styles.modal_view}>
                             <UnderlineHeader
+                                height={10}
+                                colorTo={colors.secondary}
+                                colorFrom={colors.primary}
                                 style={{ marginTop: 10 }}
                                 textStyle={styles.header_text}
                             >Break The Ice</UnderlineHeader>

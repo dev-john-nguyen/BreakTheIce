@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { View, FlatList, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
-import { InvitationsStackNavigationProp } from '../navigation/utils/types';
+import { InvitationsStackNavigationProp } from '../navigation';
 import { InvitationsRootProps, InvitationObject, InvitationsDispatchActionProps, InvitationStatusOptions } from '../../services/invitations/types';
 import { update_invitation_from_invitations } from '../../services/invitations/actions';
 import { colors, dropShadowListContainer, normalize } from '../utils/styles';
@@ -53,7 +53,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     const renderRightActions = (progress: Animated.AnimatedInterpolation) => {
         const trans = progress.interpolate({
             inputRange: [0, .4, .5, 1],
-            outputRange: [0, -50, -150, -350],
+            outputRange: [0, -50, -150, -300],
         });
 
         return (
@@ -72,7 +72,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     const renderLeftActions = (progress: Animated.AnimatedInterpolation) => {
         const trans = progress.interpolate({
             inputRange: [0, .4, .5, 1],
-            outputRange: [0, 50, 150, 350],
+            outputRange: [0, 50, 150, 300],
         });
 
         return (
@@ -99,7 +99,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
-                <Icon type='arrow-right-circle' size={30} color={colors.white} pressColor={colors.white} />
+                <Icon type='arrow-right-circle' size={40} color={colors.white} pressColor={colors.white} />
             </Animated.View>
         )
     }
@@ -134,8 +134,8 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
                                 </View>
                             </View>
                             <View style={styles.content_section}>
-                                <View style={styles.topLeft}>
-                                    <BodyText style={styles.topLeft_text}>{item.createdAt && renderDate(item.createdAt)}</BodyText>
+                                <View style={styles.topRight}>
+                                    <BodyText style={styles.topRight_text}>{item.createdAt && renderDate(item.createdAt)}</BodyText>
                                 </View>
                                 <BodyText style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</BodyText>
                             </View>
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flexDirection: 'row',
-        marginTop: 20
+        marginBottom: 20
     },
     swipe_container: {
         width: '100%',
@@ -226,13 +226,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center'
     },
-    topLeft: {
+    topRight: {
         position: 'absolute',
         top: 5,
-        left: 5,
+        right: 10,
     },
-    topLeft_text: {
-        fontSize: normalize(6),
+    topRight_text: {
+        fontSize: normalize(8),
         color: colors.primary
     },
 })

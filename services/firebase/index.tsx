@@ -18,6 +18,7 @@ export const firebaseConfig: any = {
 export const myFire = !fb.apps.length ? fb.initializeApp(firebaseConfig) : fb.app();
 export const fireDb = myFire.firestore();
 export const fireStorage = myFire.storage();
+export const realDb = myFire.database();
 
 // Initialize Firebase
 // export const firebase = () => {

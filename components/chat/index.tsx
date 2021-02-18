@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleProp, StyleSheet, Animated, Pressable } from 'react-native';
 import { colors, opacity_colors, dropShadowListContainer, normalize } from '../utils/styles';
 import { connect } from 'react-redux';
-import { ChatStackNavigationProp } from '../navigation/utils/types'
+import { ChatStackNavigationProp } from '../navigation'
 import { RootProps } from '../../services';
 import { ChatPreviewProps, ChatDispatchActionsProps } from '../../services/chat/types'
 import { ListProfileImage } from '../profile/components/ProfileImage';
@@ -124,9 +124,9 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
                                 </View>
                                 <View style={list_style.content_section}>
                                     <BodyText style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</BodyText>
-                                    <View style={list_style.content_section_small}>
-                                        <BodyText style={list_style.content_section_small_text}>{calcDateDiff(item.dateSent)}</BodyText>
-                                    </View>
+                                </View>
+                                <View style={list_style.top_right}>
+                                    <BodyText style={list_style.top_right_text}>{calcDateDiff(item.dateSent)}</BodyText>
                                 </View>
                             </Pressable>
                         </Swipeable>
@@ -163,8 +163,7 @@ const styles = StyleSheet.create({
 
 const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
     container: {
-        position: 'relative',
-        marginTop: 20,
+        position: 'relative'
     },
     content_container: {
         flex: 1,
@@ -211,12 +210,13 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center'
     },
-    content_section_small: {
-        alignSelf: 'flex-end',
-        flexDirection: 'row'
+    top_right: {
+        position: 'absolute',
+        top: 5,
+        right: 10
     },
-    content_section_small_text: {
-        fontSize: 8,
+    top_right_text: {
+        fontSize: normalize(8),
         color: colors.primary,
         margin: 5
     }

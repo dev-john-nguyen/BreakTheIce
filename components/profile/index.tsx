@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation/utils/types';
+import { ProfileScreenRouteProp, RootBottomParamList, HomeStackNavigationProp } from '../navigation';
 import { colors } from '../utils/styles';
 import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';

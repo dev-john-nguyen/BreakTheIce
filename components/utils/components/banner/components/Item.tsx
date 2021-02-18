@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleProp } from "react-native"
 import { BannerDispatchActionProps, BannerItemProps } from '../../../../../services/banner/tsTypes';
-import { BodyText } from '../../..';
+import { BodyText, Icon } from '../../..';
+import { colors } from '../../../styles';
 
 interface ItemProps {
     item: BannerItemProps;
@@ -60,6 +61,7 @@ export default ({ item, styles, remove_banner }: ItemProps) => {
                 }
             ]}
         >
+            <Icon type='alert-circle' size={24} color={colors.white} />
             <BodyText style={styles.text}>{item.message}</BodyText>
         </Animated.View>
     )

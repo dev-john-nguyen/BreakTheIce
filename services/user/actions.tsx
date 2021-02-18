@@ -8,7 +8,7 @@ import { validate_near_users, reset_near_users } from '../near_users/actions';
 import * as Location from 'expo-location';
 import { RootProps } from '..';
 import { locationSpeedToUpdate, locationDistanceIntervalToUpdate, UsersDb, timestamp, LocationsDb, FriendsDb } from '../../utils/variables'
-import { fireStorage, fireDb, myFire } from '../firebase';
+import { fireStorage, fireDb, myFire, realDb } from '../firebase';
 import firebase from 'firebase';
 import { cacheImage } from '../../utils/functions';
 import { reset_chat } from '../chat/actions';
@@ -55,7 +55,7 @@ export const verifyAuth = (): any => (dispatch: AppDispatch) => {
                         }
 
                         //set banner if profile information has not be initiated
-                        if (!statusMsg || !bioLong) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
+                        // if (!statusMsg) dispatch(set_banner('Please complete your profile under settings, so other users can know more about you.', 'success'))
 
                         dispatch({ type: SET_USER, payload: fetchedUser.profile });
                     } else {
@@ -375,7 +375,10 @@ export const sign_out = () => async (dispatch: AppDispatch, getState: () => Root
 
     //remove notification token
     try {
-        await fireDb.collection(UsersDb).doc(uid).collection('Token').doc(uid).delete()
+        await realDb.ref(`tokens/${uid}/notification/`).remove()
+            .catch((err) => {
+                console.log(err)
+            })
     } catch (err) {
         console.log(err)
         dispatch(set_banner('Oops! Something happened trying to sign out', 'error'))

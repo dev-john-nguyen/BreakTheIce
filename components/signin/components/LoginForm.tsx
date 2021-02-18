@@ -10,10 +10,15 @@ import * as FirebaseRecaptcha from 'expo-firebase-recaptcha';
 import firebase from 'firebase';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import { firebaseConfig, fireDb } from '../../../services/firebase';
+import { firebaseConfig, realDb } from '../../../services/firebase';
 import { UsersDb, timestamp } from '../../../utils/variables';
 import { BodyText, CustomButton } from '../../utils';
 import { colors, normalize } from '../../utils/styles';
+
+
+/*
+expoPushToken is updated in realDb when logged in is successful
+*/
 
 export default () => {
     const recaptchaVerifier = React.useRef(null);
@@ -27,6 +32,7 @@ export default () => {
     const [confirmError, setConfirmError] = React.useState<{ message: string }>();
     const [confirmInProgress, setConfirmInProgress] = React.useState(false);
     const isConfigValid = !!firebaseConfig.apiKey;
+
 
     const handleLoginProcess = async () => {
         try {
@@ -46,7 +52,7 @@ export default () => {
             const uid = userCred.user.uid
 
             if (token) {
-                fireDb.collection(UsersDb).doc(uid).collection('Token').doc(uid).set({
+                realDb.ref(`tokens/${uid}/notification/`).set({
                     expoPushToken: token,
                     timestamp: timestamp,
                     updatedAt: new Date()

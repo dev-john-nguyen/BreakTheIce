@@ -26,7 +26,7 @@ export default ({ showProfile, interview }: InterviewComProps) => {
                     <View style={styles.content_container}>
                         {
                             isEmpty(interview) ?
-                                <HeaderText style={styles.empty}>Interview hasn't taken place yet.</HeaderText> :
+                                <HeaderText style={styles.empty}>Empty</HeaderText> :
                                 interviewKeys.map((type, index) => {
                                     return (
                                         <View style={styles.interview_container} key={index}>

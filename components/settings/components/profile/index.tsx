@@ -4,7 +4,7 @@ import { colors, dropShadowListContainer, normalize } from '../../../utils/style
 import { Feather } from '@expo/vector-icons';
 import { UpdateUserProfileProps, UserDispatchActionsProps, UserRootStateProps, NewProfileImgProps, InterviewProps } from '../../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../../services/banner/tsTypes';
-import { MeStackNavigationProp } from '../../../navigation/utils/types';
+import { MeStackNavigationProp } from '../../../navigation';
 import { isEqual, isEmpty } from 'lodash';
 import EditProfileImg from './components/ProfileImage';
 import { ageArr } from '../../../../utils/variables';
@@ -84,9 +84,9 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
 
     const handleValidation = (formVals: UpdateUserProfileProps) => {
 
-        const { name, statusMsg, bioLong, age, gender, interview } = user;
+        const { name, statusMsg, age, interview } = user;
 
-        var oldVals = { name, statusMsg, bioLong, age, gender, interview };
+        var oldVals = { name, statusMsg, age, interview };
 
         if (isEqual(oldVals, formVals)) {
             if (mount.current) {
@@ -96,18 +96,30 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
             return false
         }
 
-        let key: keyof typeof profileVals;
-
-        for (key in profileVals) {
-            if (!profileVals[key]) {
-                if (mount.current) {
-                    set_banner('Please ensure all fields are filled out.', 'error')
-                    setLoading(false)
-                }
-                return false
-            }
-
+        if (isEmpty(name)) {
+            set_banner("Your name cannot be empty. Please try again.", "error")
+            setLoading(false)
+            return;
         }
+
+        if (isEmpty(age) || age < 0) {
+            set_banner("Invalid age. Please try again.", "error")
+            setLoading(false)
+            return;
+        }
+
+        // let key: keyof typeof profileVals;
+
+        // for (key in profileVals) {
+        //     if (!profileVals[key]) {
+        //         if (mount.current) {
+        //             set_banner('Please ensure all fields are filled out.', 'error')
+        //             setLoading(false)
+        //         }
+        //         return false
+        //     }
+
+        // }
 
         return true
     }
@@ -176,7 +188,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                 style={[styles.text_input, dropShadowListContainer]} />
                         </View>
 
-                        <View style={styles.text_input_container}>
+                        {/* <View style={styles.text_input_container}>
                             <BodyText style={styles.text_input_label}>Brief summary about yourself</BodyText>
                             <BodyText style={styles.text_input_info}>
                                 <Feather name="info" size={10} color={colors.primary} /> 200 character limit.
@@ -188,7 +200,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                 value={profileVals.bioLong}
                                 onChangeText={(text) => setProfileVals({ ...profileVals, bioLong: text })}
                                 style={[styles.text_input, dropShadowListContainer]} />
-                        </View>
+                        </View> */}
 
                         <View style={styles.pickers_container}>
                             <View style={styles.text_input_container}>
@@ -207,7 +219,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                             </View>
 
 
-                            <View style={styles.text_input_container}>
+                            {/* <View style={styles.text_input_container}>
                                 <BodyText style={styles.text_input_label}>Gender:</BodyText>
                                 <Picker
                                     enabled={false}
@@ -222,7 +234,7 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
                                     <Picker.Item label='Woman' value='woman' />
                                     <Picker.Item label="Other" value='other' />
                                 </Picker>
-                            </View>
+                            </View> */}
                         </View>
 
                         <Questions
@@ -246,7 +258,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     scrollView: {
-        paddingBottom: 100,
         alignItems: 'stretch'
     },
     text_input_container: {
@@ -259,7 +270,7 @@ const styles = StyleSheet.create({
     text_input_label: {
         fontSize: normalize(10),
         color: colors.black,
-        marginBottom: 5,
+        marginBottom: 10,
         marginLeft: 2
     },
     text_input_info: {
@@ -273,7 +284,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         margin: 10,
         alignSelf: 'stretch',
-        justifyContent: 'space-around',
     },
     picker: {
         width: 100,

@@ -67,7 +67,7 @@ export default () => {
                     height={12}
                     colorFrom={colors.primary}
                     colorTo={colors.tertiary}
-                >Break The Ice</UnderlineHeader>
+                >LetsLink</UnderlineHeader>
             </ImageBackground>
 
             <View style={{ flex: 1 }}>

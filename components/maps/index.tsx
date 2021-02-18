@@ -7,7 +7,7 @@ import { RootProps } from '../../services';
 import { validate_near_users, refresh_near_users } from '../../services/near_users/actions';
 import { NearUsersRootProps, NearByUsersProps, NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
-import { HomeToChatNavProp } from '../navigation/utils/types';
+import { HomeToChatNavProp } from '../navigation';
 import { CustomButton, Icon } from '../utils';
 import Preview from '../profile/components/Preview';
 import InvitationModal from '../modal/invitation';
@@ -82,7 +82,7 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
         }
     }
 
-    componentDidMount = () => {
+    handleNavHeader = () => {
         this.props.navigation.setOptions({
             headerTitle: () => (
                 <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} />
@@ -109,6 +109,14 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
 
             )
         })
+    }
+
+    componentDidMount = () => {
+        this.handleNavHeader()
+    }
+
+    componentDidUpdate = () => {
+        this.handleNavHeader()
     }
 
     componentWillUnmount() {
@@ -172,8 +180,8 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
             region={this.state.region}
             onRegionChangeComplete={this.handleOnRegionChangeComplete}
             showsUserLocation={true}
-            // followsUserLocation={true}
-            onPress={(e) => console.log(e.nativeEvent)}
+        // followsUserLocation={true}
+        // onPress={(e) => console.log(e.nativeEvent)}
 
         >
             {

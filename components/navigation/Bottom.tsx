@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors, normalize } from '../utils/styles';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../../utils/variables';
@@ -9,7 +9,6 @@ import { RootProps } from '../../services';
 import { InvitationsRootProps, InvitationStatusOptions } from '../../services/invitations/types';
 import { ChatRootProps } from '../../services/chat/types';
 import { BodyText } from '../utils';
-import { BottomNavBackground } from '../utils/svgs';
 
 
 interface BottomNavProps {
@@ -122,7 +121,7 @@ const BottomNav: React.FC<BottomTabBarProps & BottomNavProps> = ({ state, descri
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 20,
+        bottom: 15,
         width: '100%',
         display: 'flex',
         flexDirection: 'row',

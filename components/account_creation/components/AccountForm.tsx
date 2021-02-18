@@ -29,7 +29,7 @@ export default ({ init_user, onNext }: SignUpFormProps) => {
 
     useEffect(() => {
         Animated.timing(fadeAmin, {
-            delay: 5000,
+            delay: 7000,
             toValue: 1,
             duration: 2000,
             useNativeDriver: false

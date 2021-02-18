@@ -6,6 +6,7 @@ import invitationsReducer from './invitations/reducer';
 import friendsReducer from './friends/reducer';
 import chatReducer from './chat/reducer';
 import profileReducer from './profile/reducer';
+import utilsReducer from './utils/reducer'
 
 import { NearUsersRootProps } from './near_users/types';
 import { BannerRootStateProps } from './banner/tsTypes';
@@ -22,7 +23,8 @@ export default combineReducers({
     invitations: invitationsReducer,
     friends: friendsReducer,
     chat: chatReducer,
-    profile: profileReducer
+    profile: profileReducer,
+    utils: utilsReducer
 });
 
 export interface RootProps {

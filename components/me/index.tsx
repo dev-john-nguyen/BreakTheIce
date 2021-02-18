@@ -1,5 +1,5 @@
 import React from 'react';
-import { MeStackNavigationProp } from '../navigation/utils/types';
+import { MeStackNavigationProp } from '../navigation';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import ProfileContent from '../profile/components/content';

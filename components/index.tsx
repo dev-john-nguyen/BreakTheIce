@@ -2,13 +2,13 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
-import { remove_banner, remove_notification } from '../services/banner/actions';
+import { remove_banner } from '../services/banner/actions';
 import { BannerRootStateProps, BannerDispatchActionProps } from '../services/banner/tsTypes';
 import SignIn from './signin';
 import BottomNav from './navigation/Bottom';
 import { RootProps } from '../services';
-import { NavigationContainer } from '@react-navigation/native';
-import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation/utils/types'
+import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { HomeStackScreen, InvitationsStackScreen, MeStackScreen, ChatStackScreen } from './navigation'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { bottomTabInvitations, bottomTabChat, bottomTabsHome, bottomTabsProfile } from '../utils/variables';
 import { InvitationsDispatchActionProps } from '../services/invitations/types';
@@ -34,7 +34,6 @@ interface Base {
     set_and_listen_invitations: InvitationsDispatchActionProps['set_and_listen_invitations'];
     set_and_listen_friends: FriendDispatchActionProps['set_and_listen_friends'];
     set_and_listen_messages: ChatDispatchActionsProps['set_and_listen_messages'];
-    remove_notification: () => void;
 }
 
 
@@ -70,6 +69,20 @@ const Base = (props: Base) => {
     }, [props.user.uid, props.user.init])
 
 
+    const getTabBarVisibility = (route: any) => {
+        const routeName = getFocusedRouteNameFromRoute(route)
+        switch (routeName) {
+            case 'Message':
+            case 'Settings':
+            case 'NearByList':
+            case 'Friends':
+                return false
+            default:
+                return true
+        }
+    }
+
+
     const handleRender = () => {
         if (props.banner.loading) return <ActivityIndicator />
         if (props.user.fetchFail) return <Text>Oops! We couldn't retrieve your profile.</Text>
@@ -83,10 +96,27 @@ const Base = (props: Base) => {
             return (
                 <NavigationContainer>
                     <BottomTabs.Navigator backBehavior='history' lazy={true} tabBar={props => <BottomNav {...props} />}>
-                        <BottomTabs.Screen name={bottomTabsHome} component={HomeStackScreen} />
+                        <BottomTabs.Screen
+                            name={bottomTabsHome}
+                            component={HomeStackScreen}
+                            options={({ route }) => ({
+                                tabBarVisible: getTabBarVisibility(route)
+                            })}
+                        />
                         <BottomTabs.Screen name={bottomTabInvitations} component={InvitationsStackScreen} />
-                        <BottomTabs.Screen name={bottomTabChat} component={ChatStackScreen} />
-                        <BottomTabs.Screen name={bottomTabsProfile} component={MeStackScreen} initialParams={{ title: props.user.username }} />
+                        <BottomTabs.Screen name={bottomTabChat} component={ChatStackScreen}
+                            options={({ route }) => ({
+                                tabBarVisible: getTabBarVisibility(route)
+                            })}
+                        />
+                        <BottomTabs.Screen
+                            name={bottomTabsProfile}
+                            component={MeStackScreen}
+                            initialParams={{ title: props.user.username }}
+                            options={({ route }) => ({
+                                tabBarVisible: getTabBarVisibility(route)
+                            })}
+                        />
                     </BottomTabs.Navigator>
                 </NavigationContainer>
             )
@@ -137,5 +167,4 @@ export default connect(mapStateToProps, {
     remove_banner, set_and_listen_invitations,
     set_and_listen_friends,
     set_and_listen_messages,
-    remove_notification
 })(Base)

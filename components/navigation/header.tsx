@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, StyleProp } from 'react-native';
-import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from './utils/types';
+import { HomeScreenRouteProp, InvitationsScreenRouteProp, ChatScreenRouteProp, MeScreenRouteProp } from '.';
 import { Icon, HeaderText, UnderlineHeader } from '../utils';
 import { colors, normalize } from '../utils/styles';
 import { windowHeight } from '../../utils/variables';
@@ -54,7 +54,7 @@ export const screenOptions = ({ route, navigation }: { navigation: any, route: R
     headerTransparent: true,
     cardStyle: {
         backgroundColor: colors.backgroundColor,
-        paddingTop: (windowHeight / 12)
+        paddingTop: (windowHeight / 10)
     }
 }
 )

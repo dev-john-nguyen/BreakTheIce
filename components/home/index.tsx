@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { colors } from '../utils/styles'
+import { colors, normalize } from '../utils/styles'
 import Maps from '../maps';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
@@ -8,9 +8,9 @@ import { set_and_listen_user_location, go_online } from '../../services/user/act
 import { set_and_listen_near_users } from '../../services/near_users/actions';
 import { UserRootStateProps, UserDispatchActionsProps, CtryStateCityProps, } from '../../services/user/types';
 import { NearUsersDispatchActionProps } from '../../services/near_users/types';
-import { HomeToChatNavProp } from '../navigation/utils/types';
+import { HomeToChatNavProp } from '../navigation';
 import * as Location from 'expo-location';
-import { CustomButton, BodyText } from '../utils';
+import { CustomButton, BodyText, Icon, HeaderText } from '../utils';
 import { getBucket } from './utils';
 import * as Notifications from 'expo-notifications';
 
@@ -97,7 +97,7 @@ const Home = (props: HomeProps) => {
                 }
             } catch (e) {
                 console.log(e)
-                setErrMsg("unable to find your location. Please refresh.")
+                setErrMsg("Unable to find your location. Please refresh.")
             }
 
 
@@ -140,21 +140,23 @@ const Home = (props: HomeProps) => {
 
     return (
         <View style={styles.container}>
-            {props.user.location && props.user.ctryStateCity ?
+            {(props.user.location && props.user.ctryStateCity) ?
                 <Maps navigation={props.navigation} />
                 :
                 !!errMsg ?
-                    <>
-                        <BodyText>{errMsg}</BodyText>
-                        <CustomButton
-                            type='primary'
-                            text='refresh'
+                    <View style={styles.err_container}>
+                        <HeaderText style={styles.err_text}>{errMsg}</HeaderText>
+                        <Icon
+                            type='refresh-cw'
                             onPress={() => {
                                 setErrMsg('');
                                 setRefresh(true);
                             }}
+                            color={colors.red}
+                            pressColor={colors.lightRed}
+                            size={40}
                         />
-                    </>
+                    </View>
                     : <ActivityIndicator size='large' color={colors.primary} />}
         </View>
     )
@@ -166,6 +168,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    err_container: {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    err_text: {
+        fontSize: normalize(20),
+        color: colors.red,
+        margin: 20,
+        textAlign: 'center'
+    }
 
 })
 

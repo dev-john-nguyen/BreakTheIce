@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Pressable, Switch, StyleSheet } from 'react-native';
 import { UpdateUserPrivacyProps, UserRootStateProps, UserDispatchActionsProps } from '../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
-import { MeStackNavigationProp } from '../../navigation/utils/types';
+import { MeStackNavigationProp } from '../../navigation';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../utils/styles';
 import { isEqual } from 'lodash';
@@ -17,57 +17,49 @@ interface PrivacyProps {
 
 const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps) => {
     const { hideOnMap, offline } = user;
-    const [privacyVals, setPrivacyVals] = useState<UpdateUserPrivacyProps>({
+    const privacyVals = {
         hideOnMap,
         offline
-    })
-    const [loading, setLoading] = useState(false);
+    }
 
-    useEffect(() => {
-        var mount = true;
-        navigation.setOptions({
-            headerRight: () => {
-                if (loading) {
-                    return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 20 }} />
-                } else {
-                    return (
-                        <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 15 }}>
-                            {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
-                        </Pressable >
-                    )
-                }
-            }
-        })
+    // useEffect(() => {
+    //     var mount = true;
+    //     navigation.setOptions({
+    //         headerRight: () => {
+    //             if (loading) {
+    //                 return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 20 }} />
+    //             } else {
+    //                 return (
+    //                     <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 15 }}>
+    //                         {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
+    //                     </Pressable >
+    //                 )
+    //             }
+    //         }
+    //     })
 
-        return () => {
-            mount = false
-            navigation.setOptions({ headerRight: undefined })
-        }
-    }, [loading, privacyVals, user])
+    //     return () => {
+    //         mount = false
+    //         navigation.setOptions({ headerRight: undefined })
+    //     }
+    // }, [loading, privacyVals, user])
 
 
-    const handleSave = (mount: boolean) => {
-        mount && setLoading(true)
+    const handleSave = (privacy: UpdateUserPrivacyProps) => {
 
         const { name, statusMsg, bioLong, age, gender } = user;
 
         var oldVals = { name, statusMsg, bioLong, age, gender }
 
-        if (isEqual(oldVals, privacyVals)) {
-            if (mount) {
-                set_banner('No updates found.', 'warning')
-                setLoading(false)
-            }
+        if (isEqual(oldVals, privacy)) {
+            set_banner('No updates found.', 'warning')
             return
         }
 
-        update_privacy(privacyVals)
-            .then(() => {
-                mount && setLoading(false)
-            })
+        update_privacy(privacy)
             .catch((err) => {
                 console.log(err)
-                mount && set_banner('Oops! Something went wrong updating your profile.', 'error')
+                set_banner('Oops! Something went wrong updating your profile.', 'error')
             })
     }
 
@@ -80,7 +72,7 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
                     trackColor={{ false: colors.lightRed, true: colors.tertiary }}
                     thumbColor={privacyVals.hideOnMap ? colors.primary : colors.red}
                     ios_backgroundColor={colors.lightRed}
-                    onValueChange={(value) => setPrivacyVals({ ...privacyVals, hideOnMap: value })}
+                    onValueChange={(value) => handleSave({ ...privacyVals, hideOnMap: value })}
                     value={privacyVals.hideOnMap}
                 />
             </View>
@@ -91,7 +83,7 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
                     trackColor={{ false: colors.lightRed, true: colors.tertiary }}
                     thumbColor={privacyVals.offline ? colors.primary : colors.red}
                     ios_backgroundColor={colors.lightRed}
-                    onValueChange={(value) => setPrivacyVals({ ...privacyVals, offline: value })}
+                    onValueChange={(value) => handleSave({ ...privacyVals, offline: value })}
                     value={privacyVals.offline}
                 />
             </View>

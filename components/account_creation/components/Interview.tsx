@@ -21,7 +21,7 @@ export default ({ onNext, setInterviewVals, interviewVals }: QuestionProps) => {
 
     useEffect(() => {
         Animated.timing(fadeAmin, {
-            delay: 3000,
+            delay: 5000,
             toValue: 1,
             duration: 2000,
             useNativeDriver: false

@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableHighlight, KeyboardAvoidingView, Keyboard, T
 import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out, remove_account } from '../../services/user/actions';
 import { colors, dropShadowListContainer, normalize } from '../utils/styles';
-import { MeStackNavigationProp } from '../navigation/utils/types';
+import { MeStackNavigationProp } from '../navigation';
 import EditProfile from './components/profile';
 import Privacy from './components/Privacy';
 import { RootProps } from '../../services';
@@ -87,8 +87,8 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 <View style={styles.menu_options}>
                     {/* <TouchableHighlight
                         style={[styles.menu_items, target === TargetOptions.profile && styles.active]}
-                        onPress={() => set_banner('fdsafadsf ', 'error')}
-                        
+                        onPress={() => set_banner('kklfjdsklfjadklsjfkldsjfkldsfj sadfkljdsalf asdfjl adlskfj alsfj sjklklfjladsjf klsfjdklsfj lsadjf kls;fkl jsdadlsfjkladsfjdsa klkldsfalsdf dslfjkadlskf lfjadklsfj  ', 'success')}
+
                     >
                         <View style={styles.content}>
                             <BodyText style={[styles.text, target === TargetOptions.profile && styles.active_text]}>Error</BodyText>

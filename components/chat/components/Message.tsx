@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { connect } from 'react-redux';
 import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { colors } from '../../utils/styles';
-import { ChatStackParams, ChatStackNavigationProp } from '../../navigation/utils/types';
+import { colors, normalize, dropShadowListContainer } from '../../utils/styles';
+import { ChatStackParams, ChatStackNavigationProp } from '../../navigation';
 import { RouteProp } from '@react-navigation/native';
 import { fireDb } from '../../../services/firebase';
 import { ChatDb, ChatMessageDb } from '../../../utils/variables';
@@ -10,13 +10,14 @@ import { MessageProps, ChatRootProps } from '../../../services/chat/types';
 import { RootProps } from '../../../services';
 import { set_banner } from '../../../services/banner/actions';
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
-import { CustomButton, BodyText, HeaderText } from '../../utils';
+import { CustomButton, BodyText, HeaderText, Icon, UnderlineHeader } from '../../utils';
 import { ProfileImgProps } from '../../../services/user/types';
 import { timestamp } from '../../../utils/variables';
 import { CircleProfileImage } from '../../profile/components/ProfileImage';
 import { update_if_read, search_redux_chat, set_if_read, database_fetch_chat } from './utils';
 import { MessageCurve } from '../../utils/svgs';
 import { sendPushNotification } from '../../../services/notification/actions';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ComMessageProps {
     route: RouteProp<ChatStackParams, "Message">;
@@ -98,12 +99,12 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
         navigation.setOptions({
             headerTitle: () => (
                 <View style={{ alignItems: 'center' }}>
-                    <CircleProfileImage
-                        size='small'
-                        image={route.params.targetUser.profileImg}
-                        friend={true}
-                    />
-                    <HeaderText style={{ color: colors.primary, fontSize: 12 }}>{route.params.targetUser.username}</HeaderText>
+                    <UnderlineHeader
+                        colorFrom={colors.secondary}
+                        colorTo={colors.primary}
+                        height={9}
+                        textStyle={{ color: colors.primary, fontSize: normalize(15) }}
+                    >{route.params.targetUser.username}</UnderlineHeader>
                 </View>
             )
         })
@@ -260,16 +261,34 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             renderItem={({ item, index, separators }) => {
                 if (item.sentBy === user.uid) {
                     return (
-                        <View key={item.docId} style={styles.message_right}>
-                            <BodyText style={styles.message_right_text}>{item.message}</BodyText>
-                            <MessageCurve style={styles.message_curve_right} color='grey' />
+                        <View style={styles.message_right_container} key={item.docId}>
+                            <View style={styles.message_right_content}>
+                                <BodyText style={styles.message_right_text}>{item.message}</BodyText>
+                                <MessageCurve style={styles.message_curve_right} color='grey' />
+                            </View>
+                            <View style={{ alignSelf: 'flex-end' }}>
+                                <CircleProfileImage
+                                    size='small'
+                                    image={user.profileImg}
+                                    friend={false}
+                                />
+                            </View>
                         </View>
                     )
                 } else {
                     return (
-                        <View key={item.docId} style={styles.message_left}>
-                            <BodyText style={styles.message_left_text}>{item.message}</BodyText>
-                            <MessageCurve style={styles.message_curve} color='primary' />
+                        <View style={styles.message_left_container} key={item.docId} >
+                            <View style={{ alignSelf: 'flex-end' }}>
+                                <CircleProfileImage
+                                    size='small'
+                                    image={route.params.targetUser.profileImg}
+                                    friend={false}
+                                />
+                            </View>
+                            <View style={styles.message_left_content}>
+                                <BodyText style={styles.message_left_text}>{item.message}</BodyText>
+                                <MessageCurve style={styles.message_curve} color='primary' />
+                            </View>
                         </View>
                     )
                 }
@@ -282,16 +301,22 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
     return (
         <View style={styles.container}>
             {renderTextMsgs()}
-            <KeyboardAvoidingView keyboardVerticalOffset={100} behavior={'padding'} style={styles.message_form}>
+            <KeyboardAvoidingView keyboardVerticalOffset={80} behavior={'padding'}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={styles.message_form_content}>
-                        <TextInput
-                            style={styles.message_form_input}
-                            onChangeText={text => setMessageTxt(text)}
-                            value={messageTxt}
-                            multiline />
-                        <CustomButton type='primary' onPress={handleSendMessage} text='Send' />
-                    </View>
+                    <LinearGradient
+                        colors={[colors.secondary, colors.primary]}
+                        start={{ x: 0, y: 1 }}
+                        end={{ x: 1, y: 0 }}
+                    >
+                        <View style={styles.message_form_content}>
+                            <TextInput
+                                style={[styles.message_form_input, dropShadowListContainer]}
+                                onChangeText={text => setMessageTxt(text)}
+                                value={messageTxt}
+                                multiline />
+                            <Icon type='send' size={25} color={colors.white} pressColor={colors.secondary} onPress={handleSendMessage} />
+                        </View>
+                    </LinearGradient>
                 </ TouchableWithoutFeedback>
             </KeyboardAvoidingView>
         </View>
@@ -300,8 +325,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        marginTop: 20
+        flex: 1
     },
     empty: {
         flex: 1,
@@ -309,8 +333,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     message_form: {
-        borderTopColor: colors.primary,
-        borderTopWidth: 1,
+        backgroundColor: colors.tertiary
     },
     message_form_content: {
         flexDirection: 'row',
@@ -318,17 +341,19 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         paddingTop: 20,
         paddingBottom: 30,
-        alignItems: 'center'
+        margin: 10,
+        alignItems: 'center',
     },
     message_form_input: {
         color: 'black',
-        flexBasis: '70%',
+        flex: 1,
         borderWidth: 1,
-        borderRadius: 5,
-        marginRight: 10,
-        padding: 10,
-        paddingTop: 10,
+        borderRadius: 20,
+        marginRight: 15,
+        padding: 15,
+        paddingTop: 15,
         borderColor: colors.primary,
+        backgroundColor: colors.white,
         alignSelf: 'stretch'
     },
     profile_content: {
@@ -346,19 +371,21 @@ const styles = StyleSheet.create({
     messages: {
         flex: 1
     },
-    message_left: {
-        left: 20,
-        marginTop: 10,
-        marginBottom: 10,
+    message_left_container: {
+        flexDirection: 'row',
+        alignSelf: 'flex-start',
+        margin: 20,
+        marginRight: 40
+    },
+    message_left_content: {
+        position: 'relative',
         padding: 20,
+        marginLeft: 20,
         paddingLeft: 20,
         backgroundColor: colors.primary,
-        position: 'relative',
         borderTopRightRadius: 20,
         borderBottomRightRadius: 20,
         borderTopLeftRadius: 20,
-        alignSelf: 'flex-start',
-        maxWidth: '60%'
     },
     message_curve: {
         position: 'absolute',
@@ -369,21 +396,23 @@ const styles = StyleSheet.create({
     },
     message_left_text: {
         color: colors.white,
-        fontSize: 12
+        fontSize: normalize(10)
     },
-    message_right: {
+    message_right_container: {
+        flexDirection: 'row',
         alignSelf: 'flex-end',
-        right: 20,
-        marginTop: 10,
-        marginBottom: 10,
+        margin: 20,
+        marginLeft: 40
+    },
+    message_right_content: {
         position: 'relative',
+        marginRight: 20,
         padding: 20,
         paddingRight: 20,
         backgroundColor: colors.lightGrey,
         borderTopLeftRadius: 20,
         borderBottomLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxWidth: '60%'
     },
     message_curve_right: {
         position: 'absolute',

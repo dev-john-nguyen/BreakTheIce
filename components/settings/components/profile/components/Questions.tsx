@@ -77,6 +77,7 @@ export default (props: QuestionProps) => {
 
 const styles = StyleSheet.create({
     container: {
+        marginTop: 20,
         marginLeft: 5,
         marginRight: 5,
         width: '90%',

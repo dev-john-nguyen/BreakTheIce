@@ -275,38 +275,3 @@ export const underline_header_styles: StyleProp<any> = {
         // backgroundColor: colors.tertiary
     }
 }
-
-export const bannerStyles = (type: string) => {
-    interface StylesProps {
-        container: StyleProp<any>
-        text: StyleProp<any>
-    }
-
-    var styles: StylesProps = {
-        container: {
-            padding: 10
-        },
-        text: {
-            textAlign: 'center',
-            fontSize: normalize(12),
-            letterSpacing: .5,
-            textTransform: 'capitalize',
-            width: windowWidth
-        }
-    }
-
-    switch (type) {
-        case 'warning':
-            styles.container.backgroundColor = colors.yellow
-            styles.text.color = colors.white
-            break;
-        case 'error':
-            styles.container.backgroundColor = colors.red
-            styles.text.color = colors.white
-            break;
-        default:
-            styles.container.backgroundColor = colors.green
-            styles.text.color = colors.white
-    }
-    return styles
-}

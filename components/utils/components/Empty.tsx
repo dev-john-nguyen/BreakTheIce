@@ -5,6 +5,9 @@ import { colors } from '../styles';
 
 export default ({ style, children }: { style?: StyleProp<any>, children: string }) => (
     <UnderlineHeader
+        colorFrom={colors.secondary}
+        colorTo={colors.tertiary}
+        height={10}
         textStyle={styles.underline_header_text}
         style={style}>{children}</UnderlineHeader>
 )

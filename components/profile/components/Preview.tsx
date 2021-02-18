@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, StyleProp, Dimensions } from 'react-native';
 import { NearByUsersProps } from '../../../services/near_users/types';
 import { colors, opacity_colors, dropShadowListContainer, normalize } from '../../utils/styles';
-import { HomeToChatNavProp } from '../../navigation/utils/types';
+import { HomeToChatNavProp } from '../../navigation';
 import { CustomButton, Icon, BodyText } from '../../utils';
 import { ListProfileImage } from './ProfileImage';
 import RespondButton from '../../modal/respond/Slider';

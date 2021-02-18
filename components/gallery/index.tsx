@@ -7,6 +7,7 @@ import Empty from '../utils/components/Empty';
 import { cloneDeepWith } from 'lodash'
 import { windowWidth, windowHeight } from '../../utils/variables';
 import { getGalleryHeight, ImageWidth } from './utils';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface GalleryComProps {
     gallery: GalleryItemProps[];
@@ -49,7 +50,11 @@ export default ({ gallery, height }: GalleryComProps) => {
             dropShadow,
         styles.empty
         ]}>
-            <Empty>No Images</Empty>
+            <FontAwesome
+                name='image'
+                size={100}
+                color={colors.primary}
+            />
         </View>
     )
 
@@ -78,11 +83,14 @@ export default ({ gallery, height }: GalleryComProps) => {
 
 const styles = StyleSheet.create({
     empty: {
-        backgroundColor: colors.secondary,
         alignSelf: 'center',
+        alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 5,
-        marginTop: 10
+        marginTop: 10,
+        borderColor: colors.primary,
+        borderWidth: 2,
+        backgroundColor: `rgba(${colors.white_rgb}, .6)`
     },
     container: {
         position: 'relative',

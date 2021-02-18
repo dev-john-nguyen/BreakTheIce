@@ -3,7 +3,7 @@ import { View, FlatList, ActivityIndicator, Text, StyleSheet, RefreshControl } f
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { NearByUsersProps, NearUsersRootProps, NearUsersDispatchActionProps } from '../../services/near_users/types';
-import { HomeToChatNavProp } from '../navigation/utils/types';
+import { HomeToChatNavProp } from '../navigation';
 import { ProfilePage } from '../../utils/variables';
 import InvitationModal from '../modal/invitation';
 import Preview from '../profile/components/Preview';
@@ -142,10 +142,10 @@ const styles = StyleSheet.create({
         flex: 1
     },
     flat_list: {
-        paddingBottom: 100
+
     },
     preview_container: {
-        marginTop: 20
+        marginBottom: 20
     }
 })
 

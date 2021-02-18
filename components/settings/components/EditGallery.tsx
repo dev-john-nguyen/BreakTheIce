@@ -12,7 +12,7 @@ import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { AutoId } from '../../../utils/functions';
 import { cloneDeep, isEqual } from 'lodash'
-import { MeStackNavigationProp } from '../../navigation/utils/types';
+import { MeStackNavigationProp } from '../../navigation';
 import { set_banner } from '../../../services/banner/actions';
 import { Feather } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -239,8 +239,7 @@ const EditGallery = ({ save_gallery, gallery, navigation, set_banner, handleCame
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        position: 'relative',
-        paddingBottom: 80
+        position: 'relative'
     },
     flat_list: {
         marginRight: 40,

@@ -1,21 +1,21 @@
 import React from 'react';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, Route } from '@react-navigation/native';
-import Home from '../../home';
-import NearByList from '../../nearbylist';
-import Invitations from '../../invitations';
-import Profile from '../../profile';
-import Friends from '../../friends';
-import Chat from '../../chat';
-import Message from '../../chat/components/Message';
-import Me from '../../me';
-import Settings from '../../settings';
-import { screenOptions } from '../Header';
-import { ChatPreviewProps } from '../../../services/chat/types';
+import Home from '../home';
+import NearByList from '../nearbylist';
+import Invitations from '../invitations';
+import Profile from '../profile';
+import Friends from '../friends';
+import Chat from '../chat';
+import Message from '../chat/components/Message';
+import Me from '../me';
+import Settings from '../settings';
+import { screenOptions } from './Header';
+import { ChatPreviewProps } from '../../services/chat/types';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { ProfileImgProps } from '../../../services/user/types';
-import { windowHeight } from '../../../utils/variables';
-import { colors } from '../../utils/styles';
+import { ProfileImgProps } from '../../services/user/types';
+import { windowHeight } from '../../utils/variables';
+import { colors } from '../utils/styles';
 
 export enum InvitationScreenOptions {
     Invitations = 'Invitations',
@@ -135,7 +135,10 @@ const profileOptions = ({ route }: { route: Route<'Profile', ProfileRouteParams>
 
 export const InvitationsStackScreen = () => (
     <InvitationsStack.Navigator screenOptions={screenOptions}>
-        <InvitationsStack.Screen name="Invitations" component={Invitations} />
+        <InvitationsStack.Screen
+            name="Invitations"
+            component={Invitations}
+        />
         <InvitationsStack.Screen
             name="Profile"
             component={Profile}
@@ -148,8 +151,15 @@ export const InvitationsStackScreen = () => (
 
 export const HomeStackScreen = () => (
     <HomeStack.Navigator screenOptions={screenOptions}>
-        <HomeStack.Screen name="Home" component={Home} options={{ cardStyle: { marginTop: 0 } }} />
-        <HomeStack.Screen name="NearByList" component={NearByList} />
+        <HomeStack.Screen
+            name="Home"
+            component={Home}
+            options={{ cardStyle: { marginTop: 0 } }}
+        />
+        <HomeStack.Screen
+            name="NearByList"
+            component={NearByList}
+        />
         <HomeStack.Screen
             name="Profile"
             component={Profile}
@@ -162,21 +172,48 @@ export const MeStackScreen = (props: any) => {
     const { title } = props.route.params;
 
     return <MeStack.Navigator screenOptions={screenOptions}>
-        <MeStack.Screen name="Me" component={Me} initialParams={{ title: title ? title : 'Profile' }} options={{ cardStyle: { paddingTop: 0, backgroundColor: colors.backgroundColor } }} />
-        <MeStack.Screen name="Friends" component={Friends} options={{ cardStyle: { paddingTop: windowHeight / 9, backgroundColor: colors.backgroundColor } }} />
+        <MeStack.Screen
+            name="Me"
+            component={Me}
+            initialParams={{ title: title ? title : 'Profile' }}
+            options={{ cardStyle: { paddingTop: 0, backgroundColor: colors.backgroundColor } }} />
+        <MeStack.Screen
+            name="Friends"
+            component={Friends}
+        />
         <MeStack.Screen
             name="Profile"
             component={Profile}
             options={profileOptions}
             initialParams={{ profileUid: '' }} />
-        <MeStack.Screen name="Settings" component={Settings} options={{ cardStyle: { paddingTop: windowHeight / 9, backgroundColor: colors.backgroundColor } }} />
+        <MeStack.Screen
+            name="Settings"
+            component={Settings}
+            options={{
+                cardStyle: {
+                    paddingTop: windowHeight / 9,
+                    backgroundColor: colors.backgroundColor
+                }
+            }}
+        />
     </MeStack.Navigator>
 }
+
 
 export const ChatStackScreen = () => (
     <ChatStack.Navigator screenOptions={screenOptions}>
         <ChatStack.Screen name="Chat" component={Chat} />
-        <ChatStack.Screen name="Message" component={Message} />
+        <ChatStack.Screen
+            name="Message"
+            component={Message}
+            options={{
+                cardStyle: {
+                    padding: 0,
+                    backgroundColor: colors.backgroundColor,
+                    paddingTop: (windowHeight / 10)
+                }
+            }}
+        />
         <ChatStack.Screen
             name="Profile"
             component={Profile}
