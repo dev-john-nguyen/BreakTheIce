@@ -1,5 +1,5 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
-import { View, StyleSheet, TouchableHighlight, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, Easing, Animated } from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { View, StyleSheet, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { update_profile, update_privacy, sign_out, remove_account } from '../../services/user/actions';
 import { colors, dropShadowListContainer, normalize } from '../utils/styles';
@@ -13,8 +13,7 @@ import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
 import EditGallery from './components/EditGallery';
 import * as ImagePicker from 'expo-image-picker';
 import { BodyText, HeaderText, Icon } from '../utils';
-import RemoveAccount from './components/RemoveAccount';
-import PrivatePolicy from './components/PrivatePolicy';
+import HelpCenter from './components/help_center';
 
 interface SettingsProps {
     navigation: MeStackNavigationProp;
@@ -29,10 +28,9 @@ interface SettingsProps {
 enum TargetOptions {
     profile = 'Edit Profile',
     privacy = 'Privacy',
-    privatePolicy = "Private Policy",
     contacts = "Manage Contacts",
     gallery = "Edit Gallery",
-    removeAccount = "Remove Account"
+    help = "Help Center"
 }
 
 const Settings = ({ navigation, user, update_profile, set_banner, update_privacy, sign_out, remove_account }: SettingsProps) => {
@@ -53,10 +51,8 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
             case TargetOptions.gallery:
                 return <EditGallery navigation={navigation} handleCameraRollPermission={handleCameraRollPermission} />
-            case TargetOptions.removeAccount:
-                return <RemoveAccount remove_account={remove_account} />
-            case TargetOptions.privatePolicy:
-                return <PrivatePolicy />
+            case TargetOptions.help:
+                return <HelpCenter remove_account={remove_account} />
             case TargetOptions.profile:
             default:
                 return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} handleCameraRollPermission={handleCameraRollPermission} />
@@ -124,23 +120,12 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                     </Pressable>
 
                     <Pressable
-                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.privatePolicy || pressed) && styles.active]}
-                        onPress={() => setTarget(TargetOptions.privatePolicy)}
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.help || pressed) && styles.active]}
+                        onPress={() => setTarget(TargetOptions.help)}
 
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text]} numberOfLines={1}>Private Policy</BodyText>
-                        </View>
-                    </Pressable>
-
-
-                    <Pressable
-                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.removeAccount || pressed) && styles.active]}
-                        onPress={() => setTarget(TargetOptions.removeAccount)}
-
-                    >
-                        <View style={styles.content}>
-                            <BodyText style={[styles.text]}>Account</BodyText>
+                            <BodyText style={[styles.text]} numberOfLines={1}>Help Center</BodyText>
                         </View>
                     </Pressable>
 

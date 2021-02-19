@@ -5,7 +5,6 @@ import { fireDb } from "../firebase";
 import { InvitationsDb, FriendsDb, FriendsUsersDb } from "../../utils/variables";
 import { cacheImage } from "../../utils/functions";
 import { timestamp } from '../../utils/variables';
-import { sendPushNotification } from "../notification/actions";
 
 export async function handleInvitations(querySnapshot: firebase.default.firestore.QuerySnapshot) {
 
@@ -94,9 +93,9 @@ export async function handle_invitation_status(invitation: InvitationObject, sta
     await batch.commit()
 
     //an invitation was accepted then send notificaiton to other user indication new friend
-    if (status === InvitationStatusOptions.accepted) {
-        sendPushNotification(invitation.sentBy.uid, user.username, 'newFriend');
-    }
+    // if (status === InvitationStatusOptions.accepted) {
+    //     sendPushNotification(invitation.sentBy.uid, user.username, 'newFriend');
+    // }
 
     return;
 }

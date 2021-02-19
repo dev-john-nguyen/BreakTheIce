@@ -96,30 +96,17 @@ const EditProfile = ({ user, update_profile, set_banner, navigation, handleCamer
             return false
         }
 
-        if (isEmpty(name)) {
+        if (isEmpty(formVals.name)) {
             set_banner("Your name cannot be empty. Please try again.", "error")
             setLoading(false)
             return;
         }
 
-        if (isEmpty(age) || age < 0) {
-            set_banner("Invalid age. Please try again.", "error")
+        if (formVals.age < 18) {
+            set_banner("Invalid age. Our services are only offered to users who are 18 years of age or older.", "error")
             setLoading(false)
             return;
         }
-
-        // let key: keyof typeof profileVals;
-
-        // for (key in profileVals) {
-        //     if (!profileVals[key]) {
-        //         if (mount.current) {
-        //             set_banner('Please ensure all fields are filled out.', 'error')
-        //             setLoading(false)
-        //         }
-        //         return false
-        //     }
-
-        // }
 
         return true
     }

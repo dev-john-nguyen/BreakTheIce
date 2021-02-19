@@ -230,6 +230,11 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, newPr
 
     const { uid, profileImg } = getState().user;
 
+    if (updatedProfileVals.age < 18) {
+        dispatch(set_banner('Our services are only offered to users 18 and older.', 'error'))
+        return;
+    }
+
     interface ProfileValsProp extends UpdateUserProfileProps {
         timestamp: any,
         updatedAt: Date,
@@ -298,15 +303,34 @@ export const update_profile = (updatedProfileVals: UpdateUserProfileProps, newPr
 
 export const update_privacy = (updatedPrivacyData: UpdateUserPrivacyProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
 
-    const { uid, locationListener } = getState().user;
+    console.log()
 
-    if (updatedPrivacyData.offline) {
-        if (locationListener) locationListener.remove()
+    const { user } = getState();
+
+    const { uid, locationListener, ctryStateCity } = user;
+
+    var batch = fireDb.batch()
+
+    const userRef = fireDb.collection(UsersDb).doc(uid);
+    batch.update(userRef, { ...updatedPrivacyData, timestamp, updatedAt: new Date() })
+
+    if (!isEmpty(ctryStateCity)) {
+        if (updatedPrivacyData.offline) {
+            const locationRef = fireDb.collection(LocationsDb).doc(ctryStateCity.ctryState).collection(ctryStateCity.city).doc(uid)
+            batch.delete(locationRef)
+        }
     }
 
-    await fireDb.collection(UsersDb).doc(uid).update({ ...updatedPrivacyData, timestamp: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: new Date() });
-    dispatch({ type: UPDATE_PRIVACY, payload: updatedPrivacyData });
-    dispatch(set_banner('Saved', 'success'));
+
+    try {
+        await batch.commit()
+        dispatch({ type: UPDATE_PRIVACY, payload: updatedPrivacyData });
+        dispatch(set_banner('Successfully updated!', 'success'));
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner('Sorry, looks like something went wrong trying to save your privacy settings.', 'error'));
+    }
+
 }
 
 export const update_block_user = (blockedUser: BlockUserProps) => async (dispatch: AppDispatch, getState: () => RootProps) => {
@@ -405,7 +429,6 @@ export const remove_account = (phoneNumber: string, ctryCode: string | number) =
     }
 
     const formattedPhoneNum = ctryCode + phoneNumber.replace(/[^0-9]/g, '');
-    console.log(formattedPhoneNum)
 
     if (formattedPhoneNum.length < 3) {
         dispatch(set_banner("Please enter a valid number.", "error"))
@@ -439,7 +462,7 @@ export const remove_account = (phoneNumber: string, ctryCode: string | number) =
     }
 
 
-    myFire.auth().signOut().then(() => {
+    user.delete().then(() => {
         dispatch(set_banner('Acount successfully removed.', 'success'))
     })
         .catch((err) => {

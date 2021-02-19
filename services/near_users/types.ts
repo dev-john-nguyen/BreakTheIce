@@ -36,4 +36,5 @@ export interface NearUsersDispatchActionProps {
     validate_near_users: (location: LocationObject, nearByUsers: Array<NearByUsersProps>, allUsers: Array<UserRootStateProps>) => Promise<void>;
     reset_near_users: () => void;
     refresh_near_users: () => Promise<void | undefined>;
+    report_user: (reportedUid: string, reason: string) => Promise<void>;
 }

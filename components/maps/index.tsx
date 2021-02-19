@@ -1,7 +1,7 @@
 import React from 'react';
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Marker, Region, Circle } from 'react-native-maps';
 import { StyleSheet, View, Dimensions, ActivityIndicator } from 'react-native';
-import { ProfilePage } from '../../utils/variables';
+import { ProfilePage, acceptedRadius } from '../../utils/variables';
 import { connect } from 'react-redux';
 import { RootProps } from '../../services';
 import { validate_near_users, refresh_near_users } from '../../services/near_users/actions';
@@ -53,7 +53,7 @@ interface MapsProps {
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.0020;
+const LATITUDE_DELTA = 0.0030;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 //location and ctryStateCity are checked are parent element so this won't render unless those are checked
@@ -85,26 +85,27 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     handleNavHeader = () => {
         this.props.navigation.setOptions({
             headerTitle: () => (
-                <CustomButton text="My Location" type='secondary' onPress={this.handleOnMyLocationPress} />
+                !this.props.user.hideOnMap ? <Icon
+                    type='map-pin'
+                    color={colors.primary}
+                    pressColor={colors.secondary}
+                    size={30}
+                    onPress={this.handleOnMyLocationPress} /> : undefined
             ),
             headerLeft: () => (
                 <View style={{ flexDirection: 'row' }}>
                     <Refresh refresh_near_users={this.props.refresh_near_users} />
-                    {
-                        this.props.user.hideOnMap ?
-                            (
-                                <FontAwesome name="user-secret" size={30} color={colors.primary} style={{ marginLeft: 20 }} />
-                            ) :
-                            (
-                                <View style={{ marginLeft: 20 }}>
-                                    <CircleProfileImage
-                                        size='small'
-                                        image={this.props.user.profileImg} onImagePress={this.handleViewMe}
-                                        friend={false}
-                                    />
-                                </View>
-                            )
-                    }
+
+
+                    <View style={{ marginLeft: 20 }}>
+                        <CircleProfileImage
+                            size='small'
+                            image={this.props.user.profileImg} onImagePress={this.handleViewMe}
+                            friend={false}
+                        />
+                    </View>
+
+
                 </View>
 
             )
@@ -185,15 +186,15 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
 
         >
             {
-                <Marker
+                <Circle
                     key={this.props.user.uid}
-                    coordinate={{
+                    center={{
                         latitude: this.props.user.location.coords.latitude,
                         longitude: this.props.user.location.coords.longitude,
                     }}
-                >
-                    <FontAwesome name="dot-circle-o" size={10} color={colors.primary} />
-                </Marker>
+                    radius={acceptedRadius}
+                    strokeColor={colors.tertiary}
+                />
             }
             {
                 this.props.nearUsers && this.props.nearUsers.length > 0 && this.props.nearUsers.map((nearUser: NearByUsersProps) => {
@@ -222,6 +223,15 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
     render() {
         const { previewUser, sendInvite, previewMe, showRespond } = this.state;
         const { nearUsersFetched, user, navigation, update_invitation } = this.props;
+
+
+        if (this.props.user.hideOnMap) {
+            return (
+                <View style={styles.container}>
+                    <FontAwesome name="user-secret" size={50} color={colors.primary} style={{}} />
+                </View>
+            )
+        }
 
         return (
             <View style={styles.container}>
@@ -261,7 +271,6 @@ class Maps extends React.Component<MapsProps, MapStateProps> {
                         />
                     </View>
                 }
-                {/* <CustomButton text='View Me' type='primary' onPress={this.handleViewMe} moreStyles={styles.view_me} /> */}
 
             </View>
         )

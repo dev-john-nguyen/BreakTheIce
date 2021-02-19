@@ -25,6 +25,11 @@ export const init_user = (userFormValues: InitFormValues) => async (dispatch: Ap
 
     const { name, age, username } = userFormValues;
 
+    if (age < 18) {
+        dispatch(set_banner("Invalid age. Our services are only offered to users who are 18 years of age or older.", "error"))
+        return;
+    }
+
     //check if username is already taken...
     const usernameValid = await fireDb.collection(UsersDb).where('username', '==', username).get()
         .then(querySnapshot => {

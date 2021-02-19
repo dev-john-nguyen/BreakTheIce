@@ -8,7 +8,6 @@ import { UPDATE_INVITE_STATUS_NEAR_USER, SENT_INVITE_NEAR_USER, UPDATE_RECEIVED_
 import { set_banner } from '../banner/actions';
 import { UPDATE_INVITE_STATUS_PROFILE_HISTORY, SENT_INVITE_PROFILE_HISTORY, UPDATE_RECEIVED_INVITE_PROFILE_HISTORY } from '../profile/actionTypes';
 import { handleInvitations, handle_invitation_status } from './utils';
-import { sendPushNotification } from '../notification/actions';
 
 //define the structure of the invitation
 
@@ -22,7 +21,7 @@ export const send_invitation = (invitationObj: Omit<InvitationObject, 'docId'>) 
     }
 
     //send notification to other user
-    sendPushNotification(invitationObj.sentTo.uid, invitationObj.sentBy.username, 'sentInvite');
+    // sendPushNotification(invitationObj.sentTo.uid, invitationObj.sentBy.username, 'sentInvite');
 
     //will need to update the near user of which the invitation was sent
     dispatch({

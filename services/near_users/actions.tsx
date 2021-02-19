@@ -1,8 +1,8 @@
 import { SET_NEAR_USERS, UPDATE_NEAR_USERS, RESET_NEAR_USERS, INIT_NEAR_USERS } from './actionTypes';
 import { AppDispatch } from '../../App';
-import { fireDb } from '../firebase';
+import { fireDb, realDb } from '../firebase';
 import { LocationObject } from 'expo-location';
-import { LocationsDb, acceptedRadius } from '../../utils/variables';
+import { LocationsDb, acceptedRadius, timestamp } from '../../utils/variables';
 import { CtryStateCityProps, BlockUserProps } from '../user/types';
 import { NearByUsersProps } from './types';
 import { getDistance } from 'geolib';
@@ -13,7 +13,7 @@ import { cacheImage } from '../../utils/functions';
 import { UPDATE_PROFILE_HISTORY } from '../profile/actionTypes';
 import * as Location from 'expo-location';
 import { getBucket } from '../../components/home/utils';
-import { isEqual } from 'lodash';
+import { isEqual, isEmpty } from 'lodash';
 import { fireDb_init_user_location, fireDb_update_user_location } from '../user/utils';
 import { REFRESH_UPDATE_BUCKET } from '../user/actionTypes';
 
@@ -148,6 +148,8 @@ export const refresh_near_users = () => async (dispatch: AppDispatch, getState: 
 
                 await fireDb_init_user_location(user, currentBucket, location)
 
+                console.log(currentBucket)
+
                 dispatch({
                     type: REFRESH_UPDATE_BUCKET,
                     payload: {
@@ -246,8 +248,22 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
     })
 }
 
-export const block_user = () => (dispatch: AppDispatch) => {
+export const report_user = (reportedUid: string, reason: string) => async (dispatch: AppDispatch, getState: () => RootProps) => {
+    const { uid } = getState().user;
 
+    try {
+        await realDb.ref(`reports/${reportedUid}/${uid}`).set({
+            timestamp: timestamp,
+            updatedAt: new Date(),
+            reason: reason
+        })
+
+        dispatch(set_banner("User successfully reported.", "success"))
+
+    } catch (err) {
+        console.log(err)
+        dispatch(set_banner("Sorry, something went wrong trying to send the reported information.", "error"))
+    }
 }
 
 export const reset_near_users = () => ({ type: RESET_NEAR_USERS, payload: undefined })

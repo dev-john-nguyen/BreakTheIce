@@ -43,7 +43,8 @@ const bannerStyles = (type: string) => {
             letterSpacing: .5,
             textTransform: 'capitalize',
             marginLeft: 10,
-            width: (windowWidth / 1.2)
+            width: (windowWidth / 1.2),
+            textAlign: 'center'
         }
     }
 

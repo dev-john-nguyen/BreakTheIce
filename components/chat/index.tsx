@@ -83,58 +83,60 @@ const Chat = ({ navigation, chat, user, delete_chat }: ChatProps) => {
     </View>
 
     return (
-        <FlatList
-            ListEmptyComponent={() => (
-                <Empty style={{ marginTop: 50 }}>No Messages</Empty>
-            )}
-            data={chatPreviews}
-            contentContainerStyle={styles.flat_list}
-            renderItem={({ item, index }) => {
+        <View style={{ flex: 1, paddingBottom: 100 }}>
+            <FlatList
+                ListEmptyComponent={() => (
+                    <Empty style={{ marginTop: 50 }}>No Messages</Empty>
+                )}
+                data={chatPreviews}
+                contentContainerStyle={styles.flat_list}
+                renderItem={({ item, index }) => {
 
-                var unread = item.unread && item.recentUid !== user.uid;
+                    var unread = item.unread && item.recentUid !== user.uid;
 
-                var otherUser = renderOtherUser(item.usersInfo, user.uid);
+                    var otherUser = renderOtherUser(item.usersInfo, user.uid);
 
-                var otherUserImg = null;
+                    var otherUserImg = null;
 
-                if (otherUser) {
-                    otherUserImg = item.profileImgs[otherUser.uid]
-                }
+                    if (otherUser) {
+                        otherUserImg = item.profileImgs[otherUser.uid]
+                    }
 
-                const list_style = chat_styles(unread)
+                    const list_style = chat_styles(unread)
 
-                return (
-                    <View style={dropShadowListContainer}>
-                        <Swipeable
-                            key={item.docId ? item.docId : index.toString()}
-                            renderRightActions={renderRightActions}
-                            containerStyle={list_style.container}
-                            onSwipeableRightOpen={() => delete_chat(item.docId)}
-                        >
-                            <Pressable style={({ pressed }) => [list_style.content_container, pressed && { backgroundColor: opacity_colors.secondary_medium }]} onPress={() => directToMessage(item)}>
-                                <View style={list_style.profile_section}>
-                                    <ListProfileImage
-                                        friend={true}
-                                        image={otherUserImg}
-                                        onImagePress={() => directToProfile(otherUser)}
-                                    />
-                                    <View style={list_style.profile_section_text}>
-                                        <BodyText style={list_style.username} numberOfLines={1}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</BodyText>
+                    return (
+                        <View style={dropShadowListContainer}>
+                            <Swipeable
+                                key={item.docId ? item.docId : index.toString()}
+                                renderRightActions={renderRightActions}
+                                containerStyle={list_style.container}
+                                onSwipeableRightOpen={() => delete_chat(item.docId)}
+                            >
+                                <Pressable style={({ pressed }) => [list_style.content_container, pressed && { backgroundColor: opacity_colors.secondary_medium }]} onPress={() => directToMessage(item)}>
+                                    <View style={list_style.profile_section}>
+                                        <ListProfileImage
+                                            friend={true}
+                                            image={otherUserImg}
+                                            onImagePress={() => directToProfile(otherUser)}
+                                        />
+                                        <View style={list_style.profile_section_text}>
+                                            <BodyText style={list_style.username} numberOfLines={1}>{otherUser ? otherUser.username.toLowerCase() : 'RandomUser'}</BodyText>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={list_style.content_section}>
-                                    <BodyText style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</BodyText>
-                                </View>
-                                <View style={list_style.top_right}>
-                                    <BodyText style={list_style.top_right_text}>{calcDateDiff(item.dateSent)}</BodyText>
-                                </View>
-                            </Pressable>
-                        </Swipeable>
-                    </View>
-                )
-            }}
-            keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
-        />
+                                    <View style={list_style.content_section}>
+                                        <BodyText style={list_style.content_section_text} numberOfLines={4}>{item.recentMsg ? item.recentMsg : 'no recent message...'}</BodyText>
+                                    </View>
+                                    <View style={list_style.top_right}>
+                                        <BodyText style={list_style.top_right_text}>{calcDateDiff(item.dateSent)}</BodyText>
+                                    </View>
+                                </Pressable>
+                            </Swipeable>
+                        </View>
+                    )
+                }}
+                keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
+            />
+        </View>
     )
 }
 
@@ -170,7 +172,8 @@ const chat_styles = (unread: boolean): StyleProp<any> => StyleSheet.create({
         backgroundColor: unread ? colors.secondaryMedium : colors.white,
         flexDirection: 'row',
         paddingLeft: 30,
-        height: 150
+        height: 150,
+        marginBottom: 20
     },
     profile_section: {
         flex: .5,

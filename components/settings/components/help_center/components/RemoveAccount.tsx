@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { UserDispatchActionsProps } from '../../../services/user/types';
-import { colors } from '../../utils/styles';
-import { CustomButton, CustomInput } from '../../utils';
+import { UserDispatchActionsProps } from '../../../../../services/user/types';
+import { colors } from '../../../../utils/styles';
+import { CustomButton, CustomInput } from '../../../../utils';
 import { Picker } from '@react-native-picker/picker';
 
 interface RemoveAccountProps {

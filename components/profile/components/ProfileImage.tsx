@@ -100,7 +100,7 @@ export const ListProfileImage = ({ image, friend, onImagePress }: ListProfileIma
     }
 
     return (
-        <Pressable style={[listStyles.container, dropShadowListContainer, !image && listStyles.border]} onPress={onImagePress}>
+        <Pressable style={[listStyles.container, dropShadowListContainer, (!image || !image.uri) && listStyles.border]} onPress={onImagePress}>
             {renderImage()}
             {friend && <Icon type='link' size={15} color={colors.primary} pressColor={colors.secondary} style={listStyles.friend} />}
         </Pressable>
@@ -164,13 +164,13 @@ const smallStyles = StyleSheet.create({
         right: -2,
     },
     icon: {
-        width: 25,
-        height: 25,
-        fontSize: 25
+        width: 35,
+        height: 35,
+        fontSize: 35
     },
     image_container: {
-        width: 30,
-        height: 30,
+        width: 35,
+        height: 35,
         borderRadius: 50,
     }
 })

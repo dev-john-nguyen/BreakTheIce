@@ -44,7 +44,7 @@ export default ({ refresh_near_users }: { refresh_near_users: NearUsersDispatchA
                 }]
             }
         }>
-            <Icon type='refresh-cw' size={25} color={colors.primary} pressColor={colors.secondary} onPress={handleRefreshOnPress} />
+            <Icon type='refresh-cw' size={30} color={colors.primary} pressColor={colors.secondary} onPress={handleRefreshOnPress} />
         </Animated.View>
     )
 }

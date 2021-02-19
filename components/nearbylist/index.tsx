@@ -13,6 +13,10 @@ import Empty from '../utils/components/Empty';
 import RespondModel from '../modal/respond';
 import { refresh_near_users } from '../../services/near_users/actions';
 import { colors } from '../utils/styles';
+import { setStatusBarNetworkActivityIndicatorVisible } from 'expo-status-bar';
+import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
+import { CustomButton } from '../utils';
+import { go_online } from '../../services/user/actions';
 
 
 interface NearByListProps {
@@ -21,6 +25,8 @@ interface NearByListProps {
     nearUsersFetched: NearUsersRootProps['fetched'];
     update_invitation: InvitationsDispatchActionProps['update_invitation']
     refresh_near_users: NearUsersDispatchActionProps['refresh_near_users']
+    user: UserRootStateProps;
+    go_online: UserDispatchActionsProps['go_online']
 }
 
 interface NearByListStateProps {
@@ -77,10 +83,16 @@ class NearByList extends React.Component<NearByListProps, NearByListStateProps> 
     }
 
     renderFlatList = () => {
-        const { nearUsers, nearUsersFetched, update_invitation } = this.props
+        const { nearUsers, nearUsersFetched, update_invitation, user, go_online } = this.props
+
+        if (user.offline) {
+            return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <CustomButton text='Go Online' type='primary' onPress={go_online} />
+            </View>
+        }
 
         if (!nearUsersFetched) return (
-            <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size='large' color={colors.primary} />
             </View>
         )
@@ -151,7 +163,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: RootProps) => ({
     nearUsers: state.nearUsers.nearBy,
-    nearUsersFetched: state.nearUsers.fetched
+    nearUsersFetched: state.nearUsers.fetched,
+    user: state.user
 })
 
-export default connect(mapStateToProps, { update_invitation, refresh_near_users })(NearByList);
+export default connect(mapStateToProps, { update_invitation, refresh_near_users, go_online })(NearByList);

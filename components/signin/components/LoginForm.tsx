@@ -131,7 +131,7 @@ export default () => {
                         onPress={() => setVerificationId('')}
                         moreStyles={styles.button}
                     />
-                    {confirmError && <Text style={styles.error}>{`Error: ${confirmError.message}`}</Text>}
+                    {confirmError && <Text style={styles.error}>{`Error: ${confirmError.message.replace("_", " ")}`}</Text>}
                 </View>
             </View>
         )
@@ -143,7 +143,6 @@ export default () => {
                 <FirebaseRecaptcha.FirebaseRecaptchaVerifierModal
                     ref={recaptchaVerifier}
                     firebaseConfig={firebaseConfig}
-                    attemptInvisibleVerification={true}
                 />
                 <BodyText
                     style={styles.title}
@@ -196,7 +195,7 @@ export default () => {
                         }
                     }}
                 />
-                {verifyError && <Text style={styles.error}>{verifyError.message}</Text>}
+                {verifyError && <Text style={styles.error}>{verifyError.message.replace("_", " ")}</Text>}
             </View>
         </View>
     );

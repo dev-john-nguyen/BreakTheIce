@@ -105,46 +105,50 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
     }
 
     const renderInvitationList = () => {
-        return <FlatList
-            ListEmptyComponent={() => (
-                <Empty style={{ marginTop: 50 }}>No Invitations</Empty>
-            )}
-            data={invitation.inbound}
-            contentContainerStyle={styles.flat_list}
-            renderItem={({ item, index, separators }) => (
-                <View style={[styles.container, dropShadowListContainer]}>
-                    {index === 0 && renderAnimation()}
-                    <Swipeable
-                        renderRightActions={renderRightActions}
-                        renderLeftActions={renderLeftActions}
-                        onSwipeableRightOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.denied)}
-                        onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
-                        containerStyle={styles.swipe_container}
-                    >
-                        <Pressable style={styles.content_container} onPress={handleShowPreview}>
-                            <View style={styles.profile_section}>
-                                <ListProfileImage
-                                    image={item.sentBy.profileImg}
-                                    onImagePress={() => handleDirectToProfile(item)}
-                                    friend={false}
-                                />
-                                <View style={styles.profile_section_text}>
-                                    <BodyText style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</BodyText>
-                                    <BodyText style={styles.age}>{item.sentBy.age ? item.sentBy.age : 0} years old</BodyText>
-                                </View>
-                            </View>
-                            <View style={styles.content_section}>
-                                <View style={styles.topRight}>
-                                    <BodyText style={styles.topRight_text}>{item.createdAt && renderDate(item.createdAt)}</BodyText>
-                                </View>
-                                <BodyText style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</BodyText>
-                            </View>
-                        </Pressable>
-                    </Swipeable>
-                </View>
-            )}
-            keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
-        />
+        return (
+            <View style={{ flex: 1, paddingBottom: 100 }}>
+                <FlatList
+                    ListEmptyComponent={() => (
+                        <Empty style={{ marginTop: 50 }}>No Invitations</Empty>
+                    )}
+                    data={invitation.inbound}
+                    contentContainerStyle={styles.flat_list}
+                    renderItem={({ item, index, separators }) => (
+                        <View style={[styles.container, dropShadowListContainer]}>
+                            {index === 0 && renderAnimation()}
+                            <Swipeable
+                                renderRightActions={renderRightActions}
+                                renderLeftActions={renderLeftActions}
+                                onSwipeableRightOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.denied)}
+                                onSwipeableLeftOpen={() => handleOnStatusUpdatePress(item, InvitationStatusOptions.accepted)}
+                                containerStyle={styles.swipe_container}
+                            >
+                                <Pressable style={styles.content_container} onPress={handleShowPreview}>
+                                    <View style={styles.profile_section}>
+                                        <ListProfileImage
+                                            image={item.sentBy.profileImg}
+                                            onImagePress={() => handleDirectToProfile(item)}
+                                            friend={false}
+                                        />
+                                        <View style={styles.profile_section_text}>
+                                            <BodyText style={styles.username} numberOfLines={1}>{item.sentBy.username ? item.sentBy.username : 'UnknownUser'}</BodyText>
+                                            <BodyText style={styles.age}>{item.sentBy.age ? item.sentBy.age : 0} years old</BodyText>
+                                        </View>
+                                    </View>
+                                    <View style={styles.content_section}>
+                                        <View style={styles.topRight}>
+                                            <BodyText style={styles.topRight_text}>{item.createdAt && renderDate(item.createdAt)}</BodyText>
+                                        </View>
+                                        <BodyText style={styles.content_section_text}>{item.message ? item.message : 'No Message...'}</BodyText>
+                                    </View>
+                                </Pressable>
+                            </Swipeable>
+                        </View>
+                    )}
+                    keyExtractor={(item, index) => item.docId ? item.docId : index.toString()}
+                />
+            </View>
+        )
 
     }
 

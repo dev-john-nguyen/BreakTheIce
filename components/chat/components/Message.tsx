@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { connect } from 'react-redux';
-import { View, ScrollView, FlatList, Text, StyleSheet, ActivityIndicator, Pressable, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, FlatList, Text, StyleSheet, ActivityIndicator, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { colors, normalize, dropShadowListContainer } from '../../utils/styles';
 import { ChatStackParams, ChatStackNavigationProp } from '../../navigation';
 import { RouteProp } from '@react-navigation/native';
@@ -10,13 +10,12 @@ import { MessageProps, ChatRootProps } from '../../../services/chat/types';
 import { RootProps } from '../../../services';
 import { set_banner } from '../../../services/banner/actions';
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
-import { CustomButton, BodyText, HeaderText, Icon, UnderlineHeader } from '../../utils';
+import { BodyText, Icon, UnderlineHeader } from '../../utils';
 import { ProfileImgProps } from '../../../services/user/types';
 import { timestamp } from '../../../utils/variables';
 import { CircleProfileImage } from '../../profile/components/ProfileImage';
 import { update_if_read, search_redux_chat, set_if_read, database_fetch_chat } from './utils';
 import { MessageCurve } from '../../utils/svgs';
-import { sendPushNotification } from '../../../services/notification/actions';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface ComMessageProps {
@@ -100,9 +99,9 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             headerTitle: () => (
                 <View style={{ alignItems: 'center' }}>
                     <UnderlineHeader
-                        colorFrom={colors.secondary}
-                        colorTo={colors.primary}
-                        height={9}
+                        colorFrom={colors.tertiary}
+                        colorTo={colors.secondary}
+                        height={8}
                         textStyle={{ color: colors.primary, fontSize: normalize(15) }}
                     >{route.params.targetUser.username}</UnderlineHeader>
                 </View>
@@ -231,7 +230,7 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
             .then(() => {
                 const { targetUser } = route.params;
 
-                sendPushNotification(targetUser.uid, user.username, 'newMessage')
+                // sendPushNotification(targetUser.uid, user.username, 'newMessage')
 
                 //if chatId is not undefined then a new Chat was created
                 newChatId && setTargetChatDocId(newChatId);
@@ -345,13 +344,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     message_form_input: {
+        fontSize: normalize(10),
         color: 'black',
         flex: 1,
         borderWidth: 1,
         borderRadius: 20,
         marginRight: 15,
-        padding: 15,
-        paddingTop: 15,
+        padding: 10,
+        paddingTop: 10,
         borderColor: colors.primary,
         backgroundColor: colors.white,
         alignSelf: 'stretch'

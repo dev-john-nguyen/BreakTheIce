@@ -1,18 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, StyleSheet, ImageBackground, Animated } from 'react-native';
 import { Item1, Item2, Item3, Item4 } from './svg';
 import { colors, normalize, dropShadow } from '../utils/styles';
-import { UnderlineHeader, CustomButton, Icon, HeaderText } from '../utils';
+import { UnderlineHeader, CustomButton, Icon } from '../utils';
 import LoginForm from './components/LoginForm';
 
 
 export default () => {
-    const [login, setLogin] = useState(false);
+    const [signIn, setSignIn] = useState('');
     const fadeAdmin = useRef(new Animated.Value(0)).current
-
-    useEffect(() => {
-
-    }, [])
 
     const handleLogin = () => {
         Animated.timing(fadeAdmin, {
@@ -20,12 +16,12 @@ export default () => {
             duration: 500,
             useNativeDriver: false
         }).start(() => {
-            setLogin(false)
+            setSignIn('')
         })
     }
 
-    const handleShow = () => {
-        setLogin(true)
+    const handleShow = (type: string) => {
+        setSignIn(type)
         Animated.timing(fadeAdmin, {
             toValue: 1,
             duration: 500,
@@ -40,19 +36,19 @@ export default () => {
             <View style={[styles.modal_content, dropShadow]}>
                 <UnderlineHeader
                     textStyle={styles.modal_header}
-                    height={12}
-                    colorFrom={colors.primary}
+                    height={10}
+                    colorFrom={colors.secondary}
                     colorTo={colors.tertiary}
-                >Sign In</UnderlineHeader>
+                >{signIn}</UnderlineHeader>
                 <LoginForm />
-                <Icon type='x' size={20} color={colors.black} style={{ position: 'absolute', right: 10, top: 10 }} onPress={handleLogin} />
+                <Icon type='x' size={15} color={colors.black} style={{ position: 'absolute', right: 10, top: 10 }} onPress={handleLogin} />
             </View>
         </Animated.View>
     )
 
     return (
         <View style={styles.container}>
-            {login && renderLogin()}
+            {!!signIn && renderLogin()}
             <ImageBackground
                 source={require('./header-image.jpg')}
                 style={{
@@ -80,7 +76,7 @@ export default () => {
                 <View style={styles.section}>
                     <View style={styles.button_container}>
                         <View>
-                            <CustomButton type='primary' text='Login' onPress={handleShow} />
+                            <CustomButton type='primary' text='Login' onPress={() => handleShow('Login')} />
                         </View>
                     </View>
                     <View style={{ flex: 1 }}>
@@ -93,7 +89,7 @@ export default () => {
                     </View>
                     <View style={styles.button_container}>
                         <View>
-                            <CustomButton type='secondary' text='Sign Up' onPress={handleShow} />
+                            <CustomButton type='secondary' text='Sign Up' onPress={() => handleShow('Sign Up')} />
                         </View>
                     </View>
                 </View>

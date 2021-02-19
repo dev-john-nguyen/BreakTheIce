@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { send_invitation } from '../../services/invitations/actions';
 import { InvitationsRootProps } from '../../services/invitations/types';
 import { UserRootStateProps, UserDispatchActionsProps } from '../../services/user/types';
-import { NearUsersRootProps } from '../../services/near_users/types';
+import { NearUsersRootProps, NearUsersDispatchActionProps } from '../../services/near_users/types';
 import { FriendsRootProps, FriendDispatchActionProps } from '../../services/friends/types';
 import { RootProps } from '../../services';
 import InvitationModal from '../modal/invitation';
@@ -23,6 +23,7 @@ import { windowWidth } from '../../utils/variables';
 import { update_block_user } from '../../services/user/actions';
 import Empty from '../utils/components/Empty';
 import RespondModel from '../modal/respond';
+import { report_user } from '../../services/near_users/actions';
 
 interface ProfileProps {
     navigation: BottomTabNavigationProp<RootBottomParamList, 'Home'> & HomeStackNavigationProp
@@ -36,6 +37,7 @@ interface ProfileProps {
     unfriend_user: FriendDispatchActionProps['unfriend_user'];
     set_banner: BannerDispatchActionProps['set_banner'];
     update_block_user: UserDispatchActionsProps['update_block_user'];
+    report_user: NearUsersDispatchActionProps['report_user']
 }
 
 //Summary
@@ -54,7 +56,13 @@ const Profile = (props: ProfileProps) => {
                 const friend = profileUser?.friend ? true : false;
 
                 return (
-                    <HeaderRight handleUnfriendUser={handleUnfriendUser} handleBlockUser={handleUpdateBlockUser} blocked={blocked} friend={friend} />
+                    <HeaderRight
+                        handleUnfriendUser={handleUnfriendUser}
+                        handleBlockUser={handleUpdateBlockUser}
+                        handleReportUser={handleReportUser}
+                        blocked={blocked}
+                        friend={friend}
+                    />
                 )
             },
             headerTintColor: colors.white
@@ -98,6 +106,11 @@ const Profile = (props: ProfileProps) => {
     const handleUnfriendUser = async () => {
         if (!profileUser) return
         return await props.unfriend_user(profileUser.uid)
+    }
+
+    const handleReportUser = async (reason: string) => {
+        if (!profileUser) return;
+        return await props.report_user(profileUser.uid, reason)
     }
 
     const directToMessage = () => {
@@ -189,4 +202,4 @@ const mapStateToProps = (state: RootProps) => ({
     profile: state.profile
 })
 
-export default connect(mapStateToProps, { send_invitation, set_current_profile, unfriend_user, set_banner, update_block_user })(Profile);
+export default connect(mapStateToProps, { send_invitation, set_current_profile, unfriend_user, set_banner, update_block_user, report_user })(Profile);
