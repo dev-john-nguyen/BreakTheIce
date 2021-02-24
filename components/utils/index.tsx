@@ -38,13 +38,11 @@ export const CustomButton = ({ text, onPress, type, moreStyles, indicatorColor, 
             <>
                 <LinearGradient
                     colors={['rgba(255, 255, 255, 0.6)', 'rgba(255, 255, 255, 0.1)']}
-                    style={styles.shine}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
-                />
-                <View style={[{ flexDirection: 'row' }]}>
+                    style={styles.shine}>
                     {indicatorColor ? <ActivityIndicator size='small' color={indicatorColor} style={indicator} /> : <BodyText text={text} style={props.pressed ? pressed.text : unpressed.text} />}
-                </View>
+                </LinearGradient>
             </>
         )}
     </Pressable>
@@ -132,12 +130,10 @@ const styles = StyleSheet.create({
         fontSize: normalize(10)
     },
     shine: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        height: '100%',
         width: '100%',
-        borderRadius: 5
+        borderRadius: 5,
+        flexDirection: 'row',
+        alignSelf: 'center',
     }
 })
 

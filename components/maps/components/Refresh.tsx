@@ -14,7 +14,7 @@ export default ({ refresh_near_users }: { refresh_near_users: NearUsersDispatchA
         if (spin) {
             Animated.loop(Animated.timing(spinAdmin, {
                 toValue: 1,
-                duration: 2000,
+                duration: 1500,
                 useNativeDriver: false
             })).start()
         } else {

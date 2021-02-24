@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { UserDispatchActionsProps } from '../../../../../services/user/types';
-import { colors } from '../../../../utils/styles';
-import { CustomButton, CustomInput } from '../../../../utils';
+import { colors, normalize } from '../../../../utils/styles';
+import { CustomButton, CustomInput, HeaderText } from '../../../../utils';
 import { Picker } from '@react-native-picker/picker';
 
 interface RemoveAccountProps {
@@ -37,6 +37,7 @@ const RemoveAccount = ({ remove_account }: RemoveAccountProps) => {
 
     return (
         <View style={styles.container}>
+            <HeaderText style={styles.header_text}>Confirm phone number to remove account</HeaderText>
             <View style={styles.phone_form}>
                 <Picker
                     enabled={false}
@@ -58,7 +59,7 @@ const RemoveAccount = ({ remove_account }: RemoveAccountProps) => {
                     onChangeText={(phoneNumber: string) => setPhoneNumber(phoneNumber)}
                 />
             </View>
-            <CustomButton type='red' text='Remove' onPress={handleOnSumbit} indicatorColor={loading && colors.white} />
+            <CustomButton type='red' text='Remove' onPress={handleOnSumbit} indicatorColor={loading && colors.white} style={styles.button} />
         </View>
     )
 }
@@ -67,6 +68,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         margin: 20
+    },
+    header_text: {
+        fontSize: normalize(12),
+        marginBottom: 20,
+        color: colors.primary
     },
     phone_form: {
         flexDirection: 'row',
@@ -79,19 +85,21 @@ const styles = StyleSheet.create({
         marginRight: 5,
     },
     picker_item: {
-        fontSize: 12,
+        fontSize: normalize(10),
         height: 40,
         backgroundColor: 'transparent',
         color: colors.primary
     },
     textInput: {
-        fontSize: 17,
-        borderBottomColor: colors.black,
+        borderBottomColor: colors.primary,
         padding: 10,
         borderBottomWidth: 1,
         marginBottom: 0,
         minWidth: 160
     },
+    button: {
+        alignSelf: 'center'
+    }
 })
 
 export default RemoveAccount;

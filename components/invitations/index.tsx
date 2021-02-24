@@ -163,7 +163,7 @@ const Invitations = ({ navigation, invitation, update_invitation_from_invitation
 
 const styles = StyleSheet.create({
     flat_list: {
-        paddingBottom: 80
+        paddingBottom: 0
     },
     leftAction: {
         flex: 1,

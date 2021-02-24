@@ -148,8 +148,6 @@ export const refresh_near_users = () => async (dispatch: AppDispatch, getState: 
 
                 await fireDb_init_user_location(user, currentBucket, location)
 
-                console.log(currentBucket)
-
                 dispatch({
                     type: REFRESH_UPDATE_BUCKET,
                     payload: {
@@ -227,7 +225,6 @@ export const validate_near_users = async (location: LocationObject, nearByUsers:
             var nearByIndex = nearByUsers.findIndex(user => user.uid === allUsers[i].uid)
 
             if (nearByIndex >= 0) {
-                console.log(nearByIndex)
                 nearByUsers.splice(nearByIndex, 1);
             }
         }

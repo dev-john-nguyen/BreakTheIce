@@ -13,12 +13,14 @@ import { init_user, init_account } from '../../services/signin/actions';
 import { SigninDispatchActionProps } from '../../services/signin/types';
 import GalleryForm from './components/GalleryForm';
 import { save_gallery } from '../../services/user/actions';
-import { HeaderText } from '../utils';
+import { HeaderText, CustomButton } from '../utils';
 import { normalize, colors } from '../utils/styles';
 import { FontAwesome } from '@expo/vector-icons';
 import { TopProfileBackground } from '../utils/svgs';
 import { windowWidth, windowHeight } from '../../utils/variables';
 import { likesInitIndex, carrerInitIndex, familyInitIndex, valuesInitIndex } from '../settings/components/profile/components/utils';
+import TermsOfUse from '../settings/components/other/components/TermsOfUse';
+
 /*
 Account Creation Process
 1. basic information
@@ -59,7 +61,7 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
         mount.current = true;
 
         if (user.username) {
-            setStep(1)
+            setStep(2)
         }
 
         return () => { mount.current = false }
@@ -69,7 +71,7 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
         Keyboard.dismiss();
 
         if (imgObjs.length > 5) {
-            return set_banner('Too many photos uploading. Theres a limit of 5 photos allowed in the gallery.', 'warning');
+            return set_banner('Too many photos uploading. Theres a limit of 5 photos allowed in the gallery.', 'error');
         }
 
         //lodash clone deep causing the app to crash in production for some reason...
@@ -88,12 +90,6 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
             })
         }
 
-        await (async () => {
-            return await new Promise(resolve => {
-                setTimeout(resolve, 5000)
-            })
-        })()
-
         setLoading(true)
 
         init_account(interviewVals, profileImg, imgObjRev)
@@ -107,7 +103,7 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
     }
 
     const handleNext = () => {
-        if (step == 3) {
+        if (step > 3) {
             handleSave()
         } else {
             setStep(step + 1)
@@ -115,7 +111,7 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
     }
 
     const handlePrevious = () => {
-        if (step > 1) {
+        if (step > 2) {
             setStep(step - 1)
         }
     }
@@ -139,14 +135,27 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
     const renderStep = () => {
         switch (step) {
             case 0:
-                return <AccountForm init_user={init_user} onNext={handleNext} />
+                return (
+                    <View style={{ flex: 1 }}>
+                        <TermsOfUse />
+                        <CustomButton
+                            text='I Agree To These Terms'
+                            type='primary'
+                            onPress={handleNext}
+                            style={{ marginBottom: 10 }}
+                        />
+                    </View>
+                )
+
             case 1:
+                return <AccountForm init_user={init_user} onNext={handleNext} />
+            case 2:
                 return <Interview
                     onNext={handleNext}
                     interviewVals={interviewVals}
                     setInterviewVals={setInterviewVals}
                 />
-            case 2:
+            case 3:
                 return <ProfileImageForm
                     set_banner={set_banner}
                     handleCameraRollPermission={handleCameraRollPermission}
@@ -154,7 +163,7 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
                     setProfileImg={setProfileImg}
                     profileImg={profileImg}
                 />
-            case 3:
+            case 4:
                 return <GalleryForm
                     handleCameraRollPermission={handleCameraRollPermission}
                     set_banner={set_banner}
@@ -179,20 +188,20 @@ const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_accou
         <View style={styles.container}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginBottom: (windowHeight / 20) }}>
 
-                <FontAwesome name="arrow-circle-left" size={30} color={step > 1 ? colors.secondary : colors.lightGrey} onPress={handlePrevious} />
+                <FontAwesome name="arrow-circle-left" size={30} color={step > 2 ? colors.secondary : colors.lightGrey} onPress={handlePrevious} />
 
                 <View style={styles.progress_content}>
                     <HeaderText style={styles.progress_text}>
-                        {`Step ${step + 1}/4`}
+                        {`Step ${step + 1}/5`}
                     </HeaderText>
                     <View style={styles.progress_bar}>
                         <View style={[{
-                            width: `${(((step + 1) / 4) * 100)}%`,
+                            width: `${(((step + 1) / 5) * 100)}%`,
                         }, styles.progress_bar_progress]} />
                     </View>
                 </View>
 
-                <FontAwesome name="arrow-circle-right" size={30} color={step > 0 ? colors.primary : colors.lightGrey} onPress={() => step > 0 && handleNext()} />
+                <FontAwesome name="arrow-circle-right" size={30} color={step > 1 ? colors.primary : colors.lightGrey} onPress={() => step > 1 && handleNext()} />
             </View>
             {renderStep()}
             <TopProfileBackground style={styles.header_background} height={'40%'} width={windowWidth.toString()} />

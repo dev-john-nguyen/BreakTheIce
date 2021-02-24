@@ -4,9 +4,9 @@ import { UpdateUserPrivacyProps, UserRootStateProps, UserDispatchActionsProps } 
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import { MeStackNavigationProp } from '../../navigation';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../../utils/styles';
+import { colors, normalize } from '../../utils/styles';
 import { isEqual } from 'lodash';
-import { HeaderText } from '../../utils';
+import { HeaderText, BodyText } from '../../utils';
 
 interface PrivacyProps {
     user: UserRootStateProps;
@@ -21,29 +21,6 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
         hideOnMap,
         offline
     }
-
-    // useEffect(() => {
-    //     var mount = true;
-    //     navigation.setOptions({
-    //         headerRight: () => {
-    //             if (loading) {
-    //                 return <ActivityIndicator size='small' color={colors.primary} style={{ marginRight: 20 }} />
-    //             } else {
-    //                 return (
-    //                     <Pressable onPress={() => handleSave(mount)} style={{ marginRight: 15 }}>
-    //                         {({ pressed }) => <Feather name='save' size={30} color={pressed ? colors.secondary : colors.primary} />}
-    //                     </Pressable >
-    //                 )
-    //             }
-    //         }
-    //     })
-
-    //     return () => {
-    //         mount = false
-    //         navigation.setOptions({ headerRight: undefined })
-    //     }
-    // }, [loading, privacyVals, user])
-
 
     const handleSave = (privacy: UpdateUserPrivacyProps) => {
 
@@ -67,7 +44,7 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
     return (
         <View style={styles.container}>
             <View style={styles.content_container}>
-                <Text style={styles.content_text}>{privacyVals.hideOnMap ? 'Show On Map' : 'Hide On Map'}</Text>
+                <BodyText style={styles.content_text}>{privacyVals.hideOnMap ? 'Show On Map' : 'Hide On Map'}</BodyText>
                 <Switch
                     trackColor={{ false: colors.lightRed, true: colors.tertiary }}
                     thumbColor={privacyVals.hideOnMap ? colors.primary : colors.red}
@@ -78,7 +55,7 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
             </View>
 
             <View style={styles.content_container}>
-                <Text style={styles.content_text}>{privacyVals.offline ? 'Go Online' : 'Go Offline'}</Text>
+                <BodyText style={styles.content_text}>{privacyVals.offline ? 'Go Online' : 'Go Offline'}</BodyText>
                 <Switch
                     trackColor={{ false: colors.lightRed, true: colors.tertiary }}
                     thumbColor={privacyVals.offline ? colors.primary : colors.red}
@@ -95,7 +72,6 @@ const Privacy = ({ user, set_banner, navigation, update_privacy }: PrivacyProps)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         margin: 20
     },
     content_container: {
@@ -104,7 +80,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     content_text: {
-        fontSize: 12,
+        fontSize: normalize(10),
         color: colors.black,
         marginRight: 10
     }

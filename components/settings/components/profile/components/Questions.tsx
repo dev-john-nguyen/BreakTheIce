@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         color: colors.black
     },
     header_sub_text: {
-        fontSize: normalize(10),
+        fontSize: normalize(12),
         color: colors.black
     },
     question_container: {

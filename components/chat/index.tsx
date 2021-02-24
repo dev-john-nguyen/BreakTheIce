@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
         backgroundColor: colors.red,
     },
     flat_list: {
-        paddingBottom: 80
     }
 })
 

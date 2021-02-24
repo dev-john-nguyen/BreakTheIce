@@ -265,13 +265,13 @@ const Message = ({ route, navigation, user, set_banner, chatPreviews }: ComMessa
                                 <BodyText style={styles.message_right_text}>{item.message}</BodyText>
                                 <MessageCurve style={styles.message_curve_right} color='grey' />
                             </View>
-                            <View style={{ alignSelf: 'flex-end' }}>
+                            {/* <View style={{ alignSelf: 'flex-end' }}>
                                 <CircleProfileImage
                                     size='small'
                                     image={user.profileImg}
                                     friend={false}
                                 />
-                            </View>
+                            </View> */}
                         </View>
                     )
                 } else {
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignSelf: 'flex-start',
         margin: 20,
-        marginRight: 40
+        marginRight: 50
     },
     message_left_content: {
         position: 'relative',
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignSelf: 'flex-end',
         margin: 20,
-        marginLeft: 40
+        marginLeft: 10
     },
     message_right_content: {
         position: 'relative',

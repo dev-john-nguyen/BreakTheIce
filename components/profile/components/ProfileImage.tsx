@@ -22,7 +22,7 @@ export const CircleProfileImage = ({ image, friend, size, onImagePress }: Profil
     switch (size) {
         case 'small':
             styles = smallStyles;
-            iconSize = 5;
+            iconSize = 10;
             break;
         default:
             styles = regularStyles;
@@ -38,9 +38,11 @@ export const CircleProfileImage = ({ image, friend, size, onImagePress }: Profil
                 <View style={styles.image_container}>
                     <Image
                         source={{ uri, cache: 'force-cache' }}
-                        style={[baseStyles.image, {
-                            borderRadius: 50
-                        }]}
+                        style={{
+                            borderRadius: 50,
+                            width: '100%',
+                            height: '100%',
+                        }}
                         onError={(err) => {
                             console.log(err)
                             setErrImg(true)
@@ -67,6 +69,56 @@ export const CircleProfileImage = ({ image, friend, size, onImagePress }: Profil
     )
 }
 
+const smallStyles = StyleSheet.create({
+    container: {
+        position: 'relative'
+    },
+    friend: {
+        position: 'absolute',
+        transform: [
+            {
+                rotate: "90deg"
+            }
+        ],
+        right: -3,
+        top: -3
+    },
+    icon: {
+        width: 35,
+        height: 35,
+        fontSize: 35
+    },
+    image_container: {
+        width: 35,
+        height: 35,
+        borderRadius: 50,
+    }
+})
+
+const regularStyles = StyleSheet.create({
+    container: {
+        position: 'relative',
+        height: windowWidth / 5,
+        width: windowWidth / 5,
+    },
+    friend: {
+        position: 'absolute',
+        right: -3,
+        top: -3,
+        transform: [
+            {
+                rotate: "90deg"
+            }
+        ]
+    },
+    icon: {
+        fontSize: windowWidth / 5.5
+    },
+    image_container: {
+        flex: 1,
+        borderRadius: 50
+    }
+})
 
 interface ListProfileImageProp {
     image: ProfileImgProps | NewProfileImgProps | null;
@@ -137,65 +189,5 @@ const listStyles = StyleSheet.create({
         width: '100%',
         height: '100%',
         borderRadius: 5
-    }
-})
-
-const baseStyles: StyleProp<any> = StyleSheet.create({
-    friend: {
-        position: 'absolute',
-        transform: [
-            {
-                rotate: "90deg"
-            }
-        ]
-    },
-    image: {
-        width: '100%',
-        height: '100%',
-    }
-})
-
-const smallStyles = StyleSheet.create({
-    container: {
-        position: 'relative'
-    },
-    friend: {
-        ...baseStyles.friend,
-        right: -2,
-    },
-    icon: {
-        width: 35,
-        height: 35,
-        fontSize: 35
-    },
-    image_container: {
-        width: 35,
-        height: 35,
-        borderRadius: 50,
-    }
-})
-
-const regularStyles = StyleSheet.create({
-    container: {
-        position: 'relative',
-        height: windowWidth / 5,
-        width: windowWidth / 5,
-    },
-    friend: {
-        position: 'absolute',
-        transform: [
-            {
-                rotate: "90deg"
-            }
-        ]
-    },
-    icon: {
-        fontSize: windowWidth / 5.5
-    },
-    image_container: {
-        flex: 1,
-        // width: windowWidth / 5,
-        // height: windowWidth / 5,
-        borderRadius: 50
     }
 })

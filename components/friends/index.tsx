@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
         flex: 1
     },
     flat_list: {
-        paddingBottom: 100
     },
     friend_container: {
         padding: 10,

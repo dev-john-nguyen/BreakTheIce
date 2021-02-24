@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
 import { BodyText } from '../../../utils';
-import { colors, normalize } from '../../../utils/styles';
+import { colors, normalize, dropShadow } from '../../../utils/styles';
 import { UserDispatchActionsProps } from '../../../../services/user/types';
 import PrivatePolicy from './components/PrivatePolicy';
 import RemoveAccount from './components/RemoveAccount';
 import Contact from './components/Contact';
 import Tips from './components/Tips';
-
+import CommunityGuide from './components/CommunityGuide';
+import TermsOfUse from './components/TermsOfUse';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface HelpCenterProps {
     remove_account: UserDispatchActionsProps['remove_account'];
@@ -17,6 +19,8 @@ enum ContentOptions {
     tips = 'tips',
     policy = 'policy',
     contact = 'contact',
+    community = 'community',
+    terms = 'terms',
     remove = 'remove'
 }
 
@@ -25,6 +29,10 @@ export default ({ remove_account }: HelpCenterProps) => {
 
     const renderContent = () => {
         switch (content) {
+            case ContentOptions.terms:
+                return <TermsOfUse />
+            case ContentOptions.community:
+                return <CommunityGuide />
             case ContentOptions.tips:
                 return <Tips />
             case ContentOptions.policy:
@@ -42,12 +50,26 @@ export default ({ remove_account }: HelpCenterProps) => {
     return (
         <View style={styles.container}>
             <View style={styles.menu}>
-                <View style={styles.menu_container}>
+                <ScrollView style={[styles.menu_container, dropShadow]}>
                     <Pressable
                         style={[styles.menu_item, content === ContentOptions.tips && styles.active]}
                         onPress={() => setContent(ContentOptions.tips)}
                     >
-                        <BodyText style={styles.menu_text}>Help</BodyText>
+                        <BodyText style={styles.menu_text}>Safety Tips</BodyText>
+                    </Pressable>
+
+                    <Pressable
+                        style={[styles.menu_item, content === ContentOptions.terms && styles.active]}
+                        onPress={() => setContent(ContentOptions.terms)}
+                    >
+                        <BodyText style={styles.menu_text}>Terms of Use</BodyText>
+                    </Pressable>
+
+                    <Pressable
+                        style={[styles.menu_item, content === ContentOptions.community && styles.active]}
+                        onPress={() => setContent(ContentOptions.community)}
+                    >
+                        <BodyText style={styles.menu_text}>Community Guidelines</BodyText>
                     </Pressable>
 
                     <Pressable
@@ -70,8 +92,7 @@ export default ({ remove_account }: HelpCenterProps) => {
                     >
                         <BodyText style={styles.menu_text}>Remove Account</BodyText>
                     </Pressable>
-
-                </View>
+                </ScrollView>
             </View>
             <View style={styles.content}>
                 {renderContent()}
@@ -83,25 +104,28 @@ export default ({ remove_account }: HelpCenterProps) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row'
-    },
-    menu: {
-        flex: .2,
+        flexDirection: 'column'
     },
     active: {
-        borderBottomColor: colors.primary,
-        borderBottomWidth: 2
+        backgroundColor: colors.primary,
     },
     content: {
-        flex: .8,
+        flex: 1,
+        padding: 10
+    },
+    menu: {
+        flex: .1,
+        marginBottom: 10
     },
     menu_container: {
-
+        flex: 1,
+        borderRadius: 10,
+        backgroundColor: colors.white,
+        width: '60%',
+        alignSelf: 'center',
     },
     menu_item: {
         padding: 5,
-        margin: 5,
-        alignItems: 'center'
     },
     menu_text: {
         fontSize: normalize(10),

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View } from 'react-native';
-import { colors, normalize } from '../../utils/styles';
+import { View, StyleSheet } from 'react-native';
+import { colors, normalize, dropShadowListContainer } from '../../utils/styles';
 import { Icon, CustomButton, CustomInput } from '../../utils';
-import { NearUsersDispatchActionProps } from '../../../services/near_users/types';
 
 interface ProfileHeaderRightProps {
     handleReportUser: (reason: string) => Promise<void>;
@@ -55,34 +54,26 @@ export default ({ handleUnfriendUser, handleBlockUser, handleReportUser, blocked
 
     if (reportForm) {
         return (
-            <View style={{ margin: 10, flexDirection: 'column', alignItems: 'stretch' }}>
+            <View style={[styles.report_container, dropShadowListContainer]}>
+                <Icon type='x' size={15} color={colors.black} pressColor={colors.lightGrey} onPress={() => setReportForm(false)} />
                 <CustomInput
                     value={reason}
                     onChangeText={(txt) => setReason(txt)}
-                    style={{
-                        fontSize: normalize(8),
-                        backgroundColor: colors.white,
-                        borderRadius: 10,
-                        alignSelf: 'stretch'
-                    }}
-                    placeholder='Reason (one word)'
+                    style={styles.report_input}
+                    placeholder='Reason (a few words)'
                     maxLength={20}
                 />
-                <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center' }}>
-                    <CustomButton type='red' text={'report'} size='small' moreStyles={{ marginLeft: 5 }} onPress={handleOnReportSubmit} />
-
-                    <CustomButton type='primary' text={'cancel'} size='small' moreStyles={{ marginLeft: 5 }} onPress={() => setReportForm(false)} />
-                </View>
+                <Icon type='send' size={20} color={colors.red} pressColor={colors.lightRed} onPress={handleOnReportSubmit} style={{ alignSelf: 'center' }} />
             </View>
         )
     }
 
 
     if (showMenu) return (
-        <View style={{ marginRight: 10, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={[styles.menu_container, dropShadowListContainer]}>
 
             {
-                friend && <CustomButton type='white' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={linkloading && colors.primary} />
+                friend && <CustomButton type='secondary' text='Unlink' size='small' moreStyles={{ marginRight: 5 }} onPress={handleUnlinkPress} indicatorColor={linkloading && colors.primary} />
             }
             <CustomButton type='red_outline' text={blocked ? 'unblock' : 'block'} size='small' moreStyles={{ marginRight: 5 }} onPress={handleBlockPress} indicatorColor={blockLoading && colors.white} />
 
@@ -91,7 +82,7 @@ export default ({ handleUnfriendUser, handleBlockUser, handleReportUser, blocked
             <Icon
                 type='more-horizontal'
                 size={24}
-                color={colors.white}
+                color={colors.primary}
                 pressColor={colors.tertiary}
                 onPress={handleShowMenu}
                 style={{ marginRight: 10 }}
@@ -109,3 +100,39 @@ export default ({ handleUnfriendUser, handleBlockUser, handleReportUser, blocked
         style={{ marginRight: 10 }}
     />
 }
+
+const styles = StyleSheet.create({
+    menu_container: {
+        marginRight: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: colors.white,
+        borderColor: colors.tertiary,
+        borderWidth: 1,
+        padding: 10,
+        paddingLeft: 10,
+        width: '100%',
+        borderRadius: 10
+    },
+    report_container: {
+        flexDirection: 'row',
+        marginRight: 10,
+        padding: 2,
+        paddingRight: 5,
+        paddingLeft: 5,
+        backgroundColor: colors.white,
+        borderColor: colors.tertiary,
+        borderWidth: 1,
+        borderRadius: 10
+    },
+    report_input: {
+        fontSize: normalize(6),
+        borderBottomColor: colors.red,
+        borderBottomWidth: 2,
+        borderRadius: 10,
+        marginRight: 5,
+        alignSelf: 'stretch'
+    }
+})
+

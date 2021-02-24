@@ -13,7 +13,7 @@ import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
 import EditGallery from './components/EditGallery';
 import * as ImagePicker from 'expo-image-picker';
 import { BodyText, HeaderText, Icon } from '../utils';
-import HelpCenter from './components/help_center';
+import Other from './components/other'
 
 interface SettingsProps {
     navigation: MeStackNavigationProp;
@@ -30,7 +30,7 @@ enum TargetOptions {
     privacy = 'Privacy',
     contacts = "Manage Contacts",
     gallery = "Edit Gallery",
-    help = "Help Center"
+    other = "Other"
 }
 
 const Settings = ({ navigation, user, update_profile, set_banner, update_privacy, sign_out, remove_account }: SettingsProps) => {
@@ -51,8 +51,8 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                 return <Privacy user={user} set_banner={set_banner} navigation={navigation} update_privacy={update_privacy} />
             case TargetOptions.gallery:
                 return <EditGallery navigation={navigation} handleCameraRollPermission={handleCameraRollPermission} />
-            case TargetOptions.help:
-                return <HelpCenter remove_account={remove_account} />
+            case TargetOptions.other:
+                return <Other remove_account={remove_account} />
             case TargetOptions.profile:
             default:
                 return <EditProfile user={user} set_banner={set_banner} navigation={navigation} update_profile={update_profile} handleCameraRollPermission={handleCameraRollPermission} />
@@ -120,12 +120,12 @@ const Settings = ({ navigation, user, update_profile, set_banner, update_privacy
                     </Pressable>
 
                     <Pressable
-                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.help || pressed) && styles.active]}
-                        onPress={() => setTarget(TargetOptions.help)}
+                        style={({ pressed }) => [styles.menu_items, (target === TargetOptions.other || pressed) && styles.active]}
+                        onPress={() => setTarget(TargetOptions.other)}
 
                     >
                         <View style={styles.content}>
-                            <BodyText style={[styles.text]} numberOfLines={1}>Help Center</BodyText>
+                            <BodyText style={[styles.text]} numberOfLines={1}>Other</BodyText>
                         </View>
                     </Pressable>
 

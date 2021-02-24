@@ -108,20 +108,12 @@ export const dropShadowListContainer: StyleProp<any> = {
 //buttons
 const buttonBase: StyleProp<any> = {
     borderRadius: 5,
-    // paddingLeft: 30,
-    // paddingRight: 30,
-    // paddingTop: 10,
-    // paddingBottom: 10,
     borderWidth: 1,
     alignItems: 'center'
 }
 
 const smallButtonBase: StyleProp<any> = {
     borderRadius: 5,
-    // paddingLeft: 15,
-    // paddingRight: 15,
-    // paddingTop: 5,
-    // paddingBottom: 5,
     borderWidth: 1,
     alignItems: 'center',
 }

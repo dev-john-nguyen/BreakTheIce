@@ -127,7 +127,7 @@ export default () => {
                     />
                     <CustomButton
                         text="Try again."
-                        type='secondary'
+                        type='white'
                         onPress={() => setVerificationId('')}
                         moreStyles={styles.button}
                     />
@@ -203,17 +203,15 @@ export default () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 0,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: 20
     },
     content: {
         alignItems: 'center'
     },
     title: {
-        marginBottom: 10,
         fontSize: normalize(12),
-        color: colors.primary
+        color: colors.white
     },
     phone_form: {
         flexDirection: 'row',
@@ -224,8 +222,9 @@ const styles = StyleSheet.create({
         flexBasis: '20%',
     },
     picker_item: {
-        fontSize: 12,
+        fontSize: normalize(12),
         height: 100,
+        color: colors.white
     },
     subtitle: {
         marginBottom: 10,
@@ -237,12 +236,13 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     textInput: {
-        fontSize: 17,
+        fontSize: normalize(14),
         borderBottomColor: colors.primary,
-        padding: 10,
+        padding: 5,
         borderBottomWidth: 1,
         marginBottom: 10,
-        minWidth: 160
+        minWidth: 160,
+        color: colors.white
     },
     error: {
         marginTop: 10,
