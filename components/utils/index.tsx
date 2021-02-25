@@ -97,9 +97,10 @@ interface CustomInput {
     autoCorrect?: boolean;
     autoCompleteType?: "tel";
     autoFocus?: boolean
+    textAlignVertical?: 'top'
 }
 
-export const CustomInput = ({ style, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize, autoCorrect, autoCompleteType, autoFocus }: CustomInput) => {
+export const CustomInput = ({ style, placeholder, multiline, maxLength, value, onChangeText, keyboardType, textContentType, autoCapitalize, autoCorrect, autoCompleteType, autoFocus, textAlignVertical }: CustomInput) => {
     return <TextInput
         style={[style, styles.input, { fontFamily: 'Roboto_400Regular' }]}
         placeholder={placeholder}
@@ -113,6 +114,7 @@ export const CustomInput = ({ style, placeholder, multiline, maxLength, value, o
         autoCorrect={autoCorrect}
         autoCompleteType={autoCompleteType}
         autoFocus={autoFocus}
+        textAlignVertical={textAlignVertical}
     />
 }
 

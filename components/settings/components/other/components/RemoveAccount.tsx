@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     header_text: {
         fontSize: normalize(12),
         marginBottom: 20,
-        color: colors.primary
+        color: colors.black
     },
     phone_form: {
         flexDirection: 'row',
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         fontSize: normalize(10),
         height: 40,
         backgroundColor: 'transparent',
-        color: colors.primary
+        color: colors.black
     },
     textInput: {
         borderBottomColor: colors.primary,

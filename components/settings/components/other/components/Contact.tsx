@@ -9,7 +9,6 @@ export default () => (
         <View style={styles.content}>
             <BodyText style={styles.body_text}>You can reach us at</BodyText>
             <HeaderText style={styles.header_text}>letslinkcontact@gmail.com.</HeaderText>
-            <BodyText style={styles.body_text}>Feel free to contact us to offer advice or with any questions you might have.</BodyText>
         </View>
     </View>
 )

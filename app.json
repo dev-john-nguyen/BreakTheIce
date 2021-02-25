@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "BreakTheIce",
-    "slug": "breaktheice",
+    "name": "Letslink",
+    "slug": "Letslink",
     "privacy": "unlisted",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
@@ -19,10 +20,10 @@
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Break The Ice uses your location to identify users near you.",
-        "NSPhotoLibraryUsageDescription": "Break The Ice access photo library for users usage only to select photos for their profile."
+        "NSLocationWhenInUseUsageDescription": "This app uses users location to identify other users near by.",
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to allow users to pick and choose images for their profile."
       },
-      "bundleIdentifier": "com.nguyening20.breaktheice"
+      "bundleIdentifier": "com.letslink.app"
     },
     "android": {
       "adaptiveIcon": {

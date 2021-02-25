@@ -219,10 +219,10 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     picker: {
-        flexBasis: '20%',
+        flexBasis: '20%'
     },
     picker_item: {
-        fontSize: normalize(12),
+        fontSize: normalize(14),
         height: 100,
         color: colors.white
     },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
         borderBottomColor: colors.primary,
         padding: 5,
         borderBottomWidth: 1,
-        marginBottom: 10,
+        marginBottom: 5,
         minWidth: 160,
         color: colors.white
     },

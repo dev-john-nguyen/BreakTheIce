@@ -1,7 +1,7 @@
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
 import { View, Image, StyleSheet, Pressable, KeyboardAvoidingView, Animated } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { UserDispatchActionsProps, NewGalleryItemProps } from '../../../services/user/types';
+import { NewGalleryItemProps } from '../../../services/user/types';
 import { BannerDispatchActionProps } from '../../../services/banner/tsTypes';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { galleryImgSizeLimit } from '../../../utils/variables';
@@ -15,27 +15,31 @@ import { introStyles } from './utils';
 //image limit will be set to 10000000 byte = 10mb
 //need to lower the size
 interface UploadGalleryProps {
-    save_gallery: UserDispatchActionsProps['save_gallery'];
     set_banner: BannerDispatchActionProps['set_banner'];
     handleCameraRollPermission: () => Promise<boolean>;
-    onNext: () => void;
     imgObjs: NewGalleryItemProps[]
     setImgObjs: (imgObjs: NewGalleryItemProps[]) => void;
 }
 
-export default ({ save_gallery, set_banner, handleCameraRollPermission, onNext, imgObjs, setImgObjs }: UploadGalleryProps) => {
+export default ({ set_banner, handleCameraRollPermission, imgObjs, setImgObjs }: UploadGalleryProps) => {
     const [intro, setIntro] = useState(true)
     const fadeAmin = useRef(new Animated.Value(0)).current
+    var mount = useRef<boolean>()
 
     useEffect(() => {
+        mount.current = true
         Animated.timing(fadeAmin, {
             delay: 3000,
             toValue: 1,
             duration: 2000,
             useNativeDriver: false
         }).start(() => {
-            setIntro(false)
+            mount && setIntro(false)
         })
+
+        return () => {
+            mount.current = false
+        }
     }, [])
 
     const pickImage = async () => {
@@ -297,5 +301,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         marginRight: 40,
         marginLeft: 40,
+        alignSelf: 'center'
     }
 })

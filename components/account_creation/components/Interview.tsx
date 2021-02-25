@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Picker, StyleSheet, Animated, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { View, Picker, StyleSheet, Animated, Keyboard, Pressable } from 'react-native';
 import { interviewKeys, likesQuestions, familyQuestions, carrerQuestions, valuesQuestions } from '../../settings/components/profile/components/utils';
 import { InterviewProps } from '../../../services/user/types';
-import { BodyText, CustomInput, CustomButton, HeaderText, UnderlineHeader } from '../../utils';
-import { colors, normalize, dropShadowLight, dropShadow } from '../../utils/styles';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { windowHeight } from '../../../utils/variables';
+import { BodyText, CustomInput, CustomButton, HeaderText } from '../../utils';
+import { colors, normalize, dropShadowLight } from '../../utils/styles';
 import { introStyles } from './utils';
 
 interface QuestionProps {
@@ -18,16 +16,22 @@ export default ({ onNext, setInterviewVals, interviewVals }: QuestionProps) => {
     const [intro, setIntro] = useState(true)
     const [qStep, setQStep] = useState(0)
     const fadeAmin = useRef(new Animated.Value(0)).current
+    var mount = useRef<boolean>()
 
     useEffect(() => {
+        mount.current = true;
         Animated.timing(fadeAmin, {
             delay: 5000,
             toValue: 1,
             duration: 2000,
             useNativeDriver: false
         }).start(() => {
-            setIntro(false)
+            mount && setIntro(false)
         })
+
+        return () => {
+            mount.current = false;
+        }
     }, [])
 
     const handleOnQuestionValueChange = (question: string) => {
@@ -85,51 +89,49 @@ export default ({ onNext, setInterviewVals, interviewVals }: QuestionProps) => {
 
 
         return (
-            <>
-                <KeyboardAvoidingView style={{ flex: 1, justifyContent: 'center' }} behavior='padding' >
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <HeaderText style={styles.header}>{headerTxt}</HeaderText>
-                        <Picker
-                            selectedValue={interviewVals[curKey][0]}
-                            onValueChange={handleOnQuestionValueChange}
-                            style={[styles.picker_container, dropShadowLight]}
-                            itemStyle={styles.picker_item}
-                        >
-                            {curQuestion.map((question, index) => (
-                                <Picker.Item label={question} value={question} key={index} />
-                            ))}
-                        </Picker>
-                        <CustomInput
-                            value={interviewVals[curKey][1]}
-                            onChangeText={(text) => setInterviewVals({
-                                ...interviewVals,
-                                [curKey]: [interviewVals[curKey][0], text]
-                            })}
-                            placeholder={interviewVals[curKey][0]}
-                            maxLength={300}
-                            multiline={true}
-                            style={[styles.input, dropShadowLight]}
-                        />
-                    </TouchableWithoutFeedback>
+            <View style={styles.question_container}>
+                <Pressable onPress={Keyboard.dismiss} style={styles.question_content}>
+                    <HeaderText style={styles.header}>{headerTxt}</HeaderText>
+                    <CustomInput
+                        value={interviewVals[curKey][1]}
+                        onChangeText={(text) => setInterviewVals({
+                            ...interviewVals,
+                            [curKey]: [interviewVals[curKey][0], text]
+                        })}
+                        placeholder='Answer question in less than 300 characters'
+                        maxLength={300}
+                        multiline={true}
+                        style={[styles.input, dropShadowLight]}
+                    />
+                    <BodyText style={styles.question_text}>{interviewVals[curKey][0]}</BodyText>
+                    <Picker
+                        selectedValue={interviewVals[curKey][0]}
+                        onValueChange={handleOnQuestionValueChange}
+                        style={[styles.picker_container, dropShadowLight]}
+                        itemStyle={styles.picker_item}
+                    >
+                        {curQuestion.map((question, index) => (
+                            <Picker.Item label={question} value={question} key={index} />
+                        ))}
+                    </Picker>
+                </Pressable>
+                <View style={styles.question_buttons}>
+                    <CustomButton
+                        text='Previous'
+                        type='white'
+                        onPress={handlePrevious}
+                        style={styles.button}
+                    />
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-                        <CustomButton
-                            text='Previous'
-                            type='secondary'
-                            onPress={handlePrevious}
-                            style={styles.button}
-                        />
 
-
-                        <CustomButton
-                            text='Next'
-                            type='primary'
-                            onPress={handleNext}
-                            style={styles.button}
-                        />
-                    </View>
-                </KeyboardAvoidingView>
-            </>
+                    <CustomButton
+                        text='Next'
+                        type='primary'
+                        onPress={handleNext}
+                        style={styles.button}
+                    />
+                </View>
+            </View>
         )
     }
 
@@ -167,11 +169,30 @@ const styles = StyleSheet.create({
         color: colors.primary,
         alignSelf: 'center'
     },
+    question_container: {
+        flex: 1,
+        justifyContent: 'space-between',
+        flexDirection: 'column'
+    },
+    question_content: {
+        flex: 1,
+        justifyContent: 'space-evenly'
+    },
+    question_buttons: {
+        flex: .2,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'flex-start'
+    },
+    question_text: {
+        fontSize: normalize(10),
+        alignSelf: 'center'
+    },
     picker_container: {
         width: '100%',
         alignSelf: 'center',
         borderRadius: 10,
-        marginTop: (windowHeight / 22),
+        backgroundColor: colors.white
     },
     picker_item: {
         fontSize: normalize(9),
@@ -179,7 +200,6 @@ const styles = StyleSheet.create({
     },
     input: {
         fontSize: normalize(12),
-        marginTop: (windowHeight / 22),
         alignSelf: 'stretch',
         backgroundColor: colors.white,
         borderRadius: 10,
@@ -187,7 +207,6 @@ const styles = StyleSheet.create({
         minHeight: 100
     },
     button: {
-        marginTop: (windowHeight / 22),
-        alignSelf: 'stretch'
+        marginTop: 10
     },
 })

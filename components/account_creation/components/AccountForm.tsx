@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Picker, Animated, Keyboard } from 'react-native';
 import { SigninDispatchActionProps } from '../../../services/signin/types';
-import { UnderlineHeader, BodyText, CustomInput, CustomButton, HeaderText } from '../../utils';
+import { BodyText, CustomInput, CustomButton, HeaderText } from '../../utils';
 import { ageArr } from '../../../utils/variables';
 import { colors, normalize, dropShadowLight } from '../../utils/styles';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
@@ -138,7 +138,7 @@ export default ({ init_user, onNext }: SignUpFormProps) => {
                 </View>
             </TouchableWithoutFeedback>
             {
-                name.length > 0 && age > 0 && username.length > 0 && <CustomButton type='primary' text='Submit' onPress={handleSubmit} indicatorColor={loading && colors.white} style={styles.next_button} />
+                name.length > 0 && age > 0 && username.length > 0 && <CustomButton type='primary' text='Submit' onPress={handleSubmit} indicatorColor={loading && colors.white} style={styles.submit} />
             }
         </View>
     )
@@ -149,9 +149,9 @@ const styles = StyleSheet.create({
         flex: 1,
         position: 'relative'
     },
-    next_button: {
+    submit: {
         margin: 40,
-        alignSelf: 'stretch',
+        alignSelf: 'center',
     },
     header: {
         fontSize: normalize(25),

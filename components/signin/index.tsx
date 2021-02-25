@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, StyleSheet, ImageBackground, Image, Pressable, Keyboard } from 'react-native';
 import { colors, normalize } from '../utils/styles';
 import { UnderlineHeader, HeaderText } from '../utils';
 import LoginForm from './components/LoginForm';
@@ -18,19 +18,21 @@ export default () => {
                 end={{ x: 1, y: 1 }}
                 style={styles.container}
             >
-                <View style={styles.header}>
-                    <Image source={require('./icon.png')} style={styles.logo} />
-                    <UnderlineHeader
-                        textStyle={styles.header_text}
-                        height={10}
-                        colorFrom={colors.primary}
-                        colorTo={colors.white}
-                    >LetsLink</UnderlineHeader>
-                </View>
-                <View style={styles.content}>
-                    <HeaderText style={styles.content_header_text}>Sign In</HeaderText>
-                    <LoginForm />
-                </View>
+                <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+                    <View style={styles.header}>
+                        <Image source={require('./icon.png')} style={styles.logo} />
+                        <UnderlineHeader
+                            textStyle={styles.header_text}
+                            height={10}
+                            colorFrom={colors.primary}
+                            colorTo={colors.white}
+                        >LetsLink</UnderlineHeader>
+                    </View>
+                    <View style={styles.content}>
+                        <HeaderText style={styles.content_header_text}>Sign In</HeaderText>
+                        <LoginForm />
+                    </View>
+                </Pressable>
             </LinearGradient>
         </ImageBackground>
     )
