@@ -12,11 +12,16 @@ import { hashCode } from '../../../utils/functions';
 interface ProfileImageProps {
     set_banner: BannerDispatchActionProps['set_banner'];
     handleCameraRollPermission: () => Promise<boolean>;
+    onNext: () => void;
     profileImg: NewProfileImgProps | undefined;
     setProfileImg: (profileImg: NewProfileImgProps | undefined) => void;
 }
 
-export default ({ set_banner, handleCameraRollPermission, profileImg, setProfileImg }: ProfileImageProps) => {
+export default ({ set_banner, onNext, handleCameraRollPermission, profileImg, setProfileImg }: ProfileImageProps) => {
+
+    const handleOnNext = () => {
+        onNext()
+    }
 
     const handleOnAllowAccess = async () => {
 

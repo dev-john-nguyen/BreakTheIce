@@ -8,7 +8,7 @@ export default () => (
         <HeaderText style={styles.header}>Community Guidelines</HeaderText>
         <ScrollView style={styles.content}>
             <HeaderText style={styles.content_header}>Upload Your Own Content</HeaderText>
-            <BodyText style={styles.body_text}>Please post content that you have the rights to upload.</BodyText>
+            <BodyText style={styles.body_text}>We take copyrights seriously. Please post content that you have the rights to upload.</BodyText>
 
             <HeaderText style={styles.content_header}>Respect All Users</HeaderText>
             <BodyText style={styles.body_text}>Please take into consideration the other users and their beliefs, interests, and property. We all want a safe and open environment to meet new poeple. So with that being said, please be aware of how you treat other users.</BodyText>

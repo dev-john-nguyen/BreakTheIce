@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Keyboard, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Keyboard, Animated, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import AccountForm from './components/AccountForm';
 import { RootProps } from '../../services';
-import { UserRootStateProps, InterviewProps, NewProfileImgProps, NewGalleryItemProps } from '../../services/user/types';
+import { UserRootStateProps, UserDispatchActionsProps, InterviewProps, NewProfileImgProps, NewGalleryItemProps } from '../../services/user/types';
 import { set_banner } from '../../services/banner/actions';
 import { BannerDispatchActionProps } from '../../services/banner/tsTypes';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,6 +12,7 @@ import Interview from './components/Interview';
 import { init_user, init_account } from '../../services/signin/actions';
 import { SigninDispatchActionProps } from '../../services/signin/types';
 import GalleryForm from './components/GalleryForm';
+import { save_gallery } from '../../services/user/actions';
 import { HeaderText, CustomButton } from '../utils';
 import { normalize, colors } from '../utils/styles';
 import { FontAwesome } from '@expo/vector-icons';
@@ -39,10 +40,11 @@ interface AccountCreationProps {
     user: UserRootStateProps;
     set_banner: BannerDispatchActionProps['set_banner'];
     init_user: SigninDispatchActionProps['init_user'];
+    save_gallery: UserDispatchActionsProps['save_gallery'];
     init_account: SigninDispatchActionProps['init_account'];
 }
 
-const AccountCreation = ({ user, set_banner, init_user, init_account }: AccountCreationProps) => {
+const AccountCreation = ({ user, set_banner, init_user, save_gallery, init_account }: AccountCreationProps) => {
     const [step, setStep] = useState(0)
     const [profileImg, setProfileImg] = useState<NewProfileImgProps | undefined>();
     const [interviewVals, setInterviewVals] = useState<InterviewProps>({
@@ -140,7 +142,7 @@ const AccountCreation = ({ user, set_banner, init_user, init_account }: AccountC
                             text='I Agree To These Terms'
                             type='primary'
                             onPress={handleNext}
-                            style={{ marginBottom: 20, alignSelf: 'center' }}
+                            style={{ marginBottom: 10 }}
                         />
                     </View>
                 )
@@ -157,6 +159,7 @@ const AccountCreation = ({ user, set_banner, init_user, init_account }: AccountC
                 return <ProfileImageForm
                     set_banner={set_banner}
                     handleCameraRollPermission={handleCameraRollPermission}
+                    onNext={handleNext}
                     setProfileImg={setProfileImg}
                     profileImg={profileImg}
                 />
@@ -164,6 +167,8 @@ const AccountCreation = ({ user, set_banner, init_user, init_account }: AccountC
                 return <GalleryForm
                     handleCameraRollPermission={handleCameraRollPermission}
                     set_banner={set_banner}
+                    save_gallery={save_gallery}
+                    onNext={handleNext}
                     imgObjs={imgObjs}
                     setImgObjs={setImgObjs}
                 />
@@ -268,4 +273,4 @@ const mapStateToProps = (state: RootProps) => ({
 })
 
 
-export default connect(mapStateToProps, { set_banner, init_user, init_account })(AccountCreation);
+export default connect(mapStateToProps, { set_banner, init_user, save_gallery, init_account })(AccountCreation);

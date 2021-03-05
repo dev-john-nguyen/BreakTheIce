@@ -73,6 +73,12 @@ export default () => (
             <BodyText style={styles.body_text}>Your profile will be visible to other people around the world, so be sure that you are comfortable sharing Your Content before you post. You acknowledge and agree that Your Content may be viewed by other users, and, notwithstanding these Terms, other users may share Your Content with third parties. By uploading Your Content, you represent and warrant to us that you have all necessary rights and licenses to do so and automatically grant us a license to use Your Content.</BodyText>
             <BodyText style={styles.body_text}>You understand and agree that we may monitor or review Your Content, and we have the right to remove, delete, edit, limit, or block or prevent access to any of Your Content at any time at our sole discretion. Furthermore, you understand agree that we have no obligation to display or review Your Content.</BodyText>
 
+
+            <HeaderText style={styles.content_header}>Member Content </HeaderText>
+            <BodyText style={styles.body_text}>Other users will also share content on our Services. Member Content belongs to the user who posted the content and is stored on our servers and displayed at the direction of that user.</BodyText>
+            <BodyText style={styles.body_text}>You do not have any rights concerning Member Content, and you may only use Member Content to the extent that your use is consistent with our Services’ purpose of allowing use to communicate with and meet one another. You may not copy the Member Content or use Member Content for commercial purposes, to spam, to harass, or to make unlawful threats. We reserve the right to terminate your account if you misuse Member Content.</BodyText>
+
+
             <HeaderText style={styles.content_header}>Member Content </HeaderText>
             <BodyText style={styles.body_text}>Other users will also share content on our Services. Member Content belongs to the user who posted the content and is stored on our servers and displayed at the direction of that user.</BodyText>
             <BodyText style={styles.body_text}>You do not have any rights concerning Member Content, and you may only use Member Content to the extent that your use is consistent with our Services’ purpose of allowing use to communicate with and meet one another. You may not copy the Member Content or use Member Content for commercial purposes, to spam, to harass, or to make unlawful threats. We reserve the right to terminate your account if you misuse Member Content.</BodyText>
@@ -91,6 +97,11 @@ export default () => (
 
             <HeaderText style={styles.content_header}>Location Tracking </HeaderText>
             <BodyText style={styles.body_text}>By creating an account, you grant Letslink the right to track your location. By not authorizing the App’s access to your location data, you will not be able to access location-specific services. For more information regarding location tracking please read the Privacy Policy.</BodyText>
+
+
+            <HeaderText style={styles.content_header}>Privacy </HeaderText>
+            <BodyText style={styles.body_text}>For Information about how Letslink collects, uses, and shares your data, please visit our Privacy Policy page. By using Letslink, you acknowledge that we may use such data in our accordance with our Privacy Policy.</BodyText>
+
 
 
             <HeaderText style={styles.content_header}>Privacy </HeaderText>
@@ -116,9 +127,15 @@ ADDITIONALLY, WE DO NOT MAKE ANY WARRANTIES THAT THE APP OR SITE WILL BE UNINTER
             <BodyText style={styles.body_text}>any breach of these Terms by you</BodyText>
             <BodyText style={styles.body_text}>your violation of any law or of any rights of any third party</BodyText>
 
-            <HeaderText style={styles.content_header}>Account Termination</HeaderText>
+
+
+            <HeaderText style={styles.content_header}>Limitation of Liability </HeaderText>
+            <BodyText style={styles.body_text}>NEITHER US NOR ANY OWNER WILL BE LIABLE FOR ANY DAMAGES, DIRECT, INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR PUNITIVE, INCLUDING, WITHOUT LIMITATION, LOSS OF DATA, INCOME, PROFIT OR GOODWILL, LOSS OF OR DAMAGE TO PROPERTY AND CLAIMS OF THIRD PARTIES ARISING OUT OF YOUR ACCESS TO OR USE OF THE APP, SITE, OUR CONTENT, OR ANY MEMBER CONTENT, HOWEVER CAUSED, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), PROPRIETARY RIGHTS INFRINGEMENT, PRODUCT LIABILITY OR OTHERWISE.</BodyText>
+
+
+            <HeaderText style={styles.content_header}>Account Termination </HeaderText>
             <BodyText style={styles.body_text}>These Terms commence on the date you accept them and continue until terminated following the terms herein. If you do not accept these terms, you can terminate your account by notifying LetsLink at any time or you can personally close your account through the app. Letslink may terminate or suspend these Terms If you violate these terms, or if LetsLink is required to do so by law.</BodyText>
-            <BodyText style={styles.body_text}>If Letslink determines, in its sole discretion, that you have breached any portion of these Terms, or have otherwise demonstrated conduct inappropriate for the App, LetsLink reserves the right to terminate your account. Termination of these Terms or your Account includes the removal of access to your Account, and all related information and content associated with or inside your Account.</BodyText>
+            <BodyText style={styles.body_text}>If Letslink determines, in its sole discretion, that you have breached any portion of these Terms, or have otherwise demonstrated conduct inappropriate for the App, LetsLink reserves the right to (a) warn you via email (to any email addresses you have provided to LetsLink) that you have violated the Terms; (b) delete your User Content; (c) discontinue your Account; (d) discontinue your subscription(s); (e) notify and/or send your User Content to and/or fully cooperate with the proper law enforcement authorities for further action; and/or (f) pursue to any other action which Bumble Group deems to be appropriate. Termination of these Terms or your Account includes the removal of access to your Account, and all related information and content associated with or inside your Account.</BodyText>
 
 
             <HeaderText style={styles.content_header}>Additional </HeaderText>
